@@ -5,20 +5,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import MarketPrices from "./pages/MarketPrices";
-import Transport from "./pages/Transport";
-import Contributions from "./pages/Contributions";
-import Contact from "./pages/Contact";
-import ModDashboard from "./pages/ModDashboard";
-import ApplyModerator from "./pages/ApplyModerator";
-import ApplyContributor from "./pages/ApplyContributor";
-import Dashboard from "./pages/Dashboard";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import TermsOfService from "./pages/TermsOfService";
-import About from "./pages/About";
-import NotFound from "./pages/NotFound";
+import { lazy, Suspense } from "react";
+import RouteLoader from "@/components/RouteLoader";
+
+// Lazy load homepage
+const Index = lazy(() => import("./pages/Index"));
 
 const queryClient = new QueryClient();
 
@@ -30,22 +21,19 @@ const App = () => (
       <ErrorBoundary>
         <BrowserRouter>
           <AuthProvider>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/mod-dashboard" element={<ModDashboard />} />
-              <Route path="/apply-moderator" element={<ApplyModerator />} />
-              <Route path="/apply-contributor" element={<ApplyContributor />} />
-              <Route path="/market-prices" element={<MarketPrices />} />
-              <Route path="/transport" element={<Transport />} />
-              <Route path="/contributions" element={<Contributions />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/terms-of-service" element={<TermsOfService />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <Suspense fallback={<RouteLoader />}>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="*" element={
+                  <div className="min-h-screen flex items-center justify-center bg-background">
+                    <div className="text-center">
+                      <h1 className="text-4xl font-bold mb-2">404 - Page Not Found</h1>
+                      <p className="text-muted-foreground">The page you're looking for doesn't exist.</p>
+                    </div>
+                  </div>
+                } />
+              </Routes>
+            </Suspense>
           </AuthProvider>
         </BrowserRouter>
       </ErrorBoundary>

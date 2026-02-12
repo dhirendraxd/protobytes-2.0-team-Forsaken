@@ -111,9 +111,6 @@ const Index = () => {
           </div>
           <div className="flex items-center gap-6">
             <div className="hidden md:flex items-center gap-6">
-              <Link to="/market-prices" className="font-medium hover:text-white hover:underline transition-all duration-200">Market Prices</Link>
-              <Link to="/transport" className="font-medium hover:text-white hover:underline transition-all duration-200">Transport</Link>
-              <Link to="/contributions" className="font-medium hover:text-white hover:underline transition-all duration-200">Contributors</Link>
             </div>
             
             {isLoggedIn ? (
@@ -243,10 +240,10 @@ const Index = () => {
 
           <Card className="p-6 text-center hover:shadow-[var(--card-shadow-hover)] transition-all hover:scale-105 group">
             <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-secondary to-secondary/70 flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform">
-              <BusFront className="w-8 h-8 text-white" />
+              <Bell className="w-8 h-8 text-white" />
             </div>
-            <h3 className="font-semibold text-lg mb-2">{t('homepage.press2')}</h3>
-            <p className="text-sm text-muted-foreground">{t('homepage.transportDesc')}</p>
+            <h3 className="font-semibold text-lg mb-2">Press 2</h3>
+            <p className="text-sm text-muted-foreground">Listen to local alerts and community announcements</p>
           </Card>
 
           <Card className="p-6 text-center hover:shadow-[var(--card-shadow-hover)] transition-all hover:scale-105 group">
@@ -275,34 +272,8 @@ const Index = () => {
             <p className="text-lg text-muted-foreground">Access the same information online</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            <Link to="/market-prices" className="group">
-              <Card className="p-6 h-full hover:shadow-[var(--card-shadow-hover)] transition-all hover:scale-105 border group-hover:border-primary/50">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 w-fit mb-5">
-                  <BarChart3 className="w-9 h-9 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">Market Prices</h3>
-                <p className="text-sm text-muted-foreground mb-4">Daily updated commodity prices from local markets</p>
-                <Button className="w-full text-sm group-hover:shadow-lg transition-shadow">
-                  View Prices →
-                </Button>
-              </Card>
-            </Link>
-
-            <Link to="/transport" className="group">
-              <Card className="p-6 h-full hover:shadow-[var(--card-shadow-hover)] transition-all hover:scale-105 border group-hover:border-secondary/50">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-secondary/10 to-secondary/5 w-fit mb-5">
-                  <BusFront className="w-9 h-9 text-secondary" />
-                </div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">Transport Info</h3>
-                <p className="text-sm text-muted-foreground mb-4">Real-time bus schedules and delay alerts</p>
-                <Button className="w-full text-sm group-hover:shadow-lg transition-shadow">
-                  View Schedules →
-                </Button>
-              </Card>
-            </Link>
-
-            <Link to="/contributions?tab=alerts" className="group">
+          <div className="grid md:grid-cols-1 gap-6 max-w-2xl mx-auto">
+            <Link to="/" className="group">
               <Card className="p-6 h-full hover:shadow-[var(--card-shadow-hover)] transition-all hover:scale-105 border group-hover:border-accent/50">
                 <div className="p-3 rounded-xl bg-gradient-to-br from-accent/10 to-accent/5 w-fit mb-5">
                   <Bell className="w-9 h-9 text-accent" />
@@ -353,7 +324,7 @@ const Index = () => {
       </section>
 
       
-      <Footer showLegal={false} isLoggedIn={isLoggedIn} />
+      <Footer />
     </div>
   );
 };
