@@ -1,51 +1,56 @@
-import './App.css'
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import Index from "./pages/Index";
+import Auth from "./pages/Auth";
+import MarketPrices from "./pages/MarketPrices";
+import Transport from "./pages/Transport";
+import Contributions from "./pages/Contributions";
+import Contact from "./pages/Contact";
+import ModDashboard from "./pages/ModDashboard";
+import ApplyModerator from "./pages/ApplyModerator";
+import ApplyContributor from "./pages/ApplyContributor";
+import Dashboard from "./pages/Dashboard";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import About from "./pages/About";
+import NotFound from "./pages/NotFound";
 
-function App() {
-  return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <header className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-foreground mb-4">
-            VoiceLink
-          </h1>
-          <p className="text-xl text-muted-foreground">
-            Bridging Communities Through Voice and Technology
-          </p>
-        </header>
-        
-        <main className="max-w-4xl mx-auto">
-          <div className="bg-card border border-border rounded-lg p-8 shadow-sm">
-            <h2 className="text-2xl font-semibold mb-4">Welcome to VoiceLink</h2>
-            <p className="text-muted-foreground mb-4">
-              A comprehensive community information system designed to bridge the digital divide
-              by providing critical information to rural villages in Nepal through both voice-based
-              (IVR) and web-based interfaces.
-            </p>
-            <div className="grid md:grid-cols-3 gap-4 mt-8">
-              <div className="p-4 bg-secondary rounded-lg">
-                <h3 className="font-semibold mb-2">📊 Market Prices</h3>
-                <p className="text-sm text-muted-foreground">
-                  Real-time agricultural commodity prices
-                </p>
-              </div>
-              <div className="p-4 bg-secondary rounded-lg">
-                <h3 className="font-semibold mb-2">🚌 Transport Info</h3>
-                <p className="text-sm text-muted-foreground">
-                  Schedule and delay alerts
-                </p>
-              </div>
-              <div className="p-4 bg-secondary rounded-lg">
-                <h3 className="font-semibold mb-2">📢 Community Alerts</h3>
-                <p className="text-sm text-muted-foreground">
-                  Critical announcements and updates
-                </p>
-              </div>
-            </div>
-          </div>
-        </main>
-      </div>
-    </div>
-  )
-}
+const queryClient = new QueryClient();
 
-export default App
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <ErrorBoundary>
+        <BrowserRouter>
+          <AuthProvider>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/mod-dashboard" element={<ModDashboard />} />
+              <Route path="/apply-moderator" element={<ApplyModerator />} />
+              <Route path="/apply-contributor" element={<ApplyContributor />} />
+              <Route path="/market-prices" element={<MarketPrices />} />
+              <Route path="/transport" element={<Transport />} />
+              <Route path="/contributions" element={<Contributions />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms-of-service" element={<TermsOfService />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AuthProvider>
+        </BrowserRouter>
+      </ErrorBoundary>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
+
+export default App;
