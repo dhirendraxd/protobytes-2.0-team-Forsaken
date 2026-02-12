@@ -1,47 +1,52 @@
-# protobytes-2.0-team-Forsaken
+# VoiceLink
 
-## Team Information
+A voice-based community information system for rural villages in Nepal. Provides critical information to communities without requiring internet access.
 
-### Team Name
-Forsaken
+## Project Overview
 
-### Team Members
-- [Dhirendra] - [dhirendraxd@gmail.com] - [dhirendraxd]
-- [Hitesh] - [Email] - [GitHub Username]
-- [Ritendra] - [Email] - [GitHub Username]
-- [Shishir] - [Email] - [GitHub Username]
+**VoiceLink** bridges the digital divide by offering both:
+- **Voice-based IVR system** - No internet needed, just call
+- **Web interface** - For those with internet access
 
----
+## Features
 
-## Project Details
+- 📞 Voice-based information access (IVR system)
+- 📊 Real-time market prices
+- 🚌 Transport schedules with delay alerts
+- 📢 Community alerts and announcements
+- 👥 Community reporter network
+- 🌐 Dual language support (English & Nepali)
 
-### Project Title
-VoiceLink
+## Technology Stack
 
-### Category
-- [x] Open Innovation
+- **Frontend**: React + TypeScript + Vite
+- **UI**: shadcn/ui + Tailwind CSS
+- **Backend**: Firebase (Firestore, Authentication, Cloud Functions)
+- **Routing**: React Router
+- **State**: TanStack Query
 
-### Problem Statement
-Rural villages in Nepal face a significant information accessibility gap due to limited internet infrastructure, high data costs, and digital literacy barriers. Farmers cannot access current market prices before heading to markets, leading to unfavorable deals and exploitation by middlemen. Communities lack reliable access to transport schedules, emergency alerts, and critical announcements, leaving them isolated from vital information needed for informed decision-making.
+## Getting Started
 
-### Solution Overview
-VoiceLink is a dual-interface community information platform that bridges the digital divide by providing critical information through both voice-based (IVR) and web-based interfaces. The system enables communities without reliable internet to access real-time market prices, transport schedules, local alerts, and community announcements through simple phone calls on basic feature phones. Combined with a modern web dashboard for internet-enabled users, VoiceLink creates an inclusive, 24/7 accessible information ecosystem in Nepali and English, empowering rural communities with timely information while providing feedback channels for community-driven reporting.
+### Prerequisites
 
----
+- Node.js & npm installed ([nvm recommended](https://github.com/nvm-sh/nvm))
+- Firebase account
 
-## Technical Stack
+### Installation
 
-### Frontend
-React, TypeScript, Vite, shadcn/ui, Tailwind CSS
+```sh
+# Clone the repository
+git clone <YOUR_GIT_URL>
 
-### Backend
-Node.js, Express.js, Firebase
+# Navigate to project
+cd village-voice-hub
 
-### Database
-Firebase Firestore, PostgreSQL
+# Install dependencies
+npm install
 
-### Other Technologies
-IVR Systems (Twilio/Vonage), Redis (caching), i18next (internationalization), TanStack Query, Firebase Authentication
+# Start development server
+npm run dev
+```
 
 ### Firebase Setup
 

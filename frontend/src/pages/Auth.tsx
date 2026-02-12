@@ -1,23 +1,18 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useFormValidation, validationRules } from '@/hooks/useFormValidation';
-import { Phone, Key, Mail, ArrowLeft, Home, AlertCircle } from 'lucide-react';
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '@/config/firebase';
-import { AnonymousAlertSubmission } from '@/components/AnonymousAlertSubmission';
-import Navbar from '@/components/Navbar';
+import { Mail, AlertCircle, LogIn } from 'lucide-react';
+import BrandIcon from '@/components/BrandIcon';
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [isFirstTimeLogin, setIsFirstTimeLogin] = useState(true);
-  const { signIn, signUp, user } = useAuth();
+  const { signIn, signInWithGoogle, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -31,12 +26,6 @@ const Auth = () => {
       validationRules.required('Password is required'),
       validationRules.minLength(6, 'Password must be at least 6 characters'),
     ],
-  });
-
-  // Check if user has logged in before
-  useState(() => {
-    const hasLoggedInBefore = localStorage.getItem('hasLoggedInBefore');
-    setIsFirstTimeLogin(!hasLoggedInBefore);
   });
 
   // Redirect if already logged in
@@ -60,61 +49,22 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
-      // Verify email and password (only approved applications can be queried)
-      const applicationsRef = collection(db, "mod_applications");
-      const q = query(
-        applicationsRef,
-        where("email", "==", email),
-        where("status", "==", "approved")
-      );
-      const querySnapshot = await getDocs(q);
-
-      if (querySnapshot.empty) {
+      const { error } = await signIn(email, password);
+      if (error) {
         toast({
-          title: "Invalid Email",
-          description: "No account found with this email address.",
+          title: "Login failed",
+          description: error.message,
           variant: "destructive",
         });
         setIsLoading(false);
         return;
       }
 
-      // Get application data
-      const applicationData = querySnapshot.docs[0].data();
-      
-      // Check if application is approved
-      if (applicationData.status !== "approved") {
-        toast({
-          title: "Application Not Approved",
-          description: "Your moderator application is still pending review. You'll be able to login once it's approved.",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      }
-      
-      // Verify password
-      if (applicationData.password !== password) {
-        toast({
-          title: "Incorrect Password",
-          description: "The password you entered is incorrect. Please try again.",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      // Store application data
-      localStorage.setItem('userData', JSON.stringify(applicationData));
-      localStorage.setItem('userEmail', email);
-      localStorage.setItem('isLoggedIn', 'true');
-      
       toast({
         title: "Login Successful!",
-        description: `Welcome, ${applicationData.fullName}!`,
+        description: "Welcome back!",
       });
-      
-      // Navigate to dashboard
+
       navigate('/dashboard');
     } catch (error: any) {
       toast({
@@ -127,58 +77,66 @@ const Auth = () => {
     setIsLoading(false);
   };
 
-  // Removed signup - users get credentials immediately upon application submission
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+    try {
+      const { error } = await signInWithGoogle();
+      if (error) {
+        toast({
+          title: "Google sign-in failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      toast({
+        title: "Login Successful!",
+        description: "Signed in with Google.",
+      });
+      navigate('/dashboard');
+    } catch (error: any) {
+      toast({
+        title: "Error signing in",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+    setIsLoading(false);
+  };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header with gradient */}
-      <header className="relative animated-gradient text-primary-foreground overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSA2MCAwIEwgMCAwIDAgNjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjA1IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30"></div>
-        
-        {/* Floating particles */}
-        <div className="floating-particle w-12 h-12 left-[10%]" style={{ animation: 'float-up 15s infinite linear' }}></div>
-        <div className="floating-particle w-8 h-8 left-[25%]" style={{ animation: 'float-up 12s infinite linear 2s' }}></div>
-        <div className="floating-particle w-16 h-16 left-[40%]" style={{ animation: 'float-diagonal 18s infinite linear 1s' }}></div>
-        <div className="floating-particle w-6 h-6 left-[55%]" style={{ animation: 'float-up 10s infinite linear 3s' }}></div>
-        <div className="floating-particle w-10 h-10 left-[70%]" style={{ animation: 'float-diagonal 16s infinite linear' }}></div>
-        <div className="floating-particle w-14 h-14 left-[85%]" style={{ animation: 'float-up 14s infinite linear 4s' }}></div>
-        <div className="floating-particle w-8 h-8 left-[15%]" style={{ animation: 'float-diagonal 13s infinite linear 5s' }}></div>
-        <div className="floating-particle w-12 h-12 left-[60%]" style={{ animation: 'float-up 17s infinite linear 2.5s' }}></div>
-        
-        {/* Floating orbs */}
-        <div className="absolute top-20 right-20 w-72 h-72 bg-white/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 left-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl"></div>
-
-        <Navbar />
-
-        <div className="relative container mx-auto px-4 py-16 text-center">
-          <h1 className="text-5xl font-bold mb-3">Account Access</h1>
-          <p className="text-xl text-white/90">
-            Login as a moderator or submit a community alert
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-accent/5 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Logo Header */}
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <BrandIcon className="w-12 h-12" />
+          </div>
+          <h1 className="text-3xl font-bold text-foreground">VoiceLink</h1>
+          <p className="text-muted-foreground mt-2">Community Information Network</p>
         </div>
-      </header>
 
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-        {/* Left Side - Moderator Login */}
-        <Card className="glass-card-light border-white/40 shadow-2xl">
-          <CardHeader className="space-y-1 text-center">
-            <div className="flex justify-center mb-4">
-              <div className="p-3 rounded-full bg-primary/10">
-                <Phone className="w-8 h-8 text-primary" />
+        {/* Login Card */}
+        <Card className="border border-border/50 shadow-lg">
+          <CardHeader className="space-y-2">
+            <div className="flex items-center justify-center">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <LogIn className="w-6 h-6 text-primary" />
               </div>
             </div>
-            <CardTitle className="text-2xl font-bold">Moderator Login</CardTitle>
-            <CardDescription>Login with your email and password</CardDescription>
-            <p className="text-sm text-muted-foreground pt-2">
-              Only approved moderators can login. Check your email for approval notification.
-            </p>
+            <CardTitle className="text-2xl font-bold text-center">Login</CardTitle>
+            <CardDescription className="text-center">
+              Sign in to access your account
+            </CardDescription>
           </CardHeader>
+
           <CardContent>
             <form onSubmit={handleSignIn} className="space-y-4">
+              {/* Email Field */}
               <div className="space-y-2">
-                <Label htmlFor="email" className="flex items-center gap-2">
+                <Label htmlFor="email" className="flex items-center gap-2 text-sm font-medium">
                   <Mail className="w-4 h-4" />
                   Email Address
                 </Label>
@@ -190,63 +148,91 @@ const Auth = () => {
                   onBlur={(e) => validateField('email', e.target.value)}
                   onChange={(e) => clearFieldError('email')}
                   required
-                  className={errors.email ? 'border-red-500' : ''}
+                  className={`${errors.email ? 'border-destructive' : ''}`}
                 />
                 {errors.email && (
-                  <div className="flex items-center gap-2 text-red-500 text-sm">
+                  <div className="flex items-center gap-2 text-destructive text-sm">
                     <AlertCircle className="w-4 h-4" />
                     {errors.email}
                   </div>
                 )}
-                <p className="text-xs text-muted-foreground">
-                  Use the email you provided in your application
-                </p>
               </div>
-              
+
+              {/* Password Field */}
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-sm font-medium">
+                  Password
+                </Label>
                 <Input
                   id="password"
                   name="password"
                   type="password"
-                  placeholder="Enter your password"
+                  placeholder="••••••••"
                   onBlur={(e) => validateField('password', e.target.value)}
                   onChange={(e) => clearFieldError('password')}
                   required
-                  className={errors.password ? 'border-red-500' : ''}
+                  className={`${errors.password ? 'border-destructive' : ''}`}
                 />
                 {errors.password && (
-                  <div className="flex items-center gap-2 text-red-500 text-sm">
+                  <div className="flex items-center gap-2 text-destructive text-sm">
                     <AlertCircle className="w-4 h-4" />
                     {errors.password}
                   </div>
                 )}
-                <p className="text-xs text-muted-foreground">
-                  The password you set during application submission
-                </p>
               </div>
-              
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Verifying...' : 'Login'}
+
+              {/* Login Button */}
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={isLoading}
+                size="lg"
+              >
+                {isLoading ? 'Signing in...' : 'Sign In'}
               </Button>
-              
-              <div className="pt-4 border-t">
-                <p className="text-xs text-muted-foreground text-center">
-                  Don't have an account? <a href="/apply-moderator" className="text-primary hover:underline font-medium">Submit Application</a>
-                </p>
-                <p className="text-xs text-muted-foreground text-center mt-2">
-                  Your application will be reviewed before you can login.
-                </p>
+
+              {/* Divider */}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-border"></div>
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-2 text-muted-foreground">Or</span>
+                </div>
               </div>
+
+              {/* Google Sign In Button */}
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="w-full"
+                onClick={handleGoogleSignIn} 
+                disabled={isLoading}
+                size="lg"
+              >
+                Continue with Google
+              </Button>
             </form>
+
+            {/* Footer Text */}
+            <div className="mt-6 text-center text-xs text-muted-foreground">
+              <p>
+                Don't have an account?{' '}
+                <button
+                  onClick={() => navigate('/')}
+                  className="text-primary font-semibold hover:underline"
+                >
+                  Back to home
+                </button>
+              </p>
+            </div>
           </CardContent>
         </Card>
 
-        {/* Right Side - Submit Alert */}
-        <div>
-          <AnonymousAlertSubmission />
-        </div>
-        </div>
+        {/* Info Text */}
+        <p className="text-center text-xs text-muted-foreground mt-6">
+          Your login is secured by Firebase Authentication
+        </p>
       </div>
     </div>
   );

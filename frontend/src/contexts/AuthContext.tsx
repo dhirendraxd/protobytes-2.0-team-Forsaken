@@ -3,6 +3,8 @@ import {
   User,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
   signOut as firebaseSignOut,
   onAuthStateChanged,
   updateProfile
@@ -31,6 +33,7 @@ interface AuthContextType {
   isModerator: boolean;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signInWithGoogle: () => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   loading: boolean;
 }
@@ -71,6 +74,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
+      if (!auth || !db) {
+        return { error: new Error('Firebase not initialized') };
+      }
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       
       // Update user profile with display name
@@ -100,6 +106,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
+      if (!auth) {
+        return { error: new Error('Firebase not initialized') };
+      }
       await signInWithEmailAndPassword(auth, email, password);
       localStorage.setItem('isLoggedIn', 'true');
       
@@ -110,8 +119,44 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const signInWithGoogle = async () => {
+    try {
+      if (!auth || !db) {
+        return { error: new Error('Firebase not initialized') };
+      }
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+
+      const profileRef = doc(db, 'profiles', result.user.uid);
+      const profileSnap = await getDoc(profileRef);
+      if (!profileSnap.exists()) {
+        const profile: UserProfile = {
+          user_id: result.user.uid,
+          full_name: result.user.displayName || result.user.email || 'User',
+          email: result.user.email || '',
+          role: 'user',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        await setDoc(profileRef, profile);
+        setUserProfile(profile);
+      }
+
+      localStorage.setItem('isLoggedIn', 'true');
+      return { error: null };
+    } catch (error) {
+      const authError = error instanceof Error ? error : new Error('Google sign in failed');
+      return { error: authError };
+    }
+  };
+
   const signOut = async () => {
     try {
+      if (!auth) {
+        localStorage.removeItem('isLoggedIn');
+        window.location.href = '/';
+        return;
+      }
       await firebaseSignOut(auth);
       setUser(null);
       setUserProfile(null);
@@ -125,7 +170,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, userProfile, isModerator, signUp, signIn, signOut, loading }}>
+    <AuthContext.Provider value={{ user, userProfile, isModerator, signUp, signIn, signInWithGoogle, signOut, loading }}>
       {children}
     </AuthContext.Provider>
   );
