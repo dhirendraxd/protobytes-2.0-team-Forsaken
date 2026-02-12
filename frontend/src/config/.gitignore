@@ -1,0 +1,3 @@
+# Firebase config is now safe to commit (no sensitive data if using env vars)
+# Or keep example template only
+!firebase.ts.example
