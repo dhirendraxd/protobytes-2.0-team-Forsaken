@@ -223,5 +223,10 @@ site/
 .turbo
 *.local
 .changeset
- *.md
- 
+
+# ===================================
+# Documentation (Markdown Files)
+# ===================================
+# Ignore all markdown files except README.md
+*.md
+!README.md

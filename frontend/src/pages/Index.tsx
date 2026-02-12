@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Phone, BarChart3, BusFront, Bell, Mic2, Clock, Shield, User, LogOut, MapPin, Loader2 } from "lucide-react";
+import { Phone, BarChart3, BusFront, Bell, Mic2, Clock, Shield, User, LogOut, MapPin, Loader2, FileText, Send, CheckCircle, FolderTree } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import { Link, useNavigate } from "react-router-dom";
 import { useUserLocation } from "@/hooks/useUserLocation";
@@ -177,7 +177,10 @@ const Index = () => {
             )}
           </div>
           
-          <p className="text-xl md:text-2xl mb-12 text-white/90 max-w-3xl mx-auto">
+          <p className="text-xl md:text-2xl mb-8 text-white/90 max-w-3xl mx-auto">
+            Community-driven voice information system powered by local moderators
+          </p>
+          <p className="text-lg mb-12 text-white/80 max-w-2xl mx-auto">
             {loadingUpdates ? (
               t('homepage.loadingUpdates')
             ) : areaUpdates.length > 0 ? (
@@ -203,16 +206,16 @@ const Index = () => {
           {/* Stats with glass cards */}
           <div className="grid grid-cols-3 gap-6 max-w-3xl mx-auto">
             <div className="glass-card p-6 rounded-xl backdrop-blur-lg">
-              <p className="text-4xl md:text-5xl font-bold mb-2">2,847</p>
-              <p className="text-sm text-white/80">Calls This Week</p>
+              <p className="text-4xl md:text-5xl font-bold mb-2">12</p>
+              <p className="text-sm text-white/80">Active Briefings</p>
             </div>
             <div className="glass-card p-6 rounded-xl backdrop-blur-lg">
               <p className="text-4xl md:text-5xl font-bold mb-2">42</p>
-              <p className="text-sm text-white/80">Community Reporters</p>
+              <p className="text-sm text-white/80">Moderators</p>
             </div>
             <div className="glass-card p-6 rounded-xl backdrop-blur-lg">
-              <p className="text-4xl md:text-5xl font-bold mb-2">156</p>
-              <p className="text-sm text-white/80">Updates Today</p>
+              <p className="text-4xl md:text-5xl font-bold mb-2">247</p>
+              <p className="text-sm text-white/80">SMS Alerts Sent</p>
             </div>
           </div>
         </div>
@@ -225,69 +228,88 @@ const Index = () => {
         </div>
       </header>
 
-      {/* How It Works */}
+      {/* Moderator Portal Features */}
       <section className="container mx-auto px-4 py-14">
         <div className="text-center mb-8">
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">{t('homepage.howItWorks')}</h2>
-          <p className="text-lg text-muted-foreground">{t('homepage.simple')}</p>
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">Moderator Portal</h2>
+          <p className="text-lg text-muted-foreground">Manage community content and communications</p>
         </div>
 
         <div className="grid md:grid-cols-4 gap-6 max-w-6xl mx-auto">
           <Card className="p-6 text-center hover:shadow-[var(--card-shadow-hover)] transition-all hover:scale-105 group">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform">
-              <BarChart3 className="w-8 h-8 text-white" />
+            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform">
+              <FileText className="w-8 h-8 text-white" />
             </div>
-            <h3 className="font-semibold text-lg mb-2">{t('homepage.press1')}</h3>
-            <p className="text-sm text-muted-foreground">{t('homepage.marketPricesDesc')}</p>
+            <h3 className="font-semibold text-lg mb-2">Weekly Briefings</h3>
+            <p className="text-sm text-muted-foreground">Create and schedule IVR content with text, audio, or TTS</p>
           </Card>
 
           <Card className="p-6 text-center hover:shadow-[var(--card-shadow-hover)] transition-all hover:scale-105 group">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-secondary to-secondary/70 flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform">
-              <Bell className="w-8 h-8 text-white" />
+            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform">
+              <Send className="w-8 h-8 text-white" />
             </div>
-            <h3 className="font-semibold text-lg mb-2">Press 2</h3>
-            <p className="text-sm text-muted-foreground">Listen to local alerts and community announcements</p>
+            <h3 className="font-semibold text-lg mb-2">SMS Alerts</h3>
+            <p className="text-sm text-muted-foreground">Send urgent notifications to users by region with cost estimation</p>
           </Card>
 
           <Card className="p-6 text-center hover:shadow-[var(--card-shadow-hover)] transition-all hover:scale-105 group">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-accent to-accent/70 flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform">
-              <Bell className="w-8 h-8 text-white" />
+            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform">
+              <CheckCircle className="w-8 h-8 text-white" />
             </div>
-            <h3 className="font-semibold text-lg mb-2">{t('homepage.press3')}</h3>
-            <p className="text-sm text-muted-foreground">{t('homepage.alertsDesc')}</p>
+            <h3 className="font-semibold text-lg mb-2">Content Approval</h3>
+            <p className="text-sm text-muted-foreground">Review and approve community-submitted content</p>
           </Card>
 
           <Card className="p-6 text-center hover:shadow-[var(--card-shadow-hover)] transition-all hover:scale-105 group">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform">
-              <Mic2 className="w-8 h-8 text-white" />
+            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform">
+              <FolderTree className="w-8 h-8 text-white" />
             </div>
-            <h3 className="font-semibold text-lg mb-2">{t('homepage.press4')}</h3>
-            <p className="text-sm text-muted-foreground">{t('homepage.voiceMessageDesc')}</p>
+            <h3 className="font-semibold text-lg mb-2">Category Manager</h3>
+            <p className="text-sm text-muted-foreground">Organize content categories for IVR navigation</p>
           </Card>
         </div>
       </section>
 
-      {/* Live Information with Glassmorphism */}
-      <section className="relative py-14">
+      {/* How It Works - IVR System */}
+      <section className="relative py-14 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">Live Information</h2>
-            <p className="text-lg text-muted-foreground">Access the same information online</p>
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">How It Works</h2>
+            <p className="text-lg text-muted-foreground">Call and navigate through voice menus</p>
           </div>
 
-          <div className="grid md:grid-cols-1 gap-6 max-w-2xl mx-auto">
-            <Link to="/" className="group">
-              <Card className="p-6 h-full hover:shadow-[var(--card-shadow-hover)] transition-all hover:scale-105 border group-hover:border-accent/50">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-accent/10 to-accent/5 w-fit mb-5">
-                  <Bell className="w-9 h-9 text-accent" />
-                </div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">Local Alerts</h3>
-                <p className="text-sm text-muted-foreground mb-4">Community announcements and important updates</p>
-                <Button className="w-full text-sm group-hover:shadow-lg transition-shadow">
-                  View Alerts →
-                </Button>
-              </Card>
-            </Link>
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <Card className="p-6 h-full hover:shadow-[var(--card-shadow-hover)] transition-all hover:scale-105 border hover:border-primary/50">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 w-fit mb-5">
+                <BarChart3 className="w-9 h-9 text-primary" />
+              </div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">Press 1 - Market Prices</h3>
+              <p className="text-sm text-muted-foreground mb-4">Get real-time agricultural commodity prices for your region</p>
+            </Card>
+            
+            <Card className="p-6 h-full hover:shadow-[var(--card-shadow-hover)] transition-all hover:scale-105 border hover:border-orange-500/50">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-orange-500/10 to-orange-500/5 w-fit mb-5">
+                <Bell className="w-9 h-9 text-orange-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">Press 2 - Safety Updates</h3>
+              <p className="text-sm text-muted-foreground mb-4">Listen to emergency alerts and safety information</p>
+            </Card>
+            
+            <Card className="p-6 h-full hover:shadow-[var(--card-shadow-hover)] transition-all hover:scale-105 border hover:border-purple-500/50">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500/10 to-purple-500/5 w-fit mb-5">
+                <Bell className="w-9 h-9 text-purple-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">Press 3 - Community Notices</h3>
+              <p className="text-sm text-muted-foreground mb-4">Hear local news and community announcements</p>
+            </Card>
+            
+            <Card className="p-6 h-full hover:shadow-[var(--card-shadow-hover)] transition-all hover:scale-105 border hover:border-blue-500/50">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500/10 to-blue-500/5 w-fit mb-5">
+                <BusFront className="w-9 h-9 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">Press 4 - Transport Updates</h3>
+              <p className="text-sm text-muted-foreground mb-4">Check road conditions and transport schedules</p>
+            </Card>
           </div>
         </div>
       </section>
@@ -296,7 +318,7 @@ const Index = () => {
       <section className="container mx-auto px-4 py-14">
         <div className="text-center mb-10">
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">Why VoiceLink?</h2>
-          <p className="text-xl text-muted-foreground">Built for rural communities</p>
+          <p className="text-xl text-muted-foreground">Built for rural communities with community-driven moderation</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-10 max-w-5xl mx-auto">
@@ -305,24 +327,54 @@ const Index = () => {
               <Phone className="w-12 h-12 text-primary" />
             </div>
             <h3 className="text-2xl font-semibold text-foreground mb-3">No Internet Needed</h3>
-            <p className="text-muted-foreground text-lg">Works on any phone. Just dial and listen.</p>
+            <p className="text-muted-foreground text-lg">Works on any phone. Just dial and listen to IVR briefings.</p>
           </div>
 
           <div className="text-center">
             <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-secondary/20 to-secondary/10 flex items-center justify-center mx-auto mb-6">
-              <Clock className="w-12 h-12 text-secondary" />
+              <CheckCircle className="w-12 h-12 text-secondary" />
             </div>
-            <h3 className="text-2xl font-semibold text-foreground mb-3">Always Updated</h3>
-            <p className="text-muted-foreground text-lg">Real-time information verified by local reporters.</p>
+            <h3 className="text-2xl font-semibold text-foreground mb-3">Content Approval Workflow</h3>
+            <p className="text-muted-foreground text-lg">Community submits → Moderators review → Approved content published.</p>
           </div>
 
           <div className="text-center">
             <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center mx-auto mb-6">
-              <Shield className="w-12 h-12 text-accent" />
+              <MapPin className="w-12 h-12 text-accent" />
             </div>
-            <h3 className="text-2xl font-semibold text-foreground mb-3">Community Verified</h3>
-            <p className="text-muted-foreground text-lg">All updates moderated for accuracy.</p>
+            <h3 className="text-2xl font-semibold text-foreground mb-3">Region-Based Targeting</h3>
+            <p className="text-muted-foreground text-lg">Different regions get tailored briefings and SMS alerts.</p>
           </div>
+        </div>
+      </section>
+
+      {/* CTA for Moderators */}
+      <section className="relative py-20 animated-gradient overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSA2MCAwIEwgMCAwIDAgNjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjA1IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30"></div>
+        <div className="relative container mx-auto px-4 text-center">
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            {user ? "Access Moderator Portal" : "Join as a Moderator"}
+          </h2>
+          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+            {user 
+              ? "Manage community content, send SMS alerts, and moderate submissions" 
+              : "Sign in to access the moderator dashboard and start managing your community's content"}
+          </p>
+          {user ? (
+            <Link to="/moderator">
+              <Button size="lg" variant="secondary" className="gap-2 text-lg px-8 py-6">
+                <Shield className="w-5 h-5" />
+                Open Moderator Portal
+              </Button>
+            </Link>
+          ) : (
+            <Link to="/auth">
+              <Button size="lg" variant="secondary" className="gap-2 text-lg px-8 py-6">
+                <User className="w-5 h-5" />
+                Sign In to Continue
+              </Button>
+            </Link>
+          )}
         </div>
       </section>
 

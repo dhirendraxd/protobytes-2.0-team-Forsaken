@@ -69,6 +69,15 @@ const Dashboard = () => {
       borderColor: "border-green-500/30",
       action: () => navigate("/market-prices"),
     },
+    {
+      id: "moderator",
+      icon: <Settings className="w-6 h-6" />,
+      title: "Moderator Portal",
+      description: "Manage content and moderate community",
+      color: "from-red-500/20 to-red-600/20",
+      borderColor: "border-red-500/30",
+      action: () => navigate("/moderator"),
+    },
   ];
 
   const recentActivity = [
@@ -289,7 +298,7 @@ const Dashboard = () => {
               <h2 className="text-2xl font-bold text-foreground mb-6">
                 Quick Actions
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 {quickActions.map((action) => (
                   <button
                     key={action.id}

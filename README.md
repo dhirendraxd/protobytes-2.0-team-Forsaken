@@ -10,12 +10,24 @@ A voice-based community information system for rural villages in Nepal. Provides
 
 ## Features
 
+### User Features
 - 📞 Voice-based information access (IVR system)
 - 📊 Real-time market prices
 - 🚌 Transport schedules with delay alerts
 - 📢 Community alerts and announcements
 - 👥 Community reporter network
 - 🌐 Dual language support (English & Nepali)
+
+### Moderator Portal Features ✨
+- 📝 **Weekly Briefings Management** - Create/edit IVR content with text, audio, or TTS
+- 📱 **SMS Alert Center** - Send urgent notifications with cost estimation
+- ✅ **Content Approval Workflow** - Review and approve community submissions
+- 📁 **Category Manager** - Organize content categories for IVR navigation
+- 🌍 **Region-Based Targeting** - Tailor content to specific geographic areas
+
+> **Access**: Navigate to `/moderator` when logged in to manage community content
+
+For detailed moderator documentation, see [MODERATOR_PORTAL_DOCS.md](MODERATOR_PORTAL_DOCS.md)
 
 ## Technology Stack
 

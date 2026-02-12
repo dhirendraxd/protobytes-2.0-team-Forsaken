@@ -13,6 +13,7 @@ import { auth } from "@/config/firebase";
 const Index = lazy(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
+const ModeratorDashboard = lazy(() => import("./pages/ModeratorDashboard"));
 
 const queryClient = new QueryClient();
 
@@ -55,6 +56,14 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <Dashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/moderator"
+                  element={
+                    <ProtectedRoute>
+                      <ModeratorDashboard />
                     </ProtectedRoute>
                   }
                 />
