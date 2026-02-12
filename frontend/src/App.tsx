@@ -12,8 +12,7 @@ import { auth } from "@/config/firebase";
 // Lazy load pages
 const Index = lazy(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
-const Dashboard = lazy(() => import("./pages/Dashboard"));
-const ModeratorDashboard = lazy(() => import("./pages/ModeratorDashboard"));
+const ModerationDashboard = lazy(() => import("./pages/ModerationDashboard"));
 
 const queryClient = new QueryClient();
 
@@ -55,7 +54,7 @@ const App = () => (
                   path="/dashboard"
                   element={
                     <ProtectedRoute>
-                      <Dashboard />
+                      <ModerationDashboard />
                     </ProtectedRoute>
                   }
                 />
@@ -63,7 +62,7 @@ const App = () => (
                   path="/moderator"
                   element={
                     <ProtectedRoute>
-                      <ModeratorDashboard />
+                      <ModerationDashboard />
                     </ProtectedRoute>
                   }
                 />

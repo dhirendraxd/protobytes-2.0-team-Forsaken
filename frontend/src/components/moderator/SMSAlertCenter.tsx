@@ -12,7 +12,6 @@ import {
 import {
   Send,
   AlertTriangle,
-  DollarSign,
   CheckCircle,
   MapPin,
   Users,
@@ -23,7 +22,6 @@ interface SMSAlert {
   message: string;
   region: string;
   recipientCount: number;
-  estimatedCost: number;
 }
 
 const SMSAlertCenter = () => {
@@ -68,8 +66,6 @@ const SMSAlertCenter = () => {
   const smsCount = Math.ceil(charCount / 160) || 1;
   const selectedRegionData = regions.find((r) => r.value === region);
   const recipientCount = selectedRegionData?.count || 0;
-  const costPerSMS = 0.02; // $0.02 per SMS
-  const estimatedCost = smsCount * recipientCount * costPerSMS;
 
   const handleSend = () => {
     if (!message || !region) {
@@ -181,42 +177,6 @@ const SMSAlertCenter = () => {
             </div>
           </Card>
 
-          {/* Cost Estimation */}
-          <Card className="p-6 border border-blue-500/30 backdrop-blur-sm bg-blue-500/10">
-            <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-blue-600" />
-              Cost Estimation
-            </h3>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Recipients:</span>
-                <span className="text-foreground font-medium">
-                  {recipientCount.toLocaleString()} users
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">SMS Parts:</span>
-                <span className="text-foreground font-medium">
-                  {smsCount} message{smsCount > 1 ? "s" : ""}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Rate:</span>
-                <span className="text-foreground font-medium">
-                  ${costPerSMS.toFixed(3)} per SMS
-                </span>
-              </div>
-              <div className="pt-3 border-t border-border/50 flex justify-between items-center">
-                <span className="text-foreground font-bold">
-                  Estimated Cost:
-                </span>
-                <span className="text-xl font-bold text-blue-600">
-                  ${estimatedCost.toFixed(2)}
-                </span>
-              </div>
-            </div>
-          </Card>
-
           {/* Send Button */}
           <Button
             onClick={handleSend}
@@ -270,12 +230,6 @@ const SMSAlertCenter = () => {
                     </span>
                     <p className="text-sm text-foreground font-medium">
                       {recipientCount.toLocaleString()}
-                    </p>
-                  </div>
-                  <div>
-                    <span className="text-xs text-muted-foreground">Cost:</span>
-                    <p className="text-sm text-foreground font-medium">
-                      ${estimatedCost.toFixed(2)}
                     </p>
                   </div>
                 </div>
@@ -346,7 +300,7 @@ const SMSAlertCenter = () => {
                   <li>• Always verify the message and target region</li>
                   <li>• Use urgency levels appropriately to avoid alert fatigue</li>
                   <li>• All alerts are logged and can be audited</li>
-                  <li>• Consider cost impact before sending to all regions</li>
+                  <li>• Free SMS service - no sending costs</li>
                 </ul>
               </div>
             </div>

@@ -14,6 +14,7 @@ import {
   Calendar,
   MapPin,
   LogOut,
+  AlertTriangle,
 } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import { useState } from "react";
@@ -22,6 +23,7 @@ import BriefingEditor from "@/components/moderator/BriefingEditor";
 import CategoryManager from "@/components/moderator/CategoryManager";
 import SMSAlertCenter from "@/components/moderator/SMSAlertCenter";
 import ContentApproval from "@/components/moderator/ContentApproval";
+import DisasterMonitor from "@/components/moderator/DisasterMonitor";
 
 const ModeratorDashboard = () => {
   const navigate = useNavigate();
@@ -103,6 +105,15 @@ const ModeratorDashboard = () => {
       color: "from-purple-500/20 to-purple-600/20",
       borderColor: "border-purple-500/30",
       action: () => setActiveSection("categories"),
+    },
+    {
+      id: "disaster-monitor",
+      title: "Disaster Alerts",
+      description: "Monitor emergencies (ReliefWeb)",
+      icon: <AlertTriangle className="w-6 h-6" />,
+      color: "from-red-500/20 to-red-600/20",
+      borderColor: "border-red-500/30",
+      action: () => setActiveSection("disasters"),
     },
   ];
 
@@ -216,7 +227,7 @@ const ModeratorDashboard = () => {
           <h2 className="text-2xl font-bold text-foreground mb-4">
             Quick Actions
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             {quickActions.map((action) => (
               <button
                 key={action.id}
@@ -242,11 +253,12 @@ const ModeratorDashboard = () => {
 
         {/* Main Content Tabs */}
         <Tabs value={activeSection} onValueChange={setActiveSection}>
-          <TabsList className="grid grid-cols-5 w-full mb-6">
+          <TabsList className="grid grid-cols-6 w-full mb-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="briefings">Briefings</TabsTrigger>
             <TabsTrigger value="categories">Categories</TabsTrigger>
             <TabsTrigger value="sms">SMS Alerts</TabsTrigger>
+            <TabsTrigger value="disasters">Disasters</TabsTrigger>
             <TabsTrigger value="approvals">Approvals</TabsTrigger>
           </TabsList>
 
@@ -295,6 +307,11 @@ const ModeratorDashboard = () => {
           {/* SMS Tab */}
           <TabsContent value="sms">
             <SMSAlertCenter />
+          </TabsContent>
+
+          {/* Disasters Tab */}
+          <TabsContent value="disasters">
+            <DisasterMonitor />
           </TabsContent>
 
           {/* Approvals Tab */}
