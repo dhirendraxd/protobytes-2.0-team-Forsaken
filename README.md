@@ -42,3 +42,54 @@ Firebase Firestore, PostgreSQL
 
 ### Other Technologies
 IVR Systems (Twilio/Vonage), Redis (caching), i18next (internationalization), TanStack Query, Firebase Authentication
+
+### Firebase Setup
+
+Firebase is already configured with credentials. You just need to enable services:
+
+1. Go to [Firebase Console](https://console.firebase.google.com)
+2. Open project: **yadu-portfolio**
+3. Enable **Authentication** (Email/Password)
+4. Create **Firestore Database**
+5. Add sample data to collections (see `FIREBASE_SETUP.md`)
+
+**No environment variables needed** - credentials are in `src/config/firebase.ts`
+
+## Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+
+## Project Structure
+
+```
+src/
+├── components/      # Reusable UI components
+├── contexts/        # React contexts (Auth, etc.)
+├── hooks/          # Custom hooks
+├── lib/            # Utilities
+├── pages/          # Route components
+└── config/         # Configuration files
+```
+
+## IVR System
+
+When users call the hotline:
+- **Press 1**: Market prices
+- **Press 2**: Transport schedules  
+- **Press 3**: Local alerts
+- **Press 4**: Leave voice message
+
+## Contributing
+
+This is a community-driven project aimed at empowering rural communities. Contributions are welcome!
+
+## License
+
+MIT
+
+---
+
+Built with ❤️ for rural communities in Nepal

@@ -223,4 +223,5 @@ site/
 .turbo
 *.local
 .changeset
+ *.md
  
