@@ -2,13 +2,14 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Phone, BarChart3, BusFront, Bell, Mic2, Clock, Shield, User, LogOut, MapPin, Loader2 } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useUserLocation } from "@/hooks/useUserLocation";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import Footer from "@/components/Footer";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +20,8 @@ import {
 const Index = () => {
   const location = useUserLocation();
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
   const [areaUpdates, setAreaUpdates] = useState<Array<{
     id: string;
     title?: string;
@@ -27,12 +30,6 @@ const Index = () => {
     [key: string]: unknown;
   }>>([]);
   const [loadingUpdates, setLoadingUpdates] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const loggedIn = localStorage.getItem('isLoggedIn');
-    setIsLoggedIn(!!loggedIn);
-  }, []);
 
   useEffect(() => {
     const fetchAreaUpdates = async () => {
@@ -62,12 +59,6 @@ const Index = () => {
 
     fetchAreaUpdates();
   }, [location.city, location.loading]);
-
-  useEffect(() => {
-    // Check if moderator is logged in
-    const loggedIn = localStorage.getItem('isLoggedIn');
-    setIsLoggedIn(!!loggedIn);
-  }, []);
 
   // Get user data from localStorage for footer
   const [userData, setUserData] = useState<{fullName?: string; email?: string} | null>(null);
@@ -113,24 +104,32 @@ const Index = () => {
             <div className="hidden md:flex items-center gap-6">
             </div>
             
-            {isLoggedIn ? (
-              <Link to="/dashboard" className="font-medium hover:text-white hover:underline transition-all duration-200">
-                {t('navigation.dashboard')}
-              </Link>
-            ) : (
-              <Link to="/auth" className="font-medium hover:text-white hover:underline transition-all duration-200">
-                {t('navigation.auth')}
-              </Link>
-            )}
-            
-            {isLoggedIn && (
+            {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full bg-white/10 hover:bg-white/20">
-                    <User className="w-5 h-5" />
+                  <Button variant="ghost" size="sm" className="gap-2 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition-all">
+                    {user.photoURL ? (
+                      <img
+                        src={user.photoURL}
+                        alt="Profile"
+                        className="w-6 h-6 rounded-full"
+                      />
+                    ) : (
+                      <User className="w-5 h-5" />
+                    )}
+                    <span className="hidden sm:inline truncate max-w-[120px]">
+                      {user.displayName || user.email?.split("@")[0] || "Profile"}
+                    </span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="px-2 py-1.5 text-sm font-semibold text-foreground">
+                    {user.displayName || "User"}
+                  </div>
+                  <div className="px-2 py-1 text-xs text-muted-foreground truncate">
+                    {user.email}
+                  </div>
+                  <div className="my-1 border-t border-border/50" />
                   <DropdownMenuItem asChild>
                     <Link to="/dashboard" className="cursor-pointer">
                       <Shield className="w-4 h-4 mr-2" />
@@ -138,18 +137,22 @@ const Index = () => {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/" onClick={() => {
-                      localStorage.removeItem('isLoggedIn');
-                      localStorage.removeItem('userData');
-                      localStorage.removeItem('userEmail');
-                      window.location.href = '/';
-                    }} className="cursor-pointer text-red-600">
-                      <LogOut className="w-4 h-4 mr-2" />
-                      {t('navigation.logout')}
-                    </Link>
+                    <button
+                      onClick={async () => {
+                        await signOut();
+                      }}
+                      className="cursor-pointer text-red-600 w-full text-left"
+                    >
+                      <LogOut className="w-4 h-4 mr-2 inline" />
+                      {t("navigation.logout")}
+                    </button>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+            ) : (
+              <Link to="/auth" className="px-4 py-2 rounded-lg bg-white/20 hover:bg-white/30 text-white font-medium transition-all">
+                {t("navigation.auth")}
+              </Link>
             )}
           </div>
         </nav>

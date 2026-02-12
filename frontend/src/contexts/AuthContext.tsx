@@ -40,6 +40,20 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const toFriendlyAuthError = (error: unknown, fallbackMessage: string): Error => {
+  const authError = error as { code?: string; message?: string } | null;
+  const code = authError?.code || '';
+  const message = authError?.message || '';
+
+  if (code === 'auth/unauthorized-domain' || message.includes('auth/unauthorized-domain')) {
+    return new Error(
+      'This app domain is not authorized in Firebase Authentication. Add localhost and 127.0.0.1 to Firebase Console -> Authentication -> Settings -> Authorized domains.'
+    );
+  }
+
+  return error instanceof Error ? error : new Error(fallbackMessage);
+};
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -99,7 +113,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       return { error: null };
     } catch (error) {
-      const authError = error instanceof Error ? error : new Error('Sign up failed');
+      const authError = toFriendlyAuthError(error, 'Sign up failed');
       return { error: authError };
     }
   };
@@ -114,7 +128,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       return { error: null };
     } catch (error) {
-      const authError = error instanceof Error ? error : new Error('Sign in failed');
+      const authError = toFriendlyAuthError(error, 'Sign in failed');
       return { error: authError };
     }
   };
@@ -145,7 +159,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       localStorage.setItem('isLoggedIn', 'true');
       return { error: null };
     } catch (error) {
-      const authError = error instanceof Error ? error : new Error('Google sign in failed');
+      const authError = toFriendlyAuthError(error, 'Google sign in failed');
       return { error: authError };
     }
   };
