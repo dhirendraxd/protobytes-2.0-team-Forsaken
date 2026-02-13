@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
-  Home,
   FileText,
   Bell,
   CheckCircle,
@@ -13,7 +12,6 @@ import {
   TrendingUp,
   Calendar,
   MapPin,
-  LogOut,
   AlertTriangle,
 } from "lucide-react";
 import { useState } from "react";
@@ -23,15 +21,12 @@ import CategoryManager from "@/components/moderator/CategoryManager";
 import SMSAlertCenter from "@/components/moderator/SMSAlertCenter";
 import ContentApproval from "@/components/moderator/ContentApproval";
 import DisasterMonitor from "@/components/moderator/DisasterMonitor";
+import Navbar from "@/components/Navbar";
 
 const ModeratorDashboard = () => {
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const [activeSection, setActiveSection] = useState("overview");
-
-  const handleLogout = async () => {
-    await signOut();
-  };
 
   const stats = [
     {
@@ -145,40 +140,9 @@ const ModeratorDashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#f3f3f3]">
-      {/* Navbar */}
-      <nav className="sticky top-0 z-50 border-b border-black/5 bg-[#efefef]">
-        <div className="mx-auto w-full max-w-[1680px] px-4 py-4 sm:px-6 lg:px-10 flex items-center justify-between">
-          <a href="/" className="flex items-center gap-2 text-sm font-semibold text-black">
-            <span>VoiceLink</span>
-            <span className="inline-block h-4 w-4 rounded-full bg-lime-300" />
-            <span className="hidden sm:inline text-xs text-black/50">Moderator Portal</span>
-          </a>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Button
-              onClick={() => navigate("/")}
-              variant="ghost"
-              size="sm"
-              className="h-8 rounded-full px-3 text-xs text-black/70 hover:text-black"
-            >
-              <Home className="mr-1 h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Home</span>
-            </Button>
-            <Button
-              onClick={handleLogout}
-              variant="ghost"
-              size="sm"
-              className="h-8 rounded-full px-3 text-xs text-black/50 hover:text-red-500"
-              title="Sign out"
-            >
-              <LogOut className="h-3.5 w-3.5" />
-              <span className="sr-only">Logout</span>
-            </Button>
-          </div>
-        </div>
-      </nav>
+      <div className="mx-auto w-full max-w-[1680px] px-4 py-6 sm:px-6 lg:px-10">
+        <Navbar />
 
-      {/* Main Content */}
-      <div className="mx-auto w-full max-w-[1680px] px-4 py-8 sm:px-6 lg:px-10">
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-[40px] font-semibold leading-[0.95] tracking-[-0.03em] text-black sm:text-[48px] lg:text-[56px] mb-2">

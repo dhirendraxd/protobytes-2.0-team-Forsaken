@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Mail, Lock, Loader2, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import Navbar from "@/components/Navbar";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -69,33 +70,36 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center p-4">
-      <div className="w-full max-w-[1400px] rounded-[32px] bg-white shadow-2xl overflow-hidden">
-        <div className="grid lg:grid-cols-2">
+    <div className="min-h-screen bg-[#f3f3f3]">
+      <div className="mx-auto w-full max-w-[1680px] px-4 py-6 sm:px-6 lg:px-10">
+        <Navbar />
+        <div className="flex items-center justify-center min-h-[calc(100vh-120px)]">
+          <div className="w-full max-w-[1500px] rounded-[32px] bg-white shadow-2xl overflow-hidden">
+        <div className="grid lg:grid-cols-2 min-h-[700px]">
           {/* Left Side - Form */}
-          <div className="p-8 lg:p-12">
+          <div className="p-10 lg:p-16 flex flex-col justify-center">
             {/* Logo */}
-            <div className="mb-8 flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-black">
-                <span className="text-lg font-bold text-lime-300">V</span>
+            <div className="mb-10 flex items-center gap-2">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-black">
+                <span className="text-xl font-bold text-lime-300">V</span>
               </div>
-              <span className="text-xl font-bold text-black">VoiceLink</span>
+              <span className="text-2xl font-bold text-black">VoiceLink</span>
             </div>
 
             {/* Welcome Text */}
-            <div className="mb-6">
-              <h1 className="text-3xl font-bold text-black">Welcome Back!</h1>
-              <p className="mt-2 text-sm text-gray-500">We Are Happy To See You Again</p>
+            <div className="mb-8">
+              <h1 className="text-4xl font-bold text-black">Welcome Back!</h1>
+              <p className="mt-3 text-base text-gray-500">We Are Happy To See You Again</p>
             </div>
 
             {/* Tabs */}
-            <div className="mb-6 flex gap-2">
+            <div className="mb-8 flex gap-2">
               <button
                 onClick={() => setActiveTab("signin")}
                 className={`flex-1 rounded-full px-6 py-2.5 text-sm font-semibold transition-all ${
                   activeTab === "signin"
                     ? "bg-black text-white shadow-md"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-300 hover:text-black"
                 }`}
               >
                 Sign in
@@ -105,7 +109,7 @@ const Auth = () => {
                 className={`flex-1 rounded-full px-6 py-2.5 text-sm font-semibold transition-all ${
                   activeTab === "signup"
                     ? "bg-black text-white shadow-md"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-300 hover:text-black"
                 }`}
               >
                 Sign Up
@@ -121,7 +125,7 @@ const Auth = () => {
             )}
 
             {/* Form */}
-            <form onSubmit={handleEmailSignIn} className="space-y-4">
+            <form onSubmit={handleEmailSignIn} className="space-y-5">
               {/* Email Input */}
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
@@ -151,7 +155,7 @@ const Auth = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black transition-colors"
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
@@ -170,7 +174,7 @@ const Auth = () => {
                     Remember me
                   </label>
                 </div>
-                <a href="#" className="text-sm font-medium text-black hover:underline">
+                <a href="#" className="text-sm font-medium text-black hover:text-lime-600 hover:underline transition-colors">
                   Forgot Password?
                 </a>
               </div>
@@ -179,7 +183,7 @@ const Auth = () => {
               <Button
                 type="submit"
                 disabled={isSubmitting || !email || !password}
-                className="h-12 w-full rounded-full bg-black text-white hover:bg-gray-800"
+                className="h-12 w-full rounded-full bg-black text-white hover:bg-lime-600 transition-all duration-200 disabled:opacity-50 disabled:hover:bg-black"
               >
                 {isSubmitting ? (
                   <>
@@ -193,7 +197,7 @@ const Auth = () => {
             </form>
 
             {/* Divider */}
-            <div className="relative my-6">
+            <div className="relative my-8">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-200" />
               </div>
@@ -206,21 +210,10 @@ const Auth = () => {
             <div className="space-y-3">
               <Button
                 type="button"
-                variant="outline"
-                className="flex h-12 w-full items-center justify-center gap-2 rounded-full border-gray-200 bg-black text-white hover:bg-gray-800"
-              >
-                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
-                </svg>
-                Log in with Apple
-              </Button>
-
-              <Button
-                type="button"
                 onClick={handleGoogleSignIn}
                 disabled={isSubmitting}
                 variant="outline"
-                className="flex h-12 w-full items-center justify-center gap-2 rounded-full border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-full border-2 border-black bg-black text-white hover:bg-blue-400 hover:border-blue-400 hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:hover:bg-black disabled:hover:shadow-none"
               >
                 <svg className="h-5 w-5" viewBox="0 0 24 24">
                   <path
@@ -247,8 +240,20 @@ const Auth = () => {
 
           {/* Right Side - Decorative */}
           <div className="relative hidden lg:block bg-gradient-to-br from-lime-600 via-lime-500 to-lime-700 overflow-hidden">
+            {/* Catchy Text Content */}
+            <div className="relative z-10 flex flex-col justify-center items-center h-full px-12 text-center">
+              <div className="space-y-6">
+                <h2 className="text-7xl font-bold text-white leading-tight">
+                  Connect.<br />Engage.<br />Succeed.
+                </h2>
+                <p className="text-xl text-white/80 font-light max-w-md">
+                  Powerful messaging for modern businesses
+                </p>
+              </div>
+            </div>
+
             {/* Abstract Wave Pattern */}
-            <div className="absolute inset-0">
+            <div className="absolute inset-0 opacity-20">
               <svg className="h-full w-full" viewBox="0 0 400 600" preserveAspectRatio="xMidYMid slice">
                 <defs>
                   <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -316,6 +321,8 @@ const Auth = () => {
         </div>
       </div>
     </div>
+  </div>
+</div>
   );
 };
 

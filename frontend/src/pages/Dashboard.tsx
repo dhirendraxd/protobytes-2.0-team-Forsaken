@@ -3,11 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
-  LogOut,
   User,
   Mail,
-  Shield,
-  Home,
   Bell,
   Users,
   Phone,
@@ -17,8 +14,11 @@ import {
   AlertCircle,
   TrendingUp,
   Settings,
+  Shield,
+  LogOut,
 } from "lucide-react";
 import { useState } from "react";
+import Navbar from "@/components/Navbar";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -101,7 +101,7 @@ const Dashboard = () => {
       color:
         user?.emailVerified ?
           "text-green-600" : "text-yellow-600",
-      icon: <Shield className="w-5 h-5" />,
+      icon: <Mail className="w-5 h-5" />,
     },
     {
       label: "Auth Method",
@@ -110,55 +110,15 @@ const Dashboard = () => {
           ? "Google"
           : "Email",
       color: "text-blue-600",
-      icon: <Shield className="w-5 h-5" />,
+      icon: <Mail className="w-5 h-5" />,
     },
   ];
 
   return (
     <div className="min-h-screen bg-[#f3f3f3]">
-      <nav className="sticky top-0 z-50 border-b border-black/5 bg-[#efefef]">
-        <div className="mx-auto w-full max-w-[1680px] px-4 py-4 sm:px-6 lg:px-10 flex items-center justify-between">
-          <a href="/" className="flex items-center gap-2 text-sm font-semibold text-black">
-            <span>VoiceLink</span>
-            <span className="inline-block h-4 w-4 rounded-full bg-lime-300" />
-          </a>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Button
-              onClick={() => navigate("/")}
-              variant="ghost"
-              size="sm"
-              className="h-8 rounded-full px-3 text-xs text-black/70 hover:text-black"
-              title="Go to Homepage"
-            >
-              <Home className="mr-1 h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Home</span>
-            </Button>
-            <Button
-              onClick={() => navigate("/alerts")}
-              variant="ghost"
-              size="sm"
-              className="h-8 rounded-full px-3 text-xs text-black/70 hover:text-black"
-              title="View Alerts"
-            >
-              <Bell className="mr-1 h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Alerts</span>
-            </Button>
-            <Button
-              onClick={handleLogout}
-              variant="ghost"
-              size="sm"
-              className="h-8 rounded-full px-3 text-xs text-black/50 hover:text-red-500"
-              title="Sign out"
-            >
-              <LogOut className="h-3.5 w-3.5" />
-              <span className="sr-only">Logout</span>
-            </Button>
-          </div>
-        </div>
-      </nav>
+      <div className="mx-auto w-full max-w-[1680px] px-4 py-6 sm:px-6 lg:px-10">
+        <Navbar />
 
-      {/* Main Content */}
-      <div className="mx-auto w-full max-w-[1680px] px-4 py-8 sm:px-6 lg:px-10">
         {/* Welcome Section */}
         <div className="mb-12">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">

@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   ArrowRight,
   BadgePercent,
@@ -6,84 +7,18 @@ import {
   CircleArrowOutUpRight,
   Clock3,
   Headphones,
-  LogOut,
-  Shield,
-  User,
+  Facebook,
+  Twitter,
+  Instagram,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import Navbar from "@/components/Navbar";
 
 const Index = () => {
-  const { user, signOut } = useAuth();
-
   return (
     <div className="min-h-screen bg-[#f3f3f3]">
-      <div className="mx-auto w-full max-w-[1680px] px-4 pb-10 pt-6 sm:px-6 lg:px-10">
-        <nav className="mb-6 flex items-center justify-between bg-[#efefef] px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-1 text-sm font-semibold text-black">
-            <span>VoiceLink</span>
-            <span className="inline-block h-4 w-4 rounded-full bg-lime-300" />
-          </div>
-
-          <div className="hidden items-center gap-7 text-[11px] font-medium text-black/70 md:flex">
-            <a href="#features">Features</a>
-            <a href="#pricing">Pricing</a>
-            <a href="#why">Why Us</a>
-            <a href="#contact">Contact</a>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-8 rounded-full px-3 text-xs text-gray-900 hover:bg-black/5">
-                    {user.photoURL ? (
-                      <img src={user.photoURL} alt="Profile" className="h-5 w-5 rounded-full" />
-                    ) : (
-                      <User className="h-4 w-4" />
-                    )}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-40">
-                  <DropdownMenuItem asChild>
-                    <Link to="/dashboard" className="cursor-pointer text-xs">
-                      <Shield className="mr-2 h-3.5 w-3.5" />
-                      Dashboard
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <button
-                      onClick={async () => await signOut()}
-                      className="w-full cursor-pointer text-left text-xs text-red-600"
-                    >
-                      <LogOut className="mr-2 inline h-3.5 w-3.5" />
-                      Logout
-                    </button>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <>
-                <Link to="/auth">
-                  <Button variant="ghost" size="sm" className="h-8 rounded-full bg-black/5 px-3 text-[11px] text-black">
-                    Log In
-                  </Button>
-                </Link>
-                <Link to="/auth">
-                  <Button size="sm" className="h-8 rounded-full bg-black px-4 text-[11px] text-white hover:bg-black/90">
-                    Download App
-                  </Button>
-                </Link>
-              </>
-            )}
-          </div>
-        </nav>
+      <div className="mx-auto w-full max-w-[1680px] px-4 pt-6 sm:px-6 lg:px-10">
+        <Navbar />
 
         <section className="relative mb-16 overflow-hidden rounded-[26px] bg-lime-300 px-6 pb-10 pt-10 sm:px-8 lg:px-12">
           <div className="grid gap-10 lg:grid-cols-2">
@@ -419,33 +354,63 @@ const Index = () => {
           </Link>
         </section>
 
-        <footer className="grid gap-8 bg-black px-6 py-12 text-white sm:px-8 lg:grid-cols-4 lg:px-12">
-          <div className="text-sm font-semibold">
-            VoiceLink
-            <span className="ml-1 inline-block h-4 w-4 rounded-full bg-lime-300 align-middle" />
-          </div>
-          <div>
-            <h3 className="mb-3 text-xs font-semibold text-white/95">Platform</h3>
-            <ul className="space-y-1 text-xs text-white/60">
-              <li><a href="#features" className="hover:text-white">Features</a></li>
-              <li><a href="#pricing" className="hover:text-white">Pricing</a></li>
-              <li><a href="#">API Docs</a></li>
-              <li><a href="#">Status</a></li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="mb-3 text-xs font-semibold text-white/95">Company</h3>
-            <ul className="space-y-1 text-xs text-white/60">
-              <li><a href="#">About</a></li>
-              <li><a href="#">Blog</a></li>
-              <li><a href="#">Privacy</a></li>
-              <li><a href="#">Terms</a></li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="mb-3 text-xs font-semibold text-white/95">Get Support</h3>
-            <p className="text-xs text-white/60">Need help? Contact our support team 24/7</p>
-            <a href="mailto:support@voicelink.com" className="mt-3 text-xs text-lime-300 hover:text-lime-200">support@voicelink.com</a>
+        <footer className="mt-16 rounded-t-[26px] bg-black px-6 py-12 text-white sm:px-8 lg:px-12 -mx-4 sm:-mx-6 lg:-mx-10">
+          <div className="grid gap-12 lg:grid-cols-4 items-start">
+            {/* Logo */}
+            <div>
+              <div className="flex items-center gap-1.5 text-lg font-semibold">
+                <span>VoiceLink</span>
+                <span className="inline-block h-5 w-5 rounded-full bg-lime-300" />
+              </div>
+            </div>
+
+            {/* Resources */}
+            <div>
+              <h3 className="mb-4 text-sm font-semibold text-white">Resources</h3>
+              <ul className="space-y-2.5 text-sm text-white/60">
+                <li><a href="#" className="hover:text-white transition-colors">Stocks & Founds</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Learn</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Help & Support</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
+              </ul>
+            </div>
+
+            {/* Company */}
+            <div>
+              <h3 className="mb-4 text-sm font-semibold text-white">Company</h3>
+              <ul className="space-y-2.5 text-sm text-white/60">
+                <li><a href="#" className="hover:text-white transition-colors">About</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Privacy</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Terms</a></li>
+              </ul>
+            </div>
+
+            {/* Subscribe to News */}
+            <div>
+              <h3 className="mb-4 text-sm font-semibold text-white">Subscribe to News</h3>
+              <div className="relative mb-6">
+                <Input
+                  type="email"
+                  placeholder="Your e-mail"
+                  className="h-12 rounded-full border-white/20 bg-white/10 pr-14 text-white placeholder:text-white/50 focus-visible:ring-lime-300"
+                />
+                <button className="absolute right-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-lime-300 text-black hover:bg-lime-400 transition-colors">
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="flex gap-4">
+                <a href="#" className="text-white/60 hover:text-white transition-colors">
+                  <Facebook className="h-5 w-5" />
+                </a>
+                <a href="#" className="text-white/60 hover:text-white transition-colors">
+                  <Twitter className="h-5 w-5" />
+                </a>
+                <a href="#" className="text-white/60 hover:text-white transition-colors">
+                  <Instagram className="h-5 w-5" />
+                </a>
+              </div>
+            </div>
           </div>
         </footer>
       </div>
