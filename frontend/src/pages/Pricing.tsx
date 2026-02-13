@@ -230,12 +230,12 @@ const Pricing = () => {
           </div>
         </section>
 
-        {/* Voice IVR Feature Section */}
-        <section id="voice-ivr" className="mb-16 scroll-mt-20">
+        {/* Voice Feature Section */}
+        <section id="voice-messages" className="mb-16 scroll-mt-20">
           <div className="rounded-[26px] bg-gradient-to-br from-black to-[#1a1a1a] px-6 py-12 text-white sm:px-8 lg:px-12">
             <div className="mx-auto max-w-4xl">
               <h2 className="mb-4 text-[40px] font-semibold leading-[0.95] tracking-[-0.03em] sm:text-[48px]">
-                Voice Messages & IVR
+                Voice Messages
               </h2>
               <p className="mb-6 max-w-2xl text-lg text-white/75">
                 Automated voice calls with Text-to-Speech or custom audio for alerts, confirmations, and important notifications. Reach customers even when they can't read SMS.
@@ -262,8 +262,8 @@ const Pricing = () => {
                     <li className="flex items-start gap-3">
                       <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-lime-300" />
                       <div>
-                        <p className="font-semibold">IVR Integration</p>
-                        <p className="text-sm text-white/70">Allow customers to interact via phone keypad</p>
+                        <p className="font-semibold">Voice Routing</p>
+                        <p className="text-sm text-white/70">Route calls to the right message flow automatically</p>
                       </div>
                     </li>
                     <li className="flex items-start gap-3">
@@ -287,7 +287,7 @@ const Pricing = () => {
                     <div className="rounded-xl bg-white/10 p-4 border-2 border-lime-300">
                       <p className="text-sm text-white/70">Professional Plan</p>
                       <p className="text-2xl font-bold">रू 8,999<span className="text-base font-normal text-white/60">/month</span></p>
-                      <p className="mt-2 text-xs text-white/60">7,500 voice minutes/month + IVR features</p>
+                      <p className="mt-2 text-xs text-white/60">7,500 voice minutes/month + automation features</p>
                     </div>
                     <div className="rounded-xl bg-white/10 p-4 border border-white/20">
                       <p className="text-sm text-white/70">Add-on Voice</p>

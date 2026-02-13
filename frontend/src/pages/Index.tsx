@@ -129,7 +129,7 @@ const Index = () => {
               <p className="mt-3 max-w-[350px] text-sm leading-relaxed text-black/65">
                 {t('voicelink.features.voiceIvrDesc')}
               </p>
-              <Link to="/pricing#voice-ivr" className="mt-6 inline-flex items-center gap-1 text-xs font-semibold text-black">
+              <Link to="/pricing#voice-messages" className="mt-6 inline-flex items-center gap-1 text-xs font-semibold text-black">
                 Learn more
                 <ArrowRight className="h-3 w-3" />
               </Link>

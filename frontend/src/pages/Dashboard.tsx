@@ -31,7 +31,7 @@ import {
 type Campaign = {
   id: number;
   name: string;
-  channel: "SMS" | "Voice" | "IVR" | "Email";
+  channel: "SMS" | "Voice" | "Email";
   audience: string;
   category: "Promotion" | "Announcement" | "Reminder" | "Event" | "Survey" | "Custom";
   objective: "Awareness" | "Engagement" | "Conversion" | "Retention" | "Feedback";
@@ -65,6 +65,18 @@ type ActivityEntry = {
   title: string;
   detail: string;
   time: string;
+};
+
+type CampaignLaunchResult = {
+  id: number;
+  campaignName: string;
+  channel: Campaign["channel"];
+  audience: string;
+  targeted: number;
+  delivered: number;
+  failed: number;
+  responseRate: number;
+  launchedAt: string;
 };
 
 type BulkImportReport = {
@@ -103,10 +115,16 @@ const CAMPAIGN_TEMPLATES: Record<Campaign["category"], string> = {
   Custom: "Hi {{name}}, write your custom campaign message here.",
 };
 
+const normalizeCampaignChannel = (channel: unknown): Campaign["channel"] => {
+  if (channel === "SMS" || channel === "Voice" || channel === "Email") return channel;
+  if (channel === "IVR") return "Voice";
+  return "SMS";
+};
+
 const normalizeCampaign = (raw: Partial<Campaign>): Campaign => ({
   id: raw.id ?? Date.now(),
   name: raw.name?.trim() || "Untitled Campaign",
-  channel: raw.channel ?? "SMS",
+  channel: normalizeCampaignChannel(raw.channel),
   audience: raw.audience?.trim() || "All Contacts",
   category: raw.category ?? "Promotion",
   objective: raw.objective ?? "Awareness",
@@ -243,6 +261,7 @@ const Dashboard = () => {
   });
   const [campaignError, setCampaignError] = useState("");
   const [editingCampaignId, setEditingCampaignId] = useState<number | null>(null);
+  const [lastLaunchResult, setLastLaunchResult] = useState<CampaignLaunchResult | null>(null);
 
   const [contactForm, setContactForm] = useState({
     name: "",
@@ -475,6 +494,37 @@ const Dashboard = () => {
     setSelectedContactIds([]);
   };
 
+  const getAudienceSize = (audience: string) => {
+    if (audience === "All Contacts" || audience === "Selected Contacts") return contacts.length;
+    if (audience.endsWith(" Contacts")) {
+      const city = audience.replace(" Contacts", "").trim().toLowerCase();
+      const inCity = contacts.filter((contact) => (contact.city ?? "").toLowerCase() === city).length;
+      return inCity || Math.max(1, Math.round(contacts.length * 0.4));
+    }
+    const bySegment = contacts.filter((contact) => contact.segment.toLowerCase() === audience.toLowerCase()).length;
+    return bySegment || Math.max(1, Math.round(contacts.length * 0.3));
+  };
+
+  const buildMockLaunchResult = (campaign: Campaign): CampaignLaunchResult => {
+    const targeted = Math.max(1, getAudienceSize(campaign.audience));
+    const channelSuccessRate = campaign.channel === "SMS" ? 0.97 : campaign.channel === "Email" ? 0.94 : 0.91;
+    const delivered = Math.max(1, Math.round(targeted * channelSuccessRate));
+    const failed = Math.max(0, targeted - delivered);
+    const responseRate = Number((campaign.channel === "Email" ? 12.8 : campaign.channel === "Voice" ? 9.4 : 14.2).toFixed(1));
+
+    return {
+      id: Date.now(),
+      campaignName: campaign.name,
+      channel: campaign.channel,
+      audience: campaign.audience,
+      targeted,
+      delivered,
+      failed,
+      responseRate,
+      launchedAt: new Date().toLocaleString(),
+    };
+  };
+
   const openCampaignForAudience = (audience: string) => {
     setCampaignForm((prev) => ({
       ...prev,
@@ -574,6 +624,28 @@ const Dashboard = () => {
         }),
     [activityLog]
   );
+
+  const campaignStatusCounts = useMemo(
+    () => ({
+      all: campaigns.length,
+      Active: campaigns.filter((campaign) => campaign.status === "Active").length,
+      Scheduled: campaigns.filter((campaign) => campaign.status === "Scheduled").length,
+      Draft: campaigns.filter((campaign) => campaign.status === "Draft").length,
+    }),
+    [campaigns]
+  );
+
+  const filteredCampaigns = useMemo(() => {
+    const searched = campaigns
+      .filter((campaign) => campaignStatusFilter === "all" || campaign.status === campaignStatusFilter)
+      .filter((campaign) => campaignSearch === "" || campaign.name.toLowerCase().includes(campaignSearch.toLowerCase()));
+
+    const priority: Record<Campaign["status"], number> = { Active: 0, Scheduled: 1, Draft: 2 };
+    return [...searched].sort((a, b) => {
+      if (priority[a.status] !== priority[b.status]) return priority[a.status] - priority[b.status];
+      return new Date(a.schedule).getTime() - new Date(b.schedule).getTime();
+    });
+  }, [campaigns, campaignSearch, campaignStatusFilter]);
 
   const handleCreateCampaign = () => {
     setCampaignError("");
@@ -698,7 +770,9 @@ const Dashboard = () => {
     if (!target) return;
     const now = new Date().toISOString().slice(0, 16);
     setCampaigns((prev) => prev.map((c) => (c.id === id ? { ...c, status: "Active", schedule: now } : c)));
-    logActivity("Campaign launched", `${target.name} is now active`);
+    const mockResult = buildMockLaunchResult(target);
+    setLastLaunchResult(mockResult);
+    logActivity("Campaign launched", `${target.name}: ${mockResult.delivered}/${mockResult.targeted} delivered`);
   };
 
   const removeCampaign = (id: number) => {
@@ -1046,6 +1120,43 @@ const Dashboard = () => {
         ]}
       />
 
+      {lastLaunchResult ? (
+        <div className="rounded-2xl border border-lime-300 bg-lime-50 p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-black">Campaign Sent Successfully</p>
+              <p className="text-xs text-black/60">
+                {lastLaunchResult.campaignName} · {lastLaunchResult.channel} · {lastLaunchResult.launchedAt}
+              </p>
+            </div>
+            <button
+              onClick={() => setLastLaunchResult(null)}
+              className="rounded-lg border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:bg-black/5"
+            >
+              Dismiss
+            </button>
+          </div>
+          <div className="mt-3 grid gap-2 sm:grid-cols-4">
+            <div className="rounded-xl border border-black/10 bg-white p-3 text-xs text-black/70">
+              Targeted
+              <p className="mt-1 text-lg font-semibold text-black">{lastLaunchResult.targeted}</p>
+            </div>
+            <div className="rounded-xl border border-black/10 bg-white p-3 text-xs text-black/70">
+              Delivered
+              <p className="mt-1 text-lg font-semibold text-black">{lastLaunchResult.delivered}</p>
+            </div>
+            <div className="rounded-xl border border-black/10 bg-white p-3 text-xs text-black/70">
+              Failed
+              <p className="mt-1 text-lg font-semibold text-black">{lastLaunchResult.failed}</p>
+            </div>
+            <div className="rounded-xl border border-black/10 bg-white p-3 text-xs text-black/70">
+              Response Rate
+              <p className="mt-1 text-lg font-semibold text-black">{lastLaunchResult.responseRate}%</p>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <div className="grid gap-4 xl:grid-cols-2">
         {/* Campaign Form */}
         <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
@@ -1099,7 +1210,7 @@ const Dashboard = () => {
               <div>
                 <label className="text-sm text-black/60 block mb-2">Media Type</label>
                 <div className="flex flex-wrap gap-2">
-                  {["SMS", "Voice", "IVR", "Email"].map((type) => (
+                  {["SMS", "Voice", "Email"].map((type) => (
                     <button
                       key={type}
                       onClick={() => setCampaignForm((p) => ({ ...p, channel: type as Campaign["channel"] }))}
@@ -1109,7 +1220,7 @@ const Dashboard = () => {
                           : "border border-black/15 bg-white text-black/70 hover:bg-black/5"
                       }`}
                     >
-                      {type === "SMS" ? "SMS" : type === "Voice" ? "Voice" : type === "IVR" ? "IVR" : "Email"}
+                      {type}
                     </button>
                   ))}
                 </div>
@@ -1156,40 +1267,6 @@ const Dashboard = () => {
               </div>
             )}
 
-            {campaignForm.channel === "IVR" && (
-              <div className="space-y-2">
-                <div className="rounded-xl border border-orange-200 bg-orange-50 p-3">
-                  <label className="text-sm font-semibold text-orange-900 block mb-2">IVR Audio</label>
-                  <input
-                    type="file"
-                    accept="audio/*,.mp3,.wav,.ogg"
-                    onChange={(e) => {
-                      const fileName = e.target.files?.[0]?.name || "";
-                      setCampaignForm((p) => ({ ...p, message: fileName }));
-                    }}
-                    className="block w-full text-sm text-black/70 file:mr-3 file:rounded-lg file:border file:border-orange-300 file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium file:cursor-pointer hover:file:bg-orange-50"
-                  />
-                  {campaignForm.message && (
-                    <p className="mt-2 text-sm text-orange-700">Selected: {campaignForm.message}</p>
-                  )}
-                </div>
-                <div className="rounded-xl border border-orange-200 bg-orange-50 p-3">
-                  <label className="text-sm font-semibold text-orange-900 block mb-2">IVR Script (Optional)</label>
-                  <input
-                    type="file"
-                    accept=".txt,.pdf,.doc,.docx"
-                    onChange={(e) => {
-                      const fileName = e.target.files?.[0]?.name || "";
-                      setCampaignForm((p) => ({ ...p, info: fileName }));
-                    }}
-                    className="block w-full text-sm text-black/70 file:mr-3 file:rounded-lg file:border file:border-orange-300 file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium file:cursor-pointer hover:file:bg-orange-50"
-                  />
-                  {campaignForm.info && (
-                    <p className="mt-2 text-xs text-orange-700">Selected: {campaignForm.info}</p>
-                  )}
-                </div>
-              </div>
-            )}
 
             {campaignForm.channel === "Email" && (
               <div className="rounded-xl border border-green-200 bg-white p-0 overflow-hidden shadow-lg">
@@ -1344,7 +1421,7 @@ const Dashboard = () => {
                 </select>
               </div>
             </div>
-            {(campaignForm.channel === "SMS" || campaignForm.channel === "IVR") && (
+            {campaignForm.channel === "SMS" && (
               <>
                 <input
                   value={campaignForm.info}
@@ -1396,7 +1473,10 @@ const Dashboard = () => {
 
         {/* Campaign Queue */}
         <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
-          <h3 className="text-2xl font-semibold text-black">Campaign Queue ({campaigns.length})</h3>
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="text-2xl font-semibold text-black">Campaign Queue ({filteredCampaigns.length})</h3>
+            <span className="rounded-lg border border-black/10 bg-white px-3 py-1 text-xs text-black/60">Sorted: active first</span>
+          </div>
           
           <div className="mt-5 space-y-4">
             {/* Search */}
@@ -1422,17 +1502,14 @@ const Dashboard = () => {
                       : "border border-black/15 bg-white text-black/70 hover:bg-black/5"
                   }`}
                 >
-                  {status === "all" ? "All" : status} ({campaigns.filter((c) => status === "all" || c.status === status).length})
+                  {status === "all" ? "All" : status} ({campaignStatusCounts[status]})
                 </button>
               ))}
             </div>
 
             {/* Campaign List */}
             <div className="space-y-2">
-              {campaigns
-                .filter((c) => campaignStatusFilter === "all" || c.status === campaignStatusFilter)
-                .filter((c) => campaignSearch === "" || c.name.toLowerCase().includes(campaignSearch.toLowerCase()))
-                .map((c) => (
+              {filteredCampaigns.map((c) => (
                   <div key={c.id} className="rounded-xl border border-black/10 bg-white p-3 hover:shadow-sm transition-all">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1">
@@ -1443,6 +1520,7 @@ const Dashboard = () => {
                         <p className="mt-1 text-xs text-black/45">
                           {c.audience} · {c.frequency}
                         </p>
+                        <p className="mt-1 text-xs text-black/45">Schedule: {new Date(c.schedule).toLocaleString()}</p>
                         {c.info ? <p className="mt-1 text-xs text-black/50">{c.info}</p> : null}
                       </div>
                       <span
@@ -1458,26 +1536,26 @@ const Dashboard = () => {
                       </span>
                     </div>
                     <p className="mt-2 line-clamp-2 text-xs text-black/50">{c.message}</p>
-                    <div className="mt-2 flex flex-wrap gap-1">
+                    <div className="mt-2 flex flex-wrap gap-2">
                       <button
                         onClick={() => runCampaignNow(c.id)}
-                        className="rounded-lg bg-black px-2 py-1 text-[10px] text-white hover:bg-black/90"
+                        className="rounded-lg bg-black px-3 py-1.5 text-[11px] text-white hover:bg-black/90"
                       >
                         Run
                       </button>
-                      <button onClick={() => startEditCampaign(c)} className="rounded-lg border border-black/15 px-2 py-1 text-[10px] text-black/70 hover:bg-black/5">
+                      <button onClick={() => startEditCampaign(c)} className="rounded-lg border border-black/15 px-3 py-1.5 text-[11px] text-black/70 hover:bg-black/5">
                         Edit
                       </button>
-                      <button onClick={() => toggleCampaignStatus(c.id)} className="rounded-lg border border-black/15 px-2 py-1 text-[10px] text-black/70 hover:bg-black/5">
+                      <button onClick={() => toggleCampaignStatus(c.id)} className="rounded-lg border border-black/15 px-3 py-1.5 text-[11px] text-black/70 hover:bg-black/5">
                         {c.status === "Draft" ? "Schedule" : "Move To Draft"}
                       </button>
-                      <button onClick={() => removeCampaign(c.id)} className="rounded-lg border border-red-200 px-2 py-1 text-[10px] text-red-600 hover:bg-red-50">
+                      <button onClick={() => removeCampaign(c.id)} className="rounded-lg border border-red-200 px-3 py-1.5 text-[11px] text-red-600 hover:bg-red-50">
                         Remove
                       </button>
                     </div>
                   </div>
                 ))}
-              {campaigns.filter((c) => campaignStatusFilter === "all" || c.status === campaignStatusFilter).filter((c) => campaignSearch === "" || c.name.toLowerCase().includes(campaignSearch.toLowerCase())).length === 0 ? (
+              {filteredCampaigns.length === 0 ? (
                 <div className="rounded-xl border border-dashed border-black/20 bg-white p-4 text-center text-xs text-black/55">
                   No campaigns match. Create one or adjust filters.
                 </div>
@@ -1961,8 +2039,8 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#f3f3f3]">
-      <div className={`grid ${sidebarMinimized ? "lg:grid-cols-[80px_1fr]" : "lg:grid-cols-[280px_1fr]"}`}>
-        <aside className={`self-stretch bg-black px-4 py-6 text-white lg:py-8 transition-all duration-300 ${sidebarMinimized ? "lg:px-3" : "lg:px-5"}`}>
+      <div className={`grid min-h-screen ${sidebarMinimized ? "lg:grid-cols-[80px_1fr]" : "lg:grid-cols-[280px_1fr]"}`}>
+        <aside className={`self-stretch bg-black px-4 py-6 text-white lg:min-h-screen lg:py-8 transition-all duration-300 ${sidebarMinimized ? "lg:px-3" : "lg:px-5"}`}>
           <div className="flex items-center justify-between">
             {!sidebarMinimized && (
               <div className="flex items-center gap-2 text-sm font-semibold">
@@ -2036,7 +2114,7 @@ const Dashboard = () => {
           </div>
         </aside>
 
-        <main className="space-y-5 bg-[#f3f3f3] px-4 py-5 sm:px-5 sm:py-5 lg:px-6 lg:py-6">
+        <main className="min-h-screen space-y-5 bg-[#f3f3f3] px-4 py-5 sm:px-5 sm:py-5 lg:px-6 lg:py-6">
           <div className="px-0">
             <Navbar />
           </div>
