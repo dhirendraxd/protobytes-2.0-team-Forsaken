@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState, type ChangeEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { db } from "@/config/firebase";
-import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { doc, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import { useLocation } from "react-router-dom";
@@ -222,6 +222,9 @@ const Dashboard = () => {
   const [activityLog, setActivityLog] = useState<ActivityEntry[]>(initialStore.activityLog);
   const [storeHydrated, setStoreHydrated] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const localSerializedStoreRef = useRef("");
+  const remoteSerializedStoreRef = useRef("");
+  const applyingRemoteStateRef = useRef(false);
 
   const [campaignForm, setCampaignForm] = useState({
     name: "",
@@ -266,6 +269,8 @@ const Dashboard = () => {
     city: "",
     area: "",
   });
+  const [topUpAmount, setTopUpAmount] = useState("500");
+  const [billingError, setBillingError] = useState("");
 
   const [campaignSearch, setCampaignSearch] = useState("");
   const [campaignStatusFilter, setCampaignStatusFilter] = useState<"all" | "Draft" | "Scheduled" | "Active">("all");
@@ -298,39 +303,40 @@ const Dashboard = () => {
   }, [location.pathname]);
 
   useEffect(() => {
-    let active = true;
+    if (!user || !db) {
+      setStoreHydrated(true);
+      return;
+    }
 
-    const loadStore = async () => {
-      if (!user || !db) {
-        setStoreHydrated(true);
-        return;
-      }
-      try {
-        const snap = await getDoc(doc(db, DASHBOARD_COLLECTION, user.uid));
-        if (!active) return;
+    const docRef = doc(db, DASHBOARD_COLLECTION, user.uid);
+    const unsubscribe = onSnapshot(
+      docRef,
+      (snap) => {
         if (snap.exists()) {
           const remoteStore = mergeStore(snap.data() as Partial<DashboardStore>);
-          setCampaigns(remoteStore.campaigns);
-          setContacts(remoteStore.contacts);
-          setAlerts(remoteStore.alerts);
-          setBillingPlan(remoteStore.billingPlan);
-          setCreditBalance(remoteStore.creditBalance);
-          setSettingsState(remoteStore.settingsState);
-          setActivityLog(remoteStore.activityLog);
-        }
-      } catch (error) {
-        console.warn("Failed to load dashboard state from Firestore, using local cache.", error);
-      } finally {
-        if (active) {
-          setStoreHydrated(true);
-        }
-      }
-    };
+          const remoteSerialized = JSON.stringify(remoteStore);
+          remoteSerializedStoreRef.current = remoteSerialized;
 
-    loadStore();
-    return () => {
-      active = false;
-    };
+          if (remoteSerialized !== localSerializedStoreRef.current) {
+            applyingRemoteStateRef.current = true;
+            setCampaigns(remoteStore.campaigns);
+            setContacts(remoteStore.contacts);
+            setAlerts(remoteStore.alerts);
+            setBillingPlan(remoteStore.billingPlan);
+            setCreditBalance(remoteStore.creditBalance);
+            setSettingsState(remoteStore.settingsState);
+            setActivityLog(remoteStore.activityLog);
+          }
+        }
+        setStoreHydrated(true);
+      },
+      (error) => {
+        console.warn("Failed to subscribe dashboard state from Firestore, using local cache.", error);
+        setStoreHydrated(true);
+      }
+    );
+
+    return () => unsubscribe();
   }, [user]);
 
   useEffect(() => {
@@ -344,12 +350,23 @@ const Dashboard = () => {
       settingsState,
       activityLog,
     };
+    const serializedStore = JSON.stringify(store);
+    localSerializedStoreRef.current = serializedStore;
 
     if (typeof window !== "undefined") {
-      window.localStorage.setItem(DASHBOARD_STORAGE_KEY, JSON.stringify(store));
+      window.localStorage.setItem(DASHBOARD_STORAGE_KEY, serializedStore);
     }
 
     if (!db || !user) return;
+    if (applyingRemoteStateRef.current) {
+      applyingRemoteStateRef.current = false;
+      setSaveStatus("saved");
+      return;
+    }
+    if (serializedStore === remoteSerializedStoreRef.current) {
+      setSaveStatus("saved");
+      return;
+    }
 
     setSaveStatus("saving");
     const timeoutId = window.setTimeout(async () => {
@@ -424,16 +441,49 @@ const Dashboard = () => {
     return sorted;
   }, [contacts, contactFilters, contactSortBy]);
 
+  const filteredContactResults = useMemo(
+    () =>
+      visibleContacts.filter(
+        (contact) =>
+          contactSearch === "" ||
+          contact.name.toLowerCase().includes(contactSearch.toLowerCase()) ||
+          contact.phone.includes(contactSearch)
+      ),
+    [visibleContacts, contactSearch]
+  );
+
+  const contactsBySegment = useMemo(() => {
+    const map = new Map<string, number>();
+    contacts.forEach((contact) => {
+      const key = contact.segment || "All Contacts";
+      map.set(key, (map.get(key) ?? 0) + 1);
+    });
+    return Array.from(map.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+  }, [contacts]);
+
   const toggleContactSelection = (id: number) => {
     setSelectedContactIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   };
 
   const selectAllVisibleContacts = () => {
-    setSelectedContactIds(visibleContacts.map((contact) => contact.id));
+    setSelectedContactIds(filteredContactResults.map((contact) => contact.id));
   };
 
   const clearContactSelection = () => {
     setSelectedContactIds([]);
+  };
+
+  const openCampaignForAudience = (audience: string) => {
+    setCampaignForm((prev) => ({
+      ...prev,
+      audience,
+      name: prev.name || `${audience} Campaign`,
+      message: prev.message || CAMPAIGN_TEMPLATES[prev.category],
+      schedule: prev.schedule || new Date().toISOString().slice(0, 16),
+    }));
+    setActiveMenu("campaigns");
   };
 
   const applyBulkContactAssignment = () => {
@@ -482,16 +532,46 @@ const Dashboard = () => {
 
   const summaryStats = useMemo(
     () => [
-      { label: "Total Messages", value: `${89000 + campaigns.length * 210}`, delta: "+0.5%" },
-      { label: "Total Campaigns", value: `${campaigns.length}`, delta: "+0.3%" },
-      { label: "Avg Delivery Rate", value: `${analyticsStats.deliveryRate}%`, delta: "+0.5%" },
-      { label: "Active Contacts", value: `${contacts.length}`, delta: "+1.1%" },
+      {
+        label: "Total Messages",
+        value: `${campaigns.reduce((sum, campaign) => {
+          if (campaign.status === "Active") return sum + contacts.length;
+          if (campaign.status === "Scheduled") return sum + Math.round(contacts.length * 0.6);
+          return sum + Math.round(contacts.length * 0.2);
+        }, 0)}`,
+        note: "Live estimate from campaigns + contacts",
+      },
+      { label: "Total Campaigns", value: `${campaigns.length}`, note: "Updates in real time" },
+      { label: "Avg Delivery Rate", value: `${analyticsStats.deliveryRate}%`, note: `Live window: ${analyticsWindow}` },
+      { label: "Active Contacts", value: `${contacts.length}`, note: "Synced from Firestore" },
     ],
-    [campaigns.length, contacts.length, analyticsStats.deliveryRate]
+    [campaigns, contacts.length, analyticsStats.deliveryRate, analyticsWindow]
   );
 
   const recentActivity = useMemo(
     () => activityLog.slice(0, 6),
+    [activityLog]
+  );
+
+  const billingTransactions = useMemo(
+    () =>
+      activityLog
+        .filter((item) => {
+          const title = item.title.toLowerCase();
+          return title.includes("credit") || title.includes("plan") || title.includes("top");
+        })
+        .slice(0, 6)
+        .map((item) => {
+          const amountFromDetail = item.detail.match(/\$([0-9]+(?:\.[0-9]{1,2})?)/);
+          const amount = amountFromDetail ? Number(amountFromDetail[1]) : 0;
+          const isCredit = item.title.toLowerCase().includes("credit") || item.title.toLowerCase().includes("top");
+          return {
+            id: item.id,
+            label: item.title,
+            amount: `${isCredit ? "+" : "-"}${amount || 0}`,
+            note: item.time,
+          };
+        }),
     [activityLog]
   );
 
@@ -876,9 +956,7 @@ const Dashboard = () => {
               <ArrowUpRight className="h-4 w-4 text-black/40" />
             </div>
             <p className="mt-3 text-2xl font-semibold text-black">{stat.value}</p>
-            <p className="mt-2 text-xs text-black/50">
-              last month <span className="text-green-600">{stat.delta}</span>
-            </p>
+            <p className="mt-2 text-xs text-black/50">{stat.note}</p>
           </div>
         ))}
       </div>
@@ -887,7 +965,7 @@ const Dashboard = () => {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-xs font-semibold text-black/50">Total Delivery Volume</p>
-            <p className="mt-2 text-2xl font-semibold text-black">{campaigns.length * 1340}</p>
+            <p className="mt-2 text-2xl font-semibold text-black">{summaryStats[0]?.value ?? "0"}</p>
             <p className="text-xs text-black/50">
               scheduled <span className="text-green-600">{analyticsStats.scheduledCount}</span>
             </p>
@@ -1473,7 +1551,6 @@ const Dashboard = () => {
   );
 
   const renderContacts = () => {
-    const segmentOptions = ["All Contacts", "VIP Customers", "Retail", "Wholesale", "Leads"];
     const cityOptions = ["Pokhara", "Kathmandu", "Lalitpur", "Biratnagar", "Butwal", "Others"];
     
     // Map cities to their areas
@@ -1530,6 +1607,29 @@ const Dashboard = () => {
             { label: "Unique Categories", value: `${new Set(contacts.map((c) => c.category ?? "General")).size}`, note: "Classification groups" },
           ]}
         />
+        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <h3 className="text-lg font-semibold text-black">Campaign Ready Segments</h3>
+            <Button
+              onClick={() => openCampaignForAudience(contactFilters.city ? `${contactFilters.city} Contacts` : "All Contacts")}
+              className="rounded-xl bg-black text-white hover:bg-black/90"
+            >
+              Create Campaign For Filtered Group
+            </Button>
+          </div>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            {contactsBySegment.map(([segment, count]) => (
+              <button
+                key={segment}
+                onClick={() => openCampaignForAudience(segment)}
+                className="rounded-xl border border-black/10 bg-white px-3 py-2 text-left hover:bg-black/5"
+              >
+                <p className="text-xs font-semibold text-black">{segment}</p>
+                <p className="text-xs text-black/55">{count} contacts</p>
+              </button>
+            ))}
+          </div>
+        </div>
       <div className="grid gap-4 xl:grid-cols-2">
           {/* Add Contact Form */}
           <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
@@ -1599,7 +1699,7 @@ const Dashboard = () => {
 
           {/* Contact List */}
           <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
-            <h3 className="text-2xl font-semibold text-black">Contact List ({visibleContacts.length})</h3>
+            <h3 className="text-2xl font-semibold text-black">Contact List ({filteredContactResults.length})</h3>
             
             {/* Search and Filters */}
             <div className="mt-5 space-y-4">
@@ -1626,7 +1726,7 @@ const Dashboard = () => {
                   <option value="age">Sort by Age</option>
                 </select>
                 <div className="flex gap-2">
-                  <button onClick={selectAllVisibleContacts} className="h-10 flex-1 rounded-lg border border-black/15 bg-white px-3 text-sm text-black/70 hover:bg-black/5">Select All ({visibleContacts.length})</button>
+                  <button onClick={selectAllVisibleContacts} className="h-10 flex-1 rounded-lg border border-black/15 bg-white px-3 text-sm text-black/70 hover:bg-black/5">Select All ({filteredContactResults.length})</button>
                   <button onClick={clearContactSelection} className="h-10 flex-1 rounded-lg border border-black/15 bg-white px-3 text-sm text-black/70 hover:bg-black/5">Clear</button>
                 </div>
               </div>
@@ -1663,14 +1763,19 @@ const Dashboard = () => {
                   </select>
                 </div>
                 <Button onClick={applyBulkContactAssignment} className="mt-2 h-9 w-full rounded-lg bg-black px-3 text-xs text-white hover:bg-black/90">✓ Apply Changes</Button>
+                <Button
+                  onClick={() => openCampaignForAudience("Selected Contacts")}
+                  variant="outline"
+                  className="mt-2 h-9 w-full rounded-lg border-black/15 bg-white px-3 text-xs text-black hover:bg-black/5"
+                >
+                  Open Campaign For Selected
+                </Button>
               </div>
             )}
 
             {/* Contact Cards */}
             <div className="mt-4 space-y-2">
-              {visibleContacts
-                .filter((c) => contactSearch === "" || c.name.toLowerCase().includes(contactSearch.toLowerCase()) || c.phone.includes(contactSearch))
-                .map((contact) => (
+              {filteredContactResults.map((contact) => (
                 <div key={contact.id} className="rounded-xl border border-black/10 bg-white p-3 hover:shadow-sm transition-all">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-2 flex-1">
@@ -1694,7 +1799,7 @@ const Dashboard = () => {
                   </div>
                 </div>
               ))}
-              {visibleContacts.filter((c) => contactSearch === "" || c.name.toLowerCase().includes(contactSearch.toLowerCase()) || c.phone.includes(contactSearch)).length === 0 && (
+              {filteredContactResults.length === 0 && (
                 <div className="rounded-xl border border-dashed border-black/20 bg-white p-4 text-center text-xs text-black/55">
                   👤 No contacts. Add one or upload CSV to get started.
                 </div>
@@ -1729,11 +1834,42 @@ const Dashboard = () => {
         <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
           <h3 className="text-2xl font-semibold text-black">Top Up Credits</h3>
           <p className="mt-2 text-sm text-black/55">Add more credits to your account</p>
-          <div className="mt-5 flex gap-3">
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row">
             <input value={topUpAmount} onChange={(e) => setTopUpAmount(e.target.value)} placeholder="Amount" className="h-12 flex-1 rounded-xl border border-black/15 bg-white px-4 text-base" />
             <Button onClick={handleTopUp} className="rounded-xl bg-black px-6 text-white hover:bg-black/90">Top Up</Button>
           </div>
           {billingError ? <p className="mt-2 text-xs text-red-600">{billingError}</p> : null}
+        </div>
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-2">
+        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
+          <h3 className="text-2xl font-semibold text-black">Recent Transactions</h3>
+          <div className="mt-5 space-y-3">
+            {billingTransactions.map((item) => (
+              <div key={item.id} className="flex items-center justify-between rounded-xl border border-black/10 bg-white p-3">
+                <div>
+                  <p className="text-sm font-semibold text-black">{item.label}</p>
+                  <p className="text-xs text-black/55">{item.note}</p>
+                </div>
+                <span className={`text-sm font-semibold ${item.amount.startsWith("+") ? "text-green-600" : "text-black/70"}`}>{item.amount}</span>
+              </div>
+            ))}
+            {billingTransactions.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-black/20 bg-white p-4 text-center text-xs text-black/55">
+                No billing activity yet. Top up credits or switch plan.
+              </div>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
+          <h3 className="text-2xl font-semibold text-black">Billing Tips</h3>
+          <div className="mt-5 space-y-3 text-sm">
+            <div className="rounded-xl border border-black/10 bg-white p-3 text-black/70">Set alert rules for low balance to avoid campaign interruptions.</div>
+            <div className="rounded-xl border border-black/10 bg-white p-3 text-black/70">Use audience segmentation to reduce unnecessary message cost.</div>
+            <div className="rounded-xl border border-black/10 bg-white p-3 text-black/70">Review delivery analytics monthly before changing plans.</div>
+          </div>
         </div>
       </div>
     </div>

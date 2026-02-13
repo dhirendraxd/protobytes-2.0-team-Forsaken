@@ -8,6 +8,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { lazy, Suspense, useEffect, useState } from "react";
 import RouteLoader from "@/components/RouteLoader";
 import { auth } from "@/config/firebase";
+import FloatingParticles from "@/components/FloatingParticles";
 
 // Lazy load pages
 const Index = lazy(() => import("./pages/Index"));
@@ -25,6 +26,10 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
+    if (!auth) {
+      setIsAuthenticated(false);
+      return;
+    }
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setIsAuthenticated(!!user);
     });
@@ -46,9 +51,11 @@ const App = () => (
       <Sonner />
       <ErrorBoundary>
         <BrowserRouter>
+          <FloatingParticles />
           <AuthProvider>
             <Suspense fallback={<RouteLoader />}>
-              <Routes>
+              <div className="relative z-10">
+                <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
@@ -138,7 +145,8 @@ const App = () => (
                     </div>
                   }
                 />
-              </Routes>
+                </Routes>
+              </div>
             </Suspense>
           </AuthProvider>
         </BrowserRouter>

@@ -62,6 +62,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const isModerator = userProfile?.role === 'moderator';
 
   useEffect(() => {
+    if (!auth) {
+      setUser(null);
+      setUserProfile(null);
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       

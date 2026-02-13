@@ -67,15 +67,30 @@ npm run dev
 
 ### Firebase Setup
 
-Firebase is already configured with credentials. You just need to enable services:
+Use environment variables for Firebase in local and production:
 
 1. Go to [Firebase Console](https://console.firebase.google.com)
-2. Open project: **yadu-portfolio**
-3. Enable **Authentication** (Email/Password)
-4. Create **Firestore Database**
-5. Add sample data to collections (see `FIREBASE_SETUP.md`)
+2. Enable **Authentication** (Email/Password + Google if used)
+3. Create **Firestore Database**
+4. Add your Firebase web config values to `frontend/.env` (local) and Vercel env vars (prod)
 
-**No environment variables needed** - credentials are in `src/config/firebase.ts`
+Required variables:
+- `VITE_FIREBASE_API_KEY`
+- `VITE_FIREBASE_AUTH_DOMAIN`
+- `VITE_FIREBASE_PROJECT_ID`
+- `VITE_FIREBASE_STORAGE_BUCKET`
+- `VITE_FIREBASE_MESSAGING_SENDER_ID`
+- `VITE_FIREBASE_APP_ID`
+
+### Vercel Deployment (Production)
+
+1. Import this repo in Vercel.
+2. Set **Root Directory** to project root (keep `vercel.json` in root).
+3. Add all `VITE_FIREBASE_*` variables in Vercel Project Settings -> Environment Variables.
+4. In Firebase Authentication -> Settings -> Authorized domains, add:
+- your Vercel domain (e.g. `your-app.vercel.app`)
+- any custom domain you attach
+5. Deploy.
 
 ## Available Scripts
 
