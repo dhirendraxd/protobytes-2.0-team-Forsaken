@@ -18,14 +18,11 @@ import {
   TrendingUp,
   Settings,
 } from "lucide-react";
-import BrandIcon from "@/components/BrandIcon";
-import { useTranslation } from "react-i18next";
 import { useState } from "react";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
-  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("overview");
 
   const handleLogout = async () => {
@@ -38,8 +35,6 @@ const Dashboard = () => {
       icon: <Phone className="w-6 h-6" />,
       title: "IVR Access",
       description: "Call our number to access voice services",
-      color: "from-blue-500/20 to-blue-600/20",
-      borderColor: "border-blue-500/30",
       action: () => navigate("/"),
     },
     {
@@ -47,8 +42,6 @@ const Dashboard = () => {
       icon: <Bell className="w-6 h-6" />,
       title: "Submit Alert",
       description: "Report a community issue or update",
-      color: "from-orange-500/20 to-orange-600/20",
-      borderColor: "border-orange-500/30",
       action: () => navigate("/alerts"),
     },
     {
@@ -56,8 +49,6 @@ const Dashboard = () => {
       icon: <Users className="w-6 h-6" />,
       title: "Community",
       description: "Connect with other users",
-      color: "from-purple-500/20 to-purple-600/20",
-      borderColor: "border-purple-500/30",
       action: () => navigate("/community"),
     },
     {
@@ -65,8 +56,6 @@ const Dashboard = () => {
       icon: <TrendingUp className="w-6 h-6" />,
       title: "Market Prices",
       description: "View current market information",
-      color: "from-green-500/20 to-green-600/20",
-      borderColor: "border-green-500/30",
       action: () => navigate("/market-prices"),
     },
     {
@@ -74,8 +63,6 @@ const Dashboard = () => {
       icon: <Settings className="w-6 h-6" />,
       title: "Moderator Portal",
       description: "Manage content and moderate community",
-      color: "from-red-500/20 to-red-600/20",
-      borderColor: "border-red-500/30",
       action: () => navigate("/moderator"),
     },
   ];
@@ -128,50 +115,42 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-background/50">
-      {/* Navbar */}
-      <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-md">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <a
-            href="/"
-            className="flex items-center gap-3 hover:scale-105 transition-transform"
-          >
-            <div className="p-2 rounded-lg bg-primary/10 border border-primary/20 hover:bg-primary/20">
-              <BrandIcon className="w-6 h-6" />
-            </div>
-            <span className="text-2xl font-bold hover:text-primary transition-colors">
-              VoiceLink
-            </span>
+    <div className="min-h-screen bg-[#f3f3f3]">
+      <nav className="sticky top-0 z-50 border-b border-black/5 bg-[#efefef]">
+        <div className="mx-auto w-full max-w-[1680px] px-4 py-4 sm:px-6 lg:px-10 flex items-center justify-between">
+          <a href="/" className="flex items-center gap-2 text-sm font-semibold text-black">
+            <span>VoiceLink</span>
+            <span className="inline-block h-4 w-4 rounded-full bg-lime-300" />
           </a>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Button
               onClick={() => navigate("/")}
               variant="ghost"
               size="sm"
-              className="gap-2 text-muted-foreground hover:text-foreground"
+              className="h-8 rounded-full px-3 text-xs text-black/70 hover:text-black"
               title="Go to Homepage"
             >
-              <Home className="w-4 h-4" />
+              <Home className="mr-1 h-3.5 w-3.5" />
               <span className="hidden sm:inline">Home</span>
             </Button>
             <Button
               onClick={() => navigate("/alerts")}
               variant="ghost"
               size="sm"
-              className="gap-2 text-muted-foreground hover:text-foreground"
+              className="h-8 rounded-full px-3 text-xs text-black/70 hover:text-black"
               title="View Alerts"
             >
-              <Bell className="w-4 h-4" />
+              <Bell className="mr-1 h-3.5 w-3.5" />
               <span className="hidden sm:inline">Alerts</span>
             </Button>
             <Button
               onClick={handleLogout}
               variant="ghost"
               size="sm"
-              className="gap-2 text-muted-foreground opacity-60 hover:opacity-100 hover:text-red-500"
+              className="h-8 rounded-full px-3 text-xs text-black/50 hover:text-red-500"
               title="Sign out"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="h-3.5 w-3.5" />
               <span className="sr-only">Logout</span>
             </Button>
           </div>
@@ -179,20 +158,20 @@ const Dashboard = () => {
       </nav>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="mx-auto w-full max-w-[1680px] px-4 py-8 sm:px-6 lg:px-10">
         {/* Welcome Section */}
         <div className="mb-12">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div>
-              <h1 className="text-5xl font-bold text-foreground mb-3">
+              <h1 className="text-[42px] font-semibold leading-[0.95] tracking-[-0.03em] text-black sm:text-[52px] lg:text-[60px] mb-3">
                 Welcome back,{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-600">
+                <span className="text-black">
                   {user?.displayName?.split(" ")[0] ||
                     user?.email?.split("@")[0] ||
                     "User"}
                 </span>
               </h1>
-              <p className="text-lg text-muted-foreground">
+              <p className="text-base text-black/60">
                 You're authenticated and ready to use VoiceLink
               </p>
             </div>
@@ -201,7 +180,7 @@ const Dashboard = () => {
                 <img
                   src={user.photoURL}
                   alt="Profile"
-                  className="w-24 h-24 rounded-full border-4 border-primary shadow-lg"
+                  className="h-20 w-20 rounded-full border-2 border-black/10"
                 />
               </div>
             )}
@@ -209,15 +188,15 @@ const Dashboard = () => {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-8 border-b border-border/50">
+        <div className="mb-8 flex gap-2 border-b border-black/10">
           {["overview", "activity"].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-3 font-medium transition-colors capitalize border-b-2 ${
+              className={`px-4 py-3 text-sm font-semibold transition-colors capitalize border-b-2 ${
                 activeTab === tab
-                  ? "border-primary text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
+                  ? "border-black text-black"
+                  : "border-transparent text-black/50 hover:text-black"
               }`}
             >
               {tab}
@@ -230,22 +209,22 @@ const Dashboard = () => {
           <div className="space-y-8">
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card className="p-6 border border-border/50 backdrop-blur-sm bg-card/50 hover:border-primary/50 transition-colors">
+              <Card className="p-6 border border-black/10 bg-white shadow-none">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground mb-2">Email</p>
-                    <p className="font-semibold text-foreground break-all text-sm">
+                    <p className="text-xs text-black/50 mb-2">Email</p>
+                    <p className="font-semibold text-black break-all text-sm">
                       {user?.email}
                     </p>
                   </div>
-                  <Mail className="w-5 h-5 text-primary" />
+                  <Mail className="w-5 h-5 text-black/60" />
                 </div>
               </Card>
 
-              <Card className="p-6 border border-border/50 backdrop-blur-sm bg-card/50 hover:border-primary/50 transition-colors">
+              <Card className="p-6 border border-black/10 bg-white shadow-none">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground mb-2">
+                    <p className="text-xs text-black/50 mb-2">
                       Status
                     </p>
                     <p
@@ -258,44 +237,44 @@ const Dashboard = () => {
                       {user?.emailVerified ? "✓ Verified" : "Pending"}
                     </p>
                   </div>
-                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <CheckCircle className="w-5 h-5 text-black/60" />
                 </div>
               </Card>
 
-              <Card className="p-6 border border-border/50 backdrop-blur-sm bg-card/50 hover:border-primary/50 transition-colors">
+              <Card className="p-6 border border-black/10 bg-white shadow-none">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground mb-2">
+                    <p className="text-xs text-black/50 mb-2">
                       Auth Provider
                     </p>
-                    <p className="font-semibold text-foreground">
+                    <p className="font-semibold text-black">
                       {user?.providerData[0]?.providerId === "google.com"
                         ? "Google"
                         : "Email"}
                     </p>
                   </div>
-                  <Shield className="w-5 h-5 text-blue-600" />
+                  <Shield className="w-5 h-5 text-black/60" />
                 </div>
               </Card>
 
-              <Card className="p-6 border border-border/50 backdrop-blur-sm bg-card/50 hover:border-primary/50 transition-colors">
+              <Card className="p-6 border border-black/10 bg-white shadow-none">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground mb-2">
+                    <p className="text-xs text-black/50 mb-2">
                       User ID
                     </p>
-                    <p className="font-mono text-xs text-muted-foreground truncate">
+                    <p className="font-mono text-xs text-black/60 truncate">
                       {user?.uid?.substring(0, 12)}...
                     </p>
                   </div>
-                  <User className="w-5 h-5 text-purple-600" />
+                  <User className="w-5 h-5 text-black/60" />
                 </div>
               </Card>
             </div>
 
             {/* Quick Actions */}
             <div>
-              <h2 className="text-2xl font-bold text-foreground mb-6">
+              <h2 className="text-2xl font-semibold text-black mb-6">
                 Quick Actions
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -303,22 +282,21 @@ const Dashboard = () => {
                   <button
                     key={action.id}
                     onClick={action.action}
-                    className={`group relative p-6 rounded-xl border-2 ${action.borderColor} bg-gradient-to-br ${action.color} hover:border-primary/50 transition-all duration-300 text-left overflow-hidden`}
+                    className="group relative rounded-xl border border-black/10 bg-white p-6 text-left transition-all duration-300 hover:border-black/30"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-primary/0 to-primary/0 group-hover:from-primary/10 group-hover:to-primary/5 transition-all duration-300" />
                     <div className="relative z-10">
-                      <div className="mb-4 text-primary group-hover:scale-110 transition-transform inline-block">
+                      <div className="mb-4 inline-flex h-9 w-9 items-center justify-center rounded-full bg-lime-300 text-black">
                         {action.icon}
                       </div>
-                      <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors mb-2">
+                      <h3 className="mb-2 font-semibold text-black">
                         {action.title}
                       </h3>
-                      <p className="text-sm text-muted-foreground mb-4">
+                      <p className="mb-4 text-sm text-black/60">
                         {action.description}
                       </p>
-                      <div className="flex items-center text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center text-sm font-semibold text-black/70 opacity-0 transition-opacity group-hover:opacity-100">
                         Get started
-                        <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                        <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                       </div>
                     </div>
                   </button>
@@ -327,16 +305,16 @@ const Dashboard = () => {
             </div>
 
             {/* Additional Info */}
-            <Card className="p-8 border border-border/50 backdrop-blur-sm bg-card/50">
+            <Card className="p-8 border border-black/10 bg-white shadow-none">
               <div className="flex items-start gap-6">
-                <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
-                  <AlertCircle className="w-6 h-6 text-primary" />
+                <div className="rounded-full bg-lime-300 p-3 text-black">
+                  <AlertCircle className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground mb-2">
+                  <h3 className="mb-2 font-semibold text-black">
                     Account Information
                   </h3>
-                  <p className="text-muted-foreground mb-4">
+                  <p className="mb-4 text-black/60">
                     Your account is secured and authenticated. You have full
                     access to all VoiceLink features and services.
                   </p>
@@ -344,7 +322,7 @@ const Dashboard = () => {
                     <Button
                       onClick={() => navigate("/alerts")}
                       size="sm"
-                      className="gap-2"
+                      className="h-9 gap-2 rounded-full bg-black text-white hover:bg-black/90"
                     >
                       <Bell className="w-4 h-4" />
                       Submit Alert
@@ -353,7 +331,7 @@ const Dashboard = () => {
                       onClick={() => navigate("/community")}
                       variant="outline"
                       size="sm"
-                      className="gap-2"
+                      className="h-9 gap-2 rounded-full border-black/20 text-black hover:bg-black/5"
                     >
                       <Users className="w-4 h-4" />
                       Join Community
@@ -368,32 +346,32 @@ const Dashboard = () => {
         {/* Activity Tab */}
         {activeTab === "activity" && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-foreground">
+            <h2 className="text-2xl font-semibold text-black">
               Recent Activity
             </h2>
             <div className="space-y-4">
               {recentActivity.map((activity, index) => (
                 <Card
                   key={activity.id}
-                  className="p-6 border border-border/50 backdrop-blur-sm bg-card/50 hover:border-primary/30 transition-colors"
+                  className="p-6 border border-black/10 bg-white shadow-none"
                 >
                   <div className="flex items-start gap-4">
                     <div className="mt-1">{activity.icon}</div>
                     <div className="flex-grow">
-                      <h3 className="font-semibold text-foreground mb-1">
+                      <h3 className="mb-1 font-semibold text-black">
                         {activity.title}
                       </h3>
-                      <p className="text-sm text-muted-foreground mb-2">
+                      <p className="mb-2 text-sm text-black/60">
                         {activity.description}
                       </p>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-2 text-xs text-black/50">
                         <Clock className="w-4 h-4" />
                         {activity.timestamp}
                       </div>
                     </div>
                   </div>
                   {index < recentActivity.length - 1 && (
-                    <div className="h-8 border-l border-border/50 ml-7 mt-4" />
+                    <div className="ml-7 mt-4 h-8 border-l border-black/10" />
                   )}
                 </Card>
               ))}
@@ -402,12 +380,12 @@ const Dashboard = () => {
         )}
 
         {/* Logout Section */}
-        <div className="mt-12 pt-8 border-t border-border/50 flex justify-end">
+        <div className="mt-12 flex justify-end border-t border-black/10 pt-8">
           <Button
             onClick={handleLogout}
             variant="ghost"
             size="sm"
-            className="gap-2 text-muted-foreground opacity-60 hover:opacity-100 hover:text-red-500"
+            className="gap-2 text-black/50 hover:text-red-500"
           >
             <LogOut className="w-4 h-4" />
             Sign out

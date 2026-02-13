@@ -16,7 +16,6 @@ import {
   LogOut,
   AlertTriangle,
 } from "lucide-react";
-import BrandIcon from "@/components/BrandIcon";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BriefingEditor from "@/components/moderator/BriefingEditor";
@@ -145,44 +144,33 @@ const ModeratorDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-background/50">
+    <div className="min-h-screen bg-[#f3f3f3]">
       {/* Navbar */}
-      <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-md">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <a
-            href="/"
-            className="flex items-center gap-3 hover:scale-105 transition-transform"
-          >
-            <div className="p-2 rounded-lg bg-primary/10 border border-primary/20 hover:bg-primary/20">
-              <BrandIcon className="w-6 h-6" />
-            </div>
-            <div>
-              <span className="text-2xl font-bold hover:text-primary transition-colors block">
-                VoiceLink
-              </span>
-              <span className="text-xs text-muted-foreground">
-                Moderator Portal
-              </span>
-            </div>
+      <nav className="sticky top-0 z-50 border-b border-black/5 bg-[#efefef]">
+        <div className="mx-auto w-full max-w-[1680px] px-4 py-4 sm:px-6 lg:px-10 flex items-center justify-between">
+          <a href="/" className="flex items-center gap-2 text-sm font-semibold text-black">
+            <span>VoiceLink</span>
+            <span className="inline-block h-4 w-4 rounded-full bg-lime-300" />
+            <span className="hidden sm:inline text-xs text-black/50">Moderator Portal</span>
           </a>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Button
               onClick={() => navigate("/")}
               variant="ghost"
               size="sm"
-              className="gap-2 text-muted-foreground hover:text-foreground"
+              className="h-8 rounded-full px-3 text-xs text-black/70 hover:text-black"
             >
-              <Home className="w-4 h-4" />
+              <Home className="mr-1 h-3.5 w-3.5" />
               <span className="hidden sm:inline">Home</span>
             </Button>
             <Button
               onClick={handleLogout}
               variant="ghost"
               size="sm"
-              className="gap-2 text-muted-foreground opacity-60 hover:opacity-100 hover:text-red-500"
+              className="h-8 rounded-full px-3 text-xs text-black/50 hover:text-red-500"
               title="Sign out"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="h-3.5 w-3.5" />
               <span className="sr-only">Logout</span>
             </Button>
           </div>
@@ -190,13 +178,13 @@ const ModeratorDashboard = () => {
       </nav>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="mx-auto w-full max-w-[1680px] px-4 py-8 sm:px-6 lg:px-10">
         {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">
+          <h1 className="text-[40px] font-semibold leading-[0.95] tracking-[-0.03em] text-black sm:text-[48px] lg:text-[56px] mb-2">
             Moderator Dashboard
           </h1>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-base text-black/60">
             Welcome, {user?.displayName || user?.email?.split("@")[0]} · Manage
             content and community
           </p>
@@ -207,16 +195,18 @@ const ModeratorDashboard = () => {
           {stats.map((stat) => (
             <Card
               key={stat.label}
-              className={`p-6 border-2 ${stat.borderColor} ${stat.bgColor} backdrop-blur-sm hover:border-primary/50 transition-colors`}
+              className="p-6 border border-black/10 bg-white shadow-none"
             >
               <div className="flex items-start justify-between mb-2">
-                <div className={stat.color}>{stat.icon}</div>
+                <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-lime-300 text-black">
+                  {stat.icon}
+                </div>
               </div>
               <div>
-                <p className="text-3xl font-bold text-foreground mb-1">
+                <p className="text-3xl font-semibold text-black mb-1">
                   {stat.value}
                 </p>
-                <p className="text-sm text-muted-foreground">{stat.label}</p>
+                <p className="text-sm text-black/60">{stat.label}</p>
               </div>
             </Card>
           ))}
@@ -224,7 +214,7 @@ const ModeratorDashboard = () => {
 
         {/* Quick Actions */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-foreground mb-4">
+          <h2 className="text-2xl font-semibold text-black mb-4">
             Quick Actions
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -232,17 +222,16 @@ const ModeratorDashboard = () => {
               <button
                 key={action.id}
                 onClick={action.action}
-                className={`group relative p-6 rounded-xl border-2 ${action.borderColor} bg-gradient-to-br ${action.color} hover:border-primary/50 transition-all duration-300 text-left overflow-hidden`}
+                className="group relative rounded-xl border border-black/10 bg-white p-6 text-left transition-all duration-300 hover:border-black/30"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/0 to-primary/0 group-hover:from-primary/10 group-hover:to-primary/5 transition-all duration-300" />
                 <div className="relative z-10">
-                  <div className="mb-4 text-primary group-hover:scale-110 transition-transform inline-block">
+                  <div className="mb-4 inline-flex h-9 w-9 items-center justify-center rounded-full bg-lime-300 text-black">
                     {action.icon}
                   </div>
-                  <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors mb-2">
+                  <h3 className="mb-2 font-semibold text-black">
                     {action.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-black/60">
                     {action.description}
                   </p>
                 </div>
@@ -253,7 +242,7 @@ const ModeratorDashboard = () => {
 
         {/* Main Content Tabs */}
         <Tabs value={activeSection} onValueChange={setActiveSection}>
-          <TabsList className="grid grid-cols-6 w-full mb-6">
+          <TabsList className="grid grid-cols-6 w-full mb-6 bg-white border border-black/10">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="briefings">Briefings</TabsTrigger>
             <TabsTrigger value="categories">Categories</TabsTrigger>
@@ -264,27 +253,27 @@ const ModeratorDashboard = () => {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            <Card className="p-6 border border-border/50 backdrop-blur-sm bg-card/50">
-              <h3 className="text-xl font-bold text-foreground mb-4">
+            <Card className="p-6 border border-black/10 bg-white shadow-none">
+              <h3 className="text-xl font-semibold text-black mb-4">
                 Recent Activity
               </h3>
               <div className="space-y-4">
                 {recentActivity.map((activity) => (
                   <div
                     key={activity.id}
-                    className="flex items-start gap-4 pb-4 border-b border-border/50 last:border-0"
+                    className="flex items-start gap-4 pb-4 border-b border-black/10 last:border-0"
                   >
-                    <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
-                      <FileText className="w-5 h-5 text-primary" />
+                    <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-lime-300 text-black">
+                      <FileText className="w-5 h-5" />
                     </div>
                     <div className="flex-grow">
-                      <h4 className="font-semibold text-foreground">
+                      <h4 className="font-semibold text-black">
                         {activity.title}
                       </h4>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-black/60">
                         {activity.description}
                       </p>
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <p className="mt-1 text-xs text-black/50">
                         {activity.timestamp} · by {activity.user}
                       </p>
                     </div>

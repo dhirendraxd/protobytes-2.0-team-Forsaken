@@ -1,10 +1,16 @@
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { MessageSquare, BarChart3, Users, Phone, Mic2, Clock, Shield, User, LogOut, Zap, CheckCircle, TrendingUp } from "lucide-react";
-import BrandIcon from "@/components/BrandIcon";
-import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import Footer from "@/components/Footer";
+import {
+  ArrowRight,
+  BadgePercent,
+  BarChart3,
+  CircleArrowOutUpRight,
+  Clock3,
+  Headphones,
+  LogOut,
+  Shield,
+  User,
+} from "lucide-react";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   DropdownMenu,
@@ -14,357 +20,435 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const Index = () => {
-  const navigate = useNavigate();
   const { user, signOut } = useAuth();
 
-  // Get user data from localStorage for footer
-  const [userData, setUserData] = useState<{fullName?: string; email?: string} | null>(null);
-
-  useEffect(() => {
-    const storedUserData = localStorage.getItem('userData');
-    if (storedUserData) {
-      try {
-        setUserData(JSON.parse(storedUserData));
-      } catch (error) {
-        console.error('Error parsing user data:', error);
-      }
-    }
-  }, []);
-
   return (
-    <div className="min-h-screen bg-background">
-      {/* Hero Section with Glassmorphism */}
-      <header className="relative animated-gradient text-primary-foreground overflow-hidden">
-        {/* Animated background grid */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSA2MCAwIEwgMCAwIDAgNjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjA1IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30"></div>
-        
-        {/* Floating particles */}
-        <div className="floating-particle w-12 h-12 left-[10%]" style={{ animation: 'float-up 15s infinite linear' }}></div>
-        <div className="floating-particle w-8 h-8 left-[25%]" style={{ animation: 'float-up 12s infinite linear 2s' }}></div>
-        <div className="floating-particle w-16 h-16 left-[40%]" style={{ animation: 'float-diagonal 18s infinite linear 1s' }}></div>
-        <div className="floating-particle w-6 h-6 left-[55%]" style={{ animation: 'float-up 10s infinite linear 3s' }}></div>
-        <div className="floating-particle w-10 h-10 left-[70%]" style={{ animation: 'float-diagonal 16s infinite linear' }}></div>
-        <div className="floating-particle w-14 h-14 left-[85%]" style={{ animation: 'float-up 14s infinite linear 4s' }}></div>
-        <div className="floating-particle w-8 h-8 left-[15%]" style={{ animation: 'float-diagonal 13s infinite linear 5s' }}></div>
-        <div className="floating-particle w-12 h-12 left-[60%]" style={{ animation: 'float-up 17s infinite linear 2.5s' }}></div>
-        
-        {/* Floating orbs */}
-        <div className="absolute top-20 right-20 w-72 h-72 bg-white/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 left-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl"></div>
-
-        <nav className="relative container mx-auto px-4 py-6 flex items-center justify-between backdrop-blur-sm">
-          <div className="flex items-center gap-3">
-            <BrandIcon className="w-8 h-8" />
-            <span className="text-2xl font-bold text-white drop-shadow">VoiceLink</span>
+    <div className="min-h-screen bg-[#f3f3f3]">
+      <div className="mx-auto w-full max-w-[1680px] px-4 pb-10 pt-6 sm:px-6 lg:px-10">
+        <nav className="mb-6 flex items-center justify-between bg-[#efefef] px-4 py-3 sm:px-6">
+          <div className="flex items-center gap-1 text-sm font-semibold text-black">
+            <span>VoiceLink</span>
+            <span className="inline-block h-4 w-4 rounded-full bg-lime-300" />
           </div>
-          <div className="flex items-center gap-6">
-            <div className="hidden md:flex items-center gap-6">
-            </div>
-            
+
+          <div className="hidden items-center gap-7 text-[11px] font-medium text-black/70 md:flex">
+            <a href="#features">Features</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#why">Why Us</a>
+            <a href="#contact">Contact</a>
+          </div>
+
+          <div className="flex items-center gap-2">
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="gap-2 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition-all">
+                  <Button variant="ghost" size="sm" className="h-8 rounded-full px-3 text-xs text-gray-900 hover:bg-black/5">
                     {user.photoURL ? (
-                      <img
-                        src={user.photoURL}
-                        alt="Profile"
-                        className="w-6 h-6 rounded-full"
-                      />
+                      <img src={user.photoURL} alt="Profile" className="h-5 w-5 rounded-full" />
                     ) : (
-                      <User className="w-5 h-5" />
+                      <User className="h-4 w-4" />
                     )}
-                    <span className="hidden sm:inline truncate max-w-[120px]">
-                      {user.displayName || user.email?.split("@")[0] || "Profile"}
-                    </span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <div className="px-2 py-1.5 text-sm font-semibold text-foreground">
-                    {user.displayName || "User"}
-                  </div>
-                  <div className="px-2 py-1 text-xs text-muted-foreground truncate">
-                    {user.email}
-                  </div>
-                  <div className="my-1 border-t border-border/50" />
+                <DropdownMenuContent align="end" className="w-40">
                   <DropdownMenuItem asChild>
-                    <Link to="/dashboard" className="cursor-pointer">
-                      <Shield className="w-4 h-4 mr-2" />
+                    <Link to="/dashboard" className="cursor-pointer text-xs">
+                      <Shield className="mr-2 h-3.5 w-3.5" />
                       Dashboard
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <button
-                      onClick={async () => {
-                        await signOut();
-                      }}
-                      className="cursor-pointer text-red-600 w-full text-left"
+                      onClick={async () => await signOut()}
+                      className="w-full cursor-pointer text-left text-xs text-red-600"
                     >
-                      <LogOut className="w-4 h-4 mr-2 inline" />
+                      <LogOut className="mr-2 inline h-3.5 w-3.5" />
                       Logout
                     </button>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Link to="/auth" className="px-4 py-2 rounded-lg bg-white/20 hover:bg-white/30 text-white font-medium transition-all">
-                Sign In
-              </Link>
+              <>
+                <Link to="/auth">
+                  <Button variant="ghost" size="sm" className="h-8 rounded-full bg-black/5 px-3 text-[11px] text-black">
+                    Log In
+                  </Button>
+                </Link>
+                <Link to="/auth">
+                  <Button size="sm" className="h-8 rounded-full bg-black px-4 text-[11px] text-white hover:bg-black/90">
+                    Download App
+                  </Button>
+                </Link>
+              </>
             )}
           </div>
         </nav>
-        
-        <div className="relative container mx-auto px-4 py-24 md:py-32 text-center">
-          <div className="mb-6">
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-4">
-              Reach Your Customers
-            </h1>
-            <h2 className="text-3xl md:text-4xl font-semibold text-white/90">
-              With SMS & Voice Messages
-            </h2>
-          </div>
-          
-          <p className="text-xl md:text-2xl mb-8 text-white/90 max-w-3xl mx-auto">
-            Powerful communication platform for SMEs and organizations
-          </p>
-          <p className="text-lg mb-12 text-white/80 max-w-2xl mx-auto">
-            Send bulk SMS, voice messages, and automated campaigns to thousands of contacts in seconds. No setup fees, pay only for what you send.
-          </p>
-          
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <Link to="/auth">
-              <Button size="lg" className="bg-white text-primary hover:bg-white/90 text-lg px-8 py-6 h-auto shadow-xl">
-                <Zap className="w-5 h-5 mr-2" />
-                Start Free Trial
-              </Button>
-            </Link>
-            <Link to="/dashboard">
-              <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 text-lg px-8 py-6 h-auto">
-                View Demo
-              </Button>
-            </Link>
-          </div>
-          
-          {/* Stats with glass cards */}
-          <div className="grid grid-cols-3 gap-6 max-w-3xl mx-auto">
-            <div className="glass-card p-6 rounded-xl backdrop-blur-lg">
-              <p className="text-4xl md:text-5xl font-bold mb-2">99.9%</p>
-              <p className="text-sm text-white/80">Delivery Rate</p>
-            </div>
-            <div className="glass-card p-6 rounded-xl backdrop-blur-lg">
-              <p className="text-4xl md:text-5xl font-bold mb-2">500+</p>
-              <p className="text-sm text-white/80">Businesses</p>
-            </div>
-            <div className="glass-card p-6 rounded-xl backdrop-blur-lg">
-              <p className="text-4xl md:text-5xl font-bold mb-2">10M+</p>
-              <p className="text-sm text-white/80">Messages Sent</p>
-            </div>
-          </div>
-        </div>
 
-        {/* Wave divider for smooth transition */}
-        <div className="hero-wave">
-          <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="fill-background">
-            <path d="M0,50 C300,100 600,0 900,50 C1050,75 1125,100 1200,80 L1200,120 L0,120 Z"></path>
+        <section className="relative mb-16 overflow-hidden rounded-[26px] bg-lime-300 px-6 pb-10 pt-10 sm:px-8 lg:px-12">
+          <div className="grid gap-10 lg:grid-cols-2">
+            <div className="max-w-[520px]">
+              <h1 className="mb-5 text-[44px] font-semibold leading-[0.95] tracking-[-0.03em] text-black sm:text-[56px] lg:text-[72px]">
+                Connect with
+                <br />
+                your Customers
+              </h1>
+              <p className="max-w-[360px] text-sm leading-relaxed text-black/75 sm:text-base">
+                Send bulk SMS and voice messages instantly. Reach thousands of customers with personalized, automated communication.
+              </p>
+              <Link to="/auth">
+                <Button className="mt-7 h-11 rounded-xl bg-black px-6 text-xs font-semibold text-white hover:bg-black/90 sm:text-sm">
+                  Get Started Free
+                </Button>
+              </Link>
+              <a href="#" className="mt-7 inline-flex items-center gap-1 text-xs font-medium text-black/85">
+                See How It Works
+                <ArrowRight className="h-3 w-3" />
+              </a>
+            </div>
+
+            <div className="relative min-h-[320px] sm:min-h-[360px] lg:min-h-[420px]">
+              <div className="absolute left-0 top-2 w-[210px] rotate-[-5deg] rounded-[24px] bg-white p-4 shadow-[0_24px_40px_rgba(0,0,0,0.17)] sm:left-6 sm:w-[250px] lg:left-10 lg:w-[280px]">
+                <p className="mb-3 text-lg font-semibold text-black">Campaign Stats</p>
+                <div className="mb-3 rounded-lg border border-black/10 bg-lime-100 px-3 py-2 text-[10px] text-black font-semibold">
+                  98.5% Delivery Rate
+                </div>
+                <div className="mb-3 rounded-xl bg-black p-3 text-[10px] text-white">
+                  <p className="mb-1 font-semibold">Messages Sent</p>
+                  <p className="text-xl font-bold">12,450</p>
+                </div>
+                <div className="space-y-2 text-[11px]">
+                  <div className="flex items-center justify-between">
+                    <span>SMS Delivered</span>
+                    <span className="text-green-600 font-semibold">9,840</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Voice Calls</span>
+                    <span className="text-green-600 font-semibold">2,610</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="absolute right-0 top-10 w-[220px] rotate-[8deg] rounded-[22px] bg-black p-4 shadow-[0_26px_40px_rgba(0,0,0,0.3)] sm:w-[260px] lg:w-[300px]">
+                <div className="mb-3 flex items-center justify-between text-[10px] text-white/80">
+                  <span>Active Customers</span>
+                  <span>289</span>
+                </div>
+                <div className="h-32 rounded-xl bg-gradient-to-b from-white/5 to-black p-2 sm:h-36 lg:h-44">
+                  <svg viewBox="0 0 210 80" className="h-full w-full">
+                    <path
+                      d="M0 48 C16 18, 28 74, 44 35 C58 8, 72 52, 88 40 C102 29, 115 64, 132 22 C145 8, 162 42, 176 30 C188 20, 199 6, 210 22"
+                      fill="none"
+                      stroke="#d9ff4a"
+                      strokeWidth="2"
+                    />
+                    <path
+                      d="M0 72 C20 62, 32 76, 46 64 C64 48, 78 72, 94 66 C112 56, 126 72, 144 64 C162 58, 180 70, 210 58"
+                      fill="none"
+                      stroke="#ffffff"
+                      strokeWidth="2"
+                    />
+                  </svg>
+                </div>
+                <div className="mt-3 grid grid-cols-4 gap-2 text-center text-[10px] text-white/75">
+                  <span>SMS</span>
+                  <span>Voice</span>
+                  <span>Success</span>
+                  <span>Track</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <svg
+            viewBox="0 0 280 120"
+            className="pointer-events-none absolute bottom-8 left-[34%] hidden h-24 w-72 text-black/80 lg:block"
+          >
+            <path d="M4 14 C 102 14, 128 88, 210 86" fill="none" stroke="currentColor" strokeWidth="2.4" />
+            <path d="M206 76 L228 88 L214 106" fill="none" stroke="currentColor" strokeWidth="2.4" />
           </svg>
-        </div>
-      </header>
+        </section>
 
-      {/* Platform Features */}
-      <section className="container mx-auto px-4 py-14">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Everything You Need to Communicate
+        <section id="features" className="mb-16">
+          <h2 className="mb-8 text-[40px] font-semibold leading-[0.96] tracking-[-0.02em] text-black sm:text-[48px] lg:text-[60px]">
+            Powerful Features
+            <br />
+            for Your Business
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Professional tools to engage customers via SMS and voice
+          <div className="grid gap-4 lg:grid-cols-2">
+            <article className="relative overflow-hidden rounded-2xl bg-[#ececec] p-6">
+              <h3 className="text-2xl font-semibold text-black">Bulk SMS Campaigns</h3>
+              <p className="mt-3 max-w-[330px] text-sm leading-relaxed text-black/65">
+                Send personalized SMS to thousands of customers instantly with guaranteed delivery
+              </p>
+              <a href="#" className="mt-6 inline-flex items-center gap-1 text-xs font-semibold text-black">
+                Learn More
+                <ArrowRight className="h-3 w-3" />
+              </a>
+              <div className="absolute -bottom-4 right-0 h-24 w-24 rounded-tl-[30px] bg-lime-300" />
+            </article>
+            <article className="relative overflow-hidden rounded-2xl bg-[#ececec] p-6">
+              <h3 className="text-2xl font-semibold text-black">Voice Messages & IVR</h3>
+              <p className="mt-3 max-w-[350px] text-sm leading-relaxed text-black/65">
+                Automated voice calls with Text-to-Speech or custom audio for alerts and confirmations
+              </p>
+              <a href="#" className="mt-6 inline-flex items-center gap-1 text-xs font-semibold text-black">
+                Learn More
+                <ArrowRight className="h-3 w-3" />
+              </a>
+              <div className="absolute bottom-3 right-4 h-20 w-20 rounded-full border-[7px] border-lime-300 border-r-black border-t-[#f77d6f] border-b-transparent" />
+            </article>
+          </div>
+        </section>
+
+        <section id="why" className="mb-16">
+          <div className="grid gap-8 lg:grid-cols-[1fr_2fr]">
+            <div>
+              <h2 className="mb-3 text-[44px] font-semibold tracking-[-0.03em] text-black sm:text-[52px] lg:text-[60px]">Why VoiceLink</h2>
+              <p className="max-w-[250px] text-sm leading-relaxed text-black/70">
+                The most trusted communication platform for SMEs and organizations worldwide
+              </p>
+            </div>
+            <div className="grid gap-0 rounded-2xl border border-black/10 bg-[#f5f5f5] md:grid-cols-2">
+              <div className="border-b border-r border-black/10 p-5 md:border-b">
+                <div className="mb-3 flex items-center gap-3">
+                  <Clock3 className="h-5 w-5 rounded-full bg-lime-300 p-1 text-black" />
+                  <h3 className="text-xl font-semibold">Instant Delivery</h3>
+                </div>
+                <p className="text-sm text-black/65">
+                  Send messages to thousands instantly with 99.9% delivery guarantee
+                </p>
+              </div>
+              <div className="border-b border-black/10 p-5 md:border-b">
+                <div className="mb-3 flex items-center gap-3">
+                  <Headphones className="h-5 w-5 rounded-full bg-lime-300 p-1 text-black" />
+                  <h3 className="text-xl font-semibold">Expert Support</h3>
+                </div>
+                <p className="text-sm text-black/65">24/7 support team ready to help you maximize your campaigns</p>
+              </div>
+              <div className="border-r border-black/10 p-5">
+                <div className="mb-3 flex items-center gap-3">
+                  <BadgePercent className="h-5 w-5 rounded-full bg-lime-300 p-1 text-black" />
+                  <h3 className="text-xl font-semibold">Affordable Pricing</h3>
+                </div>
+                <p className="text-sm text-black/65">Pay only for what you send - no hidden fees or subscriptions</p>
+              </div>
+              <div className="p-5">
+                <div className="mb-3 flex items-center gap-3">
+                  <BarChart3 className="h-5 w-5 rounded-full bg-lime-300 p-1 text-black" />
+                  <h3 className="text-xl font-semibold">Real Analytics</h3>
+                </div>
+                <p className="text-sm text-black/65">Track delivery, engagement, and ROI with detailed real-time reports</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="mb-16 text-center">
+          <h2 className="text-[44px] font-semibold tracking-[-0.03em] text-black sm:text-[52px] lg:text-[60px]">Trusted by Businesses</h2>
+          <p className="mx-auto mt-3 max-w-[500px] text-sm text-black/70">
+            Thousands of SMEs and organizations use VoiceLink to reach their customers
           </p>
-        </div>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4 md:gap-6">
+            {["Twilio", "AWS", "Firebase", "Stripe", "PayPal", "SendGrid", "Vonage", "Nexmo"].map((partner) => (
+              <div
+                key={partner}
+                className="flex h-12 min-w-24 items-center justify-center rounded-full bg-white px-6 text-xs font-semibold text-black/70 border border-black/10 shadow-[0_1px_0_rgba(0,0,0,0.05)]"
+              >
+                {partner}
+              </div>
+            ))}
+          </div>
+        </section>
 
-        <div className="grid md:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16">
-          <Card className="p-6 text-center hover:shadow-[var(--card-shadow-hover)] transition-all hover:scale-105 group">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform">
-              <MessageSquare className="w-8 h-8 text-white" />
+        <section className="mb-16 rounded-[22px] bg-gradient-to-r from-black via-[#121212] to-[#212121] px-6 py-8 text-white sm:px-8 lg:px-12">
+          <div className="grid items-center gap-8 lg:grid-cols-[1.3fr_0.7fr]">
+            <div>
+              <h2 className="max-w-[520px] text-[42px] font-semibold leading-[0.95] tracking-[-0.03em] sm:text-[52px] lg:text-[60px]">
+                Start Connecting with Your Customers Today
+              </h2>
+              <Link to="/auth">
+                <Button className="mt-6 h-11 rounded-xl bg-white px-6 text-xs font-semibold text-black hover:bg-white/90 sm:text-sm">
+                  Get Started Free
+                </Button>
+              </Link>
             </div>
-            <h3 className="font-semibold text-lg mb-2">Bulk SMS</h3>
-            <p className="text-sm text-muted-foreground">Send thousands of personalized SMS messages instantly</p>
-          </Card>
-
-          <Card className="p-6 text-center hover:shadow-[var(--card-shadow-hover)] transition-all hover:scale-105 group">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform">
-              <Mic2 className="w-8 h-8 text-white" />
-            </div>
-            <h3 className="font-semibold text-lg mb-2">Voice Messages</h3>
-            <p className="text-sm text-muted-foreground">Automated voice calls with custom audio or text-to-speech</p>
-          </Card>
-
-          <Card className="p-6 text-center hover:shadow-[var(--card-shadow-hover)] transition-all hover:scale-105 group">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform">
-              <Users className="w-8 h-8 text-white" />
-            </div>
-            <h3 className="font-semibold text-lg mb-2">Contact Management</h3>
-            <p className="text-sm text-muted-foreground">Import CSV, organize groups, manage unlimited contacts</p>
-          </Card>
-
-          <Card className="p-6 text-center hover:shadow-[var(--card-shadow-hover)] transition-all hover:scale-105 group">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform">
-              <BarChart3 className="w-8 h-8 text-white" />
-            </div>
-            <h3 className="font-semibold text-lg mb-2">Analytics</h3>
-            <p className="text-sm text-muted-foreground">Real-time tracking of delivery, opens, and engagement</p>
-          </Card>
-        </div>
-
-        {/* Why Choose Us */}
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          <div className="flex gap-4">
-            <div className="flex-shrink-0">
-              <div className="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-green-600" />
+            <div className="mx-auto w-[210px] rounded-3xl bg-white p-4 text-black shadow-[0_12px_24px_rgba(0,0,0,0.35)]">
+              <p className="text-3xl font-semibold">98.5%</p>
+              <p className="text-xs text-black/70">Delivery Rate</p>
+              <div className="mt-4 rounded-xl bg-black p-3 text-xs text-white">
+                <p>Active Users</p>
+                <div className="mt-2 h-1.5 rounded-full bg-white/20">
+                  <div className="h-1.5 w-4/5 rounded-full bg-lime-300" />
+                </div>
+              </div>
+              <div className="mt-4 space-y-2 text-xs text-black/70">
+                <div className="flex items-center justify-between">
+                  <span>Messages Today</span>
+                  <span className="text-green-600 font-semibold">24,580</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Campaigns Active</span>
+                  <span className="text-green-600 font-semibold">842</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Countries Served</span>
+                  <span className="text-black font-semibold">156+</span>
+                </div>
               </div>
             </div>
-            <div>
-              <h3 className="font-semibold text-lg mb-2">Instant Setup</h3>
-              <p className="text-sm text-muted-foreground">
-                Start sending messages in under 5 minutes. No technical knowledge required.
-              </p>
+          </div>
+        </section>
+
+        <section className="mb-14 grid items-center gap-8 md:mb-16 md:grid-cols-2">
+          <div className="relative mx-auto h-40 w-[280px] sm:w-[320px]">
+            <div className="absolute left-0 top-2 h-32 w-40 rotate-[-8deg] rounded-2xl bg-lime-300" />
+            <div className="absolute left-5 top-5 h-32 w-56 rounded-2xl bg-black p-3">
+              <svg viewBox="0 0 200 80" className="h-full w-full">
+                <path
+                  d="M0 12 C20 24,40 14,62 38 C78 56,92 58,108 52 C128 44,154 30,200 26"
+                  fill="none"
+                  stroke="#d9ff4a"
+                  strokeWidth="2"
+                />
+                <path
+                  d="M0 58 C22 34,40 70,60 52 C76 42,92 64,112 48 C132 28,148 62,200 44"
+                  fill="none"
+                  stroke="#ffffff"
+                  strokeWidth="1.7"
+                  opacity="0.8"
+                />
+              </svg>
             </div>
           </div>
+          <div>
+            <h2 className="text-[42px] font-semibold leading-[0.95] tracking-[-0.03em] text-black sm:text-[52px] lg:text-[60px]">Send in Real Time</h2>
+            <p className="mt-4 max-w-[520px] text-base leading-relaxed text-black/70">
+              Messages are delivered instantly to your customers. Track delivery status in real-time and monitor engagement with advanced analytics dashboard.
+            </p>
+          </div>
+        </section>
 
-          <div className="flex gap-4">
-            <div className="flex-shrink-0">
-              <div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                <Shield className="w-6 h-6 text-blue-600" />
-              </div>
+        <section id="pricing" className="mb-16">
+          <h2 className="text-center text-[44px] font-semibold leading-[0.95] tracking-[-0.03em] text-black sm:text-[52px] lg:text-[60px]">Simple Pricing</h2>
+          <p className="mx-auto mt-3 max-w-[500px] text-center text-sm text-black/70">
+            Pay only for what you send. No setup fees, no contracts.
+          </p>
+          <div className="mt-10 grid gap-6 lg:grid-cols-3">
+            <div className="rounded-2xl border border-black/10 bg-white p-6">
+              <h3 className="text-xl font-semibold text-black">Starter</h3>
+              <p className="mt-2 text-sm text-black/60">For small businesses</p>
+              <p className="mt-4 text-4xl font-bold text-black">$0<span className="text-lg">/mo</span></p>
+              <Link to="/auth">
+                <Button className="mt-6 w-full rounded-xl border border-black/10 text-black hover:bg-black/5">Get Started</Button>
+              </Link>
+              <ul className="mt-6 space-y-3 text-sm">
+                <li className="flex items-center gap-2 text-black/70">✓ 100 SMS credits</li>
+                <li className="flex items-center gap-2 text-black/70">✓ Basic dashboard</li>
+                <li className="flex items-center gap-2 text-black/70">✓ Email support</li>
+              </ul>
             </div>
-            <div>
-              <h3 className="font-semibold text-lg mb-2">Enterprise Security</h3>
-              <p className="text-sm text-muted-foreground">
-                Bank-level encryption and compliance with data privacy regulations.
-              </p>
+            <div className="rounded-2xl border-2 border-black bg-white p-6 relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-black text-white px-3 py-1 rounded-full text-xs font-semibold">Most Popular</div>
+              <h3 className="text-xl font-semibold text-black">Professional</h3>
+              <p className="mt-2 text-sm text-black/60">For growing businesses</p>
+              <p className="mt-4 text-4xl font-bold text-black">$29<span className="text-lg">/mo</span></p>
+              <Link to="/auth">
+                <Button className="mt-6 w-full rounded-xl bg-black text-white hover:bg-black/90">Get Started</Button>
+              </Link>
+              <ul className="mt-6 space-y-3 text-sm">
+                <li className="flex items-center gap-2 text-black/70">✓ 10,000 SMS</li>
+                <li className="flex items-center gap-2 text-black/70">✓ Voice campaigns</li>
+                <li className="flex items-center gap-2 text-black/70">✓ Advanced analytics</li>
+                <li className="flex items-center gap-2 text-black/70">✓ Priority support</li>
+              </ul>
+            </div>
+            <div className="rounded-2xl border border-black/10 bg-white p-6">
+              <h3 className="text-xl font-semibold text-black">Enterprise</h3>
+              <p className="mt-2 text-sm text-black/60">For large organizations</p>
+              <p className="mt-4 text-4xl font-bold text-black">Custom<span className="text-lg">/mo</span></p>
+              <a href="#contact">
+                <Button className="mt-6 w-full rounded-xl bg-black text-white hover:bg-black/90">Contact Sales</Button>
+              </a>
+              <ul className="mt-6 space-y-3 text-sm">
+                <li className="flex items-center gap-2 text-black/70">✓ Unlimited everything</li>
+                <li className="flex items-center gap-2 text-black/70">✓ Dedicated account manager</li>
+                <li className="flex items-center gap-2 text-black/70">✓ API access</li>
+                <li className="flex items-center gap-2 text-black/70">✓ Custom integrations</li>
+              </ul>
             </div>
           </div>
+        </section>
 
-          <div className="flex gap-4">
-            <div className="flex-shrink-0">
-              <div className="w-12 h-12 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-purple-600" />
-              </div>
-            </div>
-            <div>
-              <h3 className="font-semibold text-lg mb-2">Pay As You Grow</h3>
-              <p className="text-sm text-muted-foreground">
-                No monthly fees. Only pay for messages you send. Transparent pricing.
-              </p>
+        <section className="mb-16 grid items-center gap-8 lg:grid-cols-2">
+          <div>
+            <h2 className="text-[42px] font-semibold leading-[0.95] tracking-[-0.03em] text-black sm:text-[52px] lg:text-[60px]">Campaign Management</h2>
+            <p className="mt-4 max-w-[520px] text-base leading-relaxed text-black/70">
+              Manage all your SMS and voice campaigns from one powerful dashboard. Create, send, and track campaigns with detailed analytics and insights.
+            </p>
+          </div>
+          <div className="relative flex min-h-[220px] items-center justify-center">
+            <div className="absolute right-8 h-44 w-44 rounded-full bg-lime-300" />
+            <div className="relative z-10 w-full max-w-[360px] space-y-3">
+              {[
+                ["SMS Campaign", "12,450 sent", "98.5% delivered"],
+                ["Voice Calls", "2,340 placed", "99.2% connected"],
+                ["Email Follow-up", "1,892 queued", "Pending send"],
+              ].map(([name, sent, status]) => (
+                <div key={name} className="flex items-center justify-between rounded-xl bg-white px-4 py-3 shadow-sm">
+                  <span className="text-sm font-medium text-black/85">{name}</span>
+                  <div className="text-right">
+                    <p className="text-sm font-semibold text-black">{sent}</p>
+                    <p className="text-xs text-green-600">{status}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Pricing Preview */}
-      <section className="container mx-auto px-4 py-16 bg-gradient-to-br from-primary/5 to-accent/5 rounded-3xl my-16">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Simple, Transparent Pricing
+        <section className="mb-16 text-center">
+          <h2 id="contact" className="mx-auto max-w-[620px] text-[46px] font-semibold leading-[0.95] tracking-[-0.03em] text-black sm:text-[56px] lg:text-[64px]">
+            Ready to connect with customers?
           </h2>
-          <p className="text-lg text-muted-foreground">
-            No hidden fees. No subscriptions. Pay only for what you use.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          <Card className="p-8 border-2 border-border/50 hover:border-primary/50 transition-all">
-            <div className="flex items-center gap-3 mb-6">
-              <MessageSquare className="w-8 h-8 text-blue-600" />
-              <h3 className="text-2xl font-bold">SMS Messages</h3>
-            </div>
-            <div className="mb-6">
-              <p className="text-4xl font-bold mb-2">
-                $0.05 <span className="text-lg text-muted-foreground font-normal">/message</span>
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Volume discounts available for 10,000+ messages
-              </p>
-            </div>
-            <ul className="space-y-3 text-sm">
-              <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span>Delivery confirmation</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span>Personalization variables</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span>Scheduled sending</span>
-              </li>
-            </ul>
-          </Card>
-
-          <Card className="p-8 border-2 border-border/50 hover:border-primary/50 transition-all">
-            <div className="flex items-center gap-3 mb-6">
-              <Mic2 className="w-8 h-8 text-purple-600" />
-              <h3 className="text-2xl font-bold">Voice Messages</h3>
-            </div>
-            <div className="mb-6">
-              <p className="text-4xl font-bold mb-2">
-                $0.15 <span className="text-lg text-muted-foreground font-normal">/minute</span>
-              </p>
-              <p className="text-sm text-muted-foreground">
-                First 1000 minutes free for new accounts
-              </p>
-            </div>
-            <ul className="space-y-3 text-sm">
-              <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span>Upload audio or use TTS</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span>Multi-language support</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span>Call recording & analytics</span>
-              </li>
-            </ul>
-          </Card>
-        </div>
-
-        <div className="text-center mt-12">
+          <p className="mx-auto mt-3 max-w-[500px] text-black/70">Start sending SMS and voice messages in minutes</p>
           <Link to="/auth">
-            <Button size="lg" className="px-8 py-6 h-auto text-lg">
-              Start Free Trial - No Credit Card Required
-            </Button>
-          </Link>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="container mx-auto px-4 py-16 text-center">
-        <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-          Ready to Connect With Your Customers?
-        </h2>
-        <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-          Join hundreds of SMEs and organizations using VoiceLink to send millions of messages every month.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link to="/auth">
-            <Button size="lg" className="px-8 py-6 h-auto text-lg">
-              <Zap className="w-5 h-5 mr-2" />
+            <Button className="mt-6 h-11 rounded-xl bg-black px-6 text-xs text-white hover:bg-black/90 sm:text-sm">
               Get Started Free
             </Button>
           </Link>
-          <Button size="lg" variant="outline" className="px-8 py-6 h-auto text-lg">
-            <Phone className="w-5 h-5 mr-2" />
-            Schedule a Demo
-          </Button>
-        </div>
-      </section>
+        </section>
 
-      <Footer />
+        <footer className="grid gap-8 bg-black px-6 py-12 text-white sm:px-8 lg:grid-cols-4 lg:px-12">
+          <div className="text-sm font-semibold">
+            VoiceLink
+            <span className="ml-1 inline-block h-4 w-4 rounded-full bg-lime-300 align-middle" />
+          </div>
+          <div>
+            <h3 className="mb-3 text-xs font-semibold text-white/95">Platform</h3>
+            <ul className="space-y-1 text-xs text-white/60">
+              <li><a href="#features" className="hover:text-white">Features</a></li>
+              <li><a href="#pricing" className="hover:text-white">Pricing</a></li>
+              <li><a href="#">API Docs</a></li>
+              <li><a href="#">Status</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="mb-3 text-xs font-semibold text-white/95">Company</h3>
+            <ul className="space-y-1 text-xs text-white/60">
+              <li><a href="#">About</a></li>
+              <li><a href="#">Blog</a></li>
+              <li><a href="#">Privacy</a></li>
+              <li><a href="#">Terms</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="mb-3 text-xs font-semibold text-white/95">Get Support</h3>
+            <p className="text-xs text-white/60">Need help? Contact our support team 24/7</p>
+            <a href="mailto:support@voicelink.com" className="mt-3 text-xs text-lime-300 hover:text-lime-200">support@voicelink.com</a>
+          </div>
+        </footer>
+      </div>
     </div>
   );
 };
