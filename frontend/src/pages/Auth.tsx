@@ -213,7 +213,7 @@ const Auth = () => {
                 onClick={handleGoogleSignIn}
                 disabled={isSubmitting}
                 variant="outline"
-                className="flex h-12 w-full items-center justify-center gap-2 rounded-full border-2 border-black bg-black text-white hover:bg-blue-400 hover:border-blue-400 hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:hover:bg-black disabled:hover:shadow-none"
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-full border-2 border-black bg-black text-white hover:bg-lime-600 hover:border-lime-600 hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:hover:bg-black disabled:hover:border-black disabled:hover:shadow-none"
               >
                 <svg className="h-5 w-5" viewBox="0 0 24 24">
                   <path

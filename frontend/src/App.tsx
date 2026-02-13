@@ -12,7 +12,7 @@ import { auth } from "@/config/firebase";
 // Lazy load pages
 const Index = lazy(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
-const ModerationDashboard = lazy(() => import("./pages/ModerationDashboard"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Features = lazy(() => import("./pages/Features"));
 const Pricing = lazy(() => import("./pages/Pricing"));
 const WhyUs = lazy(() => import("./pages/WhyUs"));
@@ -62,15 +62,15 @@ const App = () => (
                   path="/dashboard"
                   element={
                     <ProtectedRoute>
-                      <ModerationDashboard />
+                      <Dashboard />
                     </ProtectedRoute>
                   }
                 />
                 <Route
-                  path="/moderator"
+                  path="/moderation"
                   element={
                     <ProtectedRoute>
-                      <ModerationDashboard />
+                      <Dashboard />
                     </ProtectedRoute>
                   }
                 />

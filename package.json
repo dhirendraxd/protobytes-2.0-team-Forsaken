@@ -5,6 +5,7 @@
   "type": "commonjs",
   "scripts": {
     "dev": "cd frontend && vite",
+    "postinstall": "npm --prefix frontend install",
     "build": "cd frontend && vite build",
     "build:dev": "cd frontend && vite build --mode development",
     "lint": "cd frontend && eslint .",
