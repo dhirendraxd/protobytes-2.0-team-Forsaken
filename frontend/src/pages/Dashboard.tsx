@@ -1441,9 +1441,9 @@ const Dashboard = () => {
                           {c.category} · {c.objective} · {c.channel}
                         </p>
                         <p className="mt-1 text-xs text-black/45">
-                          📍 {c.audience} · 🔄 {c.frequency}
+                          {c.audience} · {c.frequency}
                         </p>
-                        {c.info ? <p className="mt-1 text-xs text-black/50">💡 {c.info}</p> : null}
+                        {c.info ? <p className="mt-1 text-xs text-black/50">{c.info}</p> : null}
                       </div>
                       <span
                         className={`rounded-full px-2 py-0.5 text-[10px] whitespace-nowrap font-medium ${
@@ -1457,19 +1457,19 @@ const Dashboard = () => {
                         {c.status}
                       </span>
                     </div>
-                    <p className="mt-2 line-clamp-2 text-xs text-black/50">"{c.message}"</p>
+                    <p className="mt-2 line-clamp-2 text-xs text-black/50">{c.message}</p>
                     <div className="mt-2 flex flex-wrap gap-1">
                       <button
                         onClick={() => runCampaignNow(c.id)}
                         className="rounded-lg bg-black px-2 py-1 text-[10px] text-white hover:bg-black/90"
                       >
-                        ▶ Run
+                        Run
                       </button>
                       <button onClick={() => startEditCampaign(c)} className="rounded-lg border border-black/15 px-2 py-1 text-[10px] text-black/70 hover:bg-black/5">
-                        ✏️ Edit
+                        Edit
                       </button>
                       <button onClick={() => toggleCampaignStatus(c.id)} className="rounded-lg border border-black/15 px-2 py-1 text-[10px] text-black/70 hover:bg-black/5">
-                        {c.status === "Draft" ? "📅 Schedule" : "📄 Draft"}
+                        {c.status === "Draft" ? "Schedule" : "Move To Draft"}
                       </button>
                       <button onClick={() => removeCampaign(c.id)} className="rounded-lg border border-red-200 px-2 py-1 text-[10px] text-red-600 hover:bg-red-50">
                         Remove
@@ -1479,7 +1479,7 @@ const Dashboard = () => {
                 ))}
               {campaigns.filter((c) => campaignStatusFilter === "all" || c.status === campaignStatusFilter).filter((c) => campaignSearch === "" || c.name.toLowerCase().includes(campaignSearch.toLowerCase())).length === 0 ? (
                 <div className="rounded-xl border border-dashed border-black/20 bg-white p-4 text-center text-xs text-black/55">
-                  🎯 No campaigns match. Create one or adjust filters.
+                  No campaigns match. Create one or adjust filters.
                 </div>
               ) : null}
             </div>
@@ -1513,38 +1513,15 @@ const Dashboard = () => {
         ]}
       />
 
-      <div className="grid gap-4 xl:grid-cols-2">
-        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
-          <h3 className="text-2xl font-semibold text-black">Performance Context</h3>
-          <p className="mt-3 text-base text-black/60">
-            Delivery improves when contacts are segmented and campaigns are scheduled for the audience timezone. Current timezone: {settingsState.timezone}.
-          </p>
-          <div className="mt-4 space-y-2 text-sm">
-            <div className="rounded-xl border border-black/10 bg-white p-3">Campaigns: {campaigns.length}</div>
-            <div className="rounded-xl border border-black/10 bg-white p-3">Contacts: {contacts.length}</div>
-            <div className="rounded-xl border border-black/10 bg-white p-3">Scheduled: {analyticsStats.scheduledCount}</div>
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
-          <h3 className="text-2xl font-semibold text-black">Channel Mix</h3>
-          <div className="mt-4 space-y-2">
-            {(["SMS", "Voice", "IVR", "Email"] as Campaign["channel"][]).map((channel) => {
-              const count = campaigns.filter((campaign) => campaign.channel === channel).length;
-              const width = campaigns.length ? Math.max(8, Math.round((count / campaigns.length) * 100)) : 8;
-              return (
-                <div key={channel} className="rounded-xl border border-black/10 bg-white p-3">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium text-black">{channel}</span>
-                    <span className="text-black/60">{count}</span>
-                  </div>
-                  <div className="mt-2 h-2 w-full rounded-full bg-black/10">
-                    <div className="h-2 rounded-full bg-black" style={{ width: `${width}%` }} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+      <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
+        <h3 className="text-2xl font-semibold text-black">Performance Context</h3>
+        <p className="mt-3 text-base text-black/60">
+          Delivery improves when contacts are segmented and campaigns are scheduled for the audience timezone. Current timezone: {settingsState.timezone}.
+        </p>
+        <div className="mt-4 grid gap-2 text-sm sm:grid-cols-3">
+          <div className="rounded-xl border border-black/10 bg-white p-3">Campaigns: {campaigns.length}</div>
+          <div className="rounded-xl border border-black/10 bg-white p-3">Contacts: {contacts.length}</div>
+          <div className="rounded-xl border border-black/10 bg-white p-3">Scheduled: {analyticsStats.scheduledCount}</div>
         </div>
       </div>
     </div>
@@ -1789,7 +1766,7 @@ const Dashboard = () => {
                         <p className="text-sm font-semibold text-black">{contact.name}</p>
                         <p className="text-xs text-black/55">{contact.phone}</p>
                         <p className="mt-1 text-[11px] text-black/60">
-                          {contact.segment} · 📍 {contact.city || "-"} · {contact.area || "-"} · 🎂 {contact.age || "-"} · {contact.category || "General"}
+                          {contact.segment} · {contact.city || "-"} · {contact.area || "-"} · Age {contact.age || "-"} · {contact.category || "General"}
                         </p>
                       </div>
                     </div>
@@ -1801,7 +1778,7 @@ const Dashboard = () => {
               ))}
               {filteredContactResults.length === 0 && (
                 <div className="rounded-xl border border-dashed border-black/20 bg-white p-4 text-center text-xs text-black/55">
-                  👤 No contacts. Add one or upload CSV to get started.
+                  No contacts. Add one or upload CSV to get started.
                 </div>
               )}
             </div>
@@ -1842,34 +1819,23 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-2">
-        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
-          <h3 className="text-2xl font-semibold text-black">Recent Transactions</h3>
-          <div className="mt-5 space-y-3">
-            {billingTransactions.map((item) => (
-              <div key={item.id} className="flex items-center justify-between rounded-xl border border-black/10 bg-white p-3">
-                <div>
-                  <p className="text-sm font-semibold text-black">{item.label}</p>
-                  <p className="text-xs text-black/55">{item.note}</p>
-                </div>
-                <span className={`text-sm font-semibold ${item.amount.startsWith("+") ? "text-green-600" : "text-black/70"}`}>{item.amount}</span>
+      <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
+        <h3 className="text-2xl font-semibold text-black">Recent Transactions</h3>
+        <div className="mt-5 space-y-3">
+          {billingTransactions.map((item) => (
+            <div key={item.id} className="flex items-center justify-between rounded-xl border border-black/10 bg-white p-3">
+              <div>
+                <p className="text-sm font-semibold text-black">{item.label}</p>
+                <p className="text-xs text-black/55">{item.note}</p>
               </div>
-            ))}
-            {billingTransactions.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-black/20 bg-white p-4 text-center text-xs text-black/55">
-                No billing activity yet. Top up credits or switch plan.
-              </div>
-            ) : null}
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
-          <h3 className="text-2xl font-semibold text-black">Billing Tips</h3>
-          <div className="mt-5 space-y-3 text-sm">
-            <div className="rounded-xl border border-black/10 bg-white p-3 text-black/70">Set alert rules for low balance to avoid campaign interruptions.</div>
-            <div className="rounded-xl border border-black/10 bg-white p-3 text-black/70">Use audience segmentation to reduce unnecessary message cost.</div>
-            <div className="rounded-xl border border-black/10 bg-white p-3 text-black/70">Review delivery analytics monthly before changing plans.</div>
-          </div>
+              <span className={`text-sm font-semibold ${item.amount.startsWith("+") ? "text-green-600" : "text-black/70"}`}>{item.amount}</span>
+            </div>
+          ))}
+          {billingTransactions.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-black/20 bg-white p-4 text-center text-xs text-black/55">
+              No billing activity yet. Top up credits or switch plan.
+            </div>
+          ) : null}
         </div>
       </div>
     </div>
@@ -1934,50 +1900,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-2">
-        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
-          <h3 className="text-2xl font-semibold text-black">Quick Alert Presets</h3>
-          <div className="mt-5 space-y-3">
-            {[
-              { title: "Low credit balance", severity: "High" as AlertRule["severity"], channel: "Email" as AlertRule["channel"] },
-              { title: "Delivery rate below 95%", severity: "Medium" as AlertRule["severity"], channel: "SMS" as AlertRule["channel"] },
-              { title: "Campaign scheduled for today", severity: "Low" as AlertRule["severity"], channel: "Email" as AlertRule["channel"] },
-            ].map((preset) => (
-              <button
-                key={preset.title}
-                onClick={() => setAlertForm(preset)}
-                className="w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-left hover:bg-black/5"
-              >
-                <p className="text-sm font-semibold text-black">{preset.title}</p>
-                <p className="text-xs text-black/60">
-                  {preset.severity} · {preset.channel}
-                </p>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
-          <h3 className="text-2xl font-semibold text-black">Recent Alert Activity</h3>
-          <div className="mt-5 space-y-3">
-            {activityLog
-              .filter((item) => item.title.toLowerCase().includes("alert"))
-              .slice(0, 6)
-              .map((item) => (
-                <div key={item.id} className="rounded-xl border border-black/10 bg-white p-3">
-                  <p className="text-sm font-semibold text-black">{item.title}</p>
-                  <p className="text-xs text-black/55">{item.detail}</p>
-                  <p className="mt-1 text-[11px] text-black/45">{item.time}</p>
-                </div>
-              ))}
-            {activityLog.filter((item) => item.title.toLowerCase().includes("alert")).length === 0 ? (
-              <div className="rounded-xl border border-dashed border-black/20 bg-white p-4 text-center text-xs text-black/55">
-                No alert activity yet.
-              </div>
-            ) : null}
-          </div>
-        </div>
-      </div>
     </div>
   );
 
@@ -1992,50 +1914,35 @@ const Dashboard = () => {
         ]}
       />
 
-      <div className="grid gap-4 xl:grid-cols-2">
-        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
-          <h3 className="text-2xl font-semibold text-black">Platform Settings</h3>
-          <div className="mt-5 grid gap-4">
-            <label className="rounded-xl border border-black/10 bg-white p-4 text-sm text-black/80">
-              Timezone
-              <select
-                value={settingsState.timezone}
-                onChange={(e) => updateSetting("timezone", e.target.value)}
-                className="mt-3 h-12 w-full rounded-lg border border-black/15 px-4 text-base"
-              >
-                <option>Asia/Kathmandu</option>
-                <option>Asia/Kolkata</option>
-                <option>UTC</option>
-              </select>
+      <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
+        <h3 className="text-2xl font-semibold text-black">Platform Settings</h3>
+        <div className="mt-5 grid gap-4">
+          <label className="rounded-xl border border-black/10 bg-white p-4 text-sm text-black/80">
+            Timezone
+            <select
+              value={settingsState.timezone}
+              onChange={(e) => updateSetting("timezone", e.target.value)}
+              className="mt-3 h-12 w-full rounded-lg border border-black/15 px-4 text-base"
+            >
+              <option>Asia/Kathmandu</option>
+              <option>Asia/Kolkata</option>
+              <option>UTC</option>
+            </select>
+          </label>
+
+          <div className="space-y-3 rounded-xl border border-black/10 bg-white p-4 text-sm text-black/80">
+            <label className="flex items-center justify-between">
+              Two-factor authentication
+              <input type="checkbox" checked={settingsState.twoFactor} onChange={(e) => updateSetting("twoFactor", e.target.checked)} />
             </label>
-
-            <div className="space-y-3 rounded-xl border border-black/10 bg-white p-4 text-sm text-black/80">
-              <label className="flex items-center justify-between">
-                Two-factor authentication
-                <input type="checkbox" checked={settingsState.twoFactor} onChange={(e) => updateSetting("twoFactor", e.target.checked)} />
-              </label>
-              <label className="flex items-center justify-between">
-                Email reports
-                <input type="checkbox" checked={settingsState.emailReports} onChange={(e) => updateSetting("emailReports", e.target.checked)} />
-              </label>
-              <label className="flex items-center justify-between">
-                Auto retry failed sends
-                <input type="checkbox" checked={settingsState.autoRetry} onChange={(e) => updateSetting("autoRetry", e.target.checked)} />
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
-          <h3 className="text-2xl font-semibold text-black">Recent Configuration Activity</h3>
-          <div className="mt-5 space-y-3">
-            {activityLog.slice(0, 6).map((item) => (
-              <div key={item.id} className="rounded-xl border border-black/10 bg-white p-3">
-                <p className="text-sm font-semibold text-black">{item.title}</p>
-                <p className="text-xs text-black/55">{item.detail}</p>
-                <p className="mt-1 text-[11px] text-black/45">{item.time}</p>
-              </div>
-            ))}
+            <label className="flex items-center justify-between">
+              Email reports
+              <input type="checkbox" checked={settingsState.emailReports} onChange={(e) => updateSetting("emailReports", e.target.checked)} />
+            </label>
+            <label className="flex items-center justify-between">
+              Auto retry failed sends
+              <input type="checkbox" checked={settingsState.autoRetry} onChange={(e) => updateSetting("autoRetry", e.target.checked)} />
+            </label>
           </div>
         </div>
       </div>
