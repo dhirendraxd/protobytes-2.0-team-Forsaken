@@ -5,6 +5,15 @@ import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   ArrowUpRight,
   Bell,
   Home,
@@ -214,6 +223,7 @@ const Dashboard = () => {
     message: "",
   });
   const [campaignError, setCampaignError] = useState("");
+  const [editingCampaignId, setEditingCampaignId] = useState<number | null>(null);
 
   const [contactForm, setContactForm] = useState({
     name: "",
@@ -250,6 +260,7 @@ const Dashboard = () => {
     channel: "Email" as AlertRule["channel"],
   });
   const [alertError, setAlertError] = useState("");
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const menuItems = useMemo(
     () => [
@@ -469,21 +480,51 @@ const Dashboard = () => {
       return;
     }
 
-    const createdCampaign: Campaign = {
-      id: Date.now(),
-      name: campaignForm.name.trim(),
-      channel: campaignForm.channel,
-      audience: campaignForm.audience.trim() || "All Contacts",
-      category: campaignForm.category,
-      objective: campaignForm.objective,
-      frequency: campaignForm.frequency,
-      schedule: campaignForm.schedule || new Date().toISOString().slice(0, 16),
-      info: campaignForm.info.trim(),
-      message: campaignForm.message.trim(),
-      status: campaignForm.schedule ? "Scheduled" : "Draft",
-    };
+    if (editingCampaignId !== null) {
+      // Update existing campaign
+      setCampaigns((prev) =>
+        prev.map((c) =>
+          c.id === editingCampaignId
+            ? {
+                ...c,
+                name: campaignForm.name.trim(),
+                channel: campaignForm.channel,
+                audience: campaignForm.audience.trim() || "All Contacts",
+                category: campaignForm.category,
+                objective: campaignForm.objective,
+                frequency: campaignForm.frequency,
+                schedule: campaignForm.schedule || new Date().toISOString().slice(0, 16),
+                info: campaignForm.info.trim(),
+                message: campaignForm.message.trim(),
+              }
+            : c
+        )
+      );
+      const campaign = campaigns.find((c) => c.id === editingCampaignId);
+      if (campaign) {
+        logActivity("Campaign updated", `${campaignForm.name.trim()} modified`);
+      }
+      setEditingCampaignId(null);
+    } else {
+      // Create new campaign
+      const createdCampaign: Campaign = {
+        id: Date.now(),
+        name: campaignForm.name.trim(),
+        channel: campaignForm.channel,
+        audience: campaignForm.audience.trim() || "All Contacts",
+        category: campaignForm.category,
+        objective: campaignForm.objective,
+        frequency: campaignForm.frequency,
+        schedule: campaignForm.schedule || new Date().toISOString().slice(0, 16),
+        info: campaignForm.info.trim(),
+        message: campaignForm.message.trim(),
+        status: campaignForm.schedule ? "Scheduled" : "Draft",
+      };
 
-    setCampaigns((prev) => [createdCampaign, ...prev]);
+      setCampaigns((prev) => [createdCampaign, ...prev]);
+      logActivity("Campaign created", `${createdCampaign.name} (${createdCampaign.channel}, ${createdCampaign.category})`);
+    }
+
     setCampaignForm({
       name: "",
       channel: "SMS",
@@ -495,7 +536,37 @@ const Dashboard = () => {
       info: "",
       message: "",
     });
-    logActivity("Campaign created", `${createdCampaign.name} (${createdCampaign.channel}, ${createdCampaign.category})`);
+  };
+
+  const startEditCampaign = (campaign: Campaign) => {
+    setEditingCampaignId(campaign.id);
+    setCampaignForm({
+      name: campaign.name,
+      channel: campaign.channel,
+      audience: campaign.audience,
+      category: campaign.category,
+      objective: campaign.objective,
+      frequency: campaign.frequency,
+      schedule: campaign.schedule,
+      info: campaign.info,
+      message: campaign.message,
+    });
+    setCampaignError("");
+  };
+
+  const cancelEditCampaign = () => {
+    setEditingCampaignId(null);
+    setCampaignForm({
+      name: "",
+      channel: "SMS",
+      audience: "All Contacts",
+      category: "Promotion",
+      objective: "Awareness",
+      frequency: "One-time",
+      schedule: "",
+      info: "",
+      message: "",
+    });
   };
 
   const toggleCampaignStatus = (id: number) => {
@@ -865,8 +936,8 @@ const Dashboard = () => {
 
       <div className="grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
         <div className="rounded-2xl border border-black/10 bg-[#efefef] p-5">
-          <h3 className="text-lg font-semibold text-black">Create Campaign</h3>
-          <p className="mt-1 text-xs text-black/55">Pick category, timing, message, and audience. Keep it simple and launch fast.</p>
+          <h3 className="text-lg font-semibold text-black">{editingCampaignId !== null ? "Edit Campaign" : "Create Campaign"}</h3>
+          <p className="mt-1 text-xs text-black/55">{editingCampaignId !== null ? "Update campaign details and save changes." : "Pick category, timing, message, and audience. Keep it simple and launch fast."}</p>
           <div className="mt-4 space-y-3 text-sm">
             <input
               value={campaignForm.name}
@@ -979,9 +1050,16 @@ const Dashboard = () => {
               <span className="font-medium text-black">{campaignForm.frequency}</span>
             </div>
             {campaignError ? <p className="text-xs text-red-600">{campaignError}</p> : null}
-            <Button onClick={handleCreateCampaign} className="w-full rounded-xl bg-black text-white">
-              Save Campaign
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={handleCreateCampaign} className="flex-1 rounded-xl bg-black text-white">
+                {editingCampaignId !== null ? "Update Campaign" : "Save Campaign"}
+              </Button>
+              {editingCampaignId !== null && (
+                <Button onClick={cancelEditCampaign} variant="outline" className="rounded-xl border-black/20">
+                  Cancel
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -1021,6 +1099,9 @@ const Dashboard = () => {
                   </button>
                   <button onClick={() => toggleCampaignStatus(c.id)} className="rounded-lg border border-black/15 px-2 py-1 text-[10px] text-black/70">
                     {c.status === "Draft" ? "Schedule" : "Move To Draft"}
+                  </button>
+                  <button onClick={() => startEditCampaign(c)} className="rounded-lg border border-black/15 px-2 py-1 text-[10px] text-black/70">
+                    Edit
                   </button>
                   <button onClick={() => removeCampaign(c.id)} className="rounded-lg border border-red-200 px-2 py-1 text-[10px] text-red-600">
                     Remove
@@ -1074,8 +1155,50 @@ const Dashboard = () => {
 
   const renderContacts = () => {
     const segmentOptions = ["All Contacts", "VIP Customers", "Retail", "Wholesale", "Leads"];
-    const cityOptions = ["Kathmandu", "Pokhara", "Lalitpur", "Biratnagar", "Butwal"];
-    const areaOptions = ["Ward 1", "Ward 5", "Ward 10", "Lakeside", "Thamel"];
+    const cityOptions = ["Pokhara", "Kathmandu", "Lalitpur", "Biratnagar", "Butwal", "Others"];
+    
+    // Map cities to their areas
+    const cityAreaMap: Record<string, string[]> = {
+      "Pokhara": [
+        "Lakeside",
+        "Pokhara City Centre",
+        "Sarangkot",
+        "Ward 1",
+        "Ward 5",
+        "Ward 10",
+        "Ward 15",
+        "Ward 20",
+        "Amar Narayan",
+        "Mahendra Bazaar",
+        "Ramghat",
+        "Hardi Bazaar",
+        "Others"
+      ],
+      "Kathmandu": [
+        "Thamel",
+        "Durbar Square",
+        "Asan",
+        "Koteshwor",
+        "Baluwatar",
+        "Bhaktapur",
+        "Others"
+      ],
+      "Lalitpur": [
+        "Patan Durbar Square",
+        "Jawalakhel",
+        "Lubhu",
+        "Godawari",
+        "Others"
+      ],
+      "Others": ["Not Specified"]
+    };
+
+    // Get areas for selected city
+    const getAreasForCity = (city: string) => {
+      return cityAreaMap[city] || ["Select a city first"];
+    };
+
+    const areaOptions = getAreasForCity(contactForm.city);
     const categoryOptions = ["General", "High Value", "New", "At Risk"];
 
     return (
@@ -1101,7 +1224,7 @@ const Dashboard = () => {
                 <input value={contactForm.age} onChange={(e) => setContactForm((p) => ({ ...p, age: e.target.value }))} placeholder="Age (optional)" className="h-10 rounded-xl border border-black/15 bg-white px-3" />
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <select value={contactForm.city} onChange={(e) => setContactForm((p) => ({ ...p, city: e.target.value }))} className="h-10 rounded-xl border border-black/15 bg-white px-3">
+                <select value={contactForm.city} onChange={(e) => setContactForm((p) => ({ ...p, city: e.target.value, area: "" }))} className="h-10 rounded-xl border border-black/15 bg-white px-3">
                   <option value="">Select city</option>
                   {cityOptions.map((opt) => <option key={opt}>{opt}</option>)}
                 </select>
@@ -1157,13 +1280,13 @@ const Dashboard = () => {
             </div>
 
             <div className="mt-2 grid gap-2 sm:grid-cols-3">
-              <select value={contactFilters.city} onChange={(e) => setContactFilters((p) => ({ ...p, city: e.target.value }))} className="h-9 rounded-lg border border-black/15 bg-white px-2 text-xs">
+              <select value={contactFilters.city} onChange={(e) => setContactFilters((p) => ({ ...p, city: e.target.value, area: "" }))} className="h-9 rounded-lg border border-black/15 bg-white px-2 text-xs">
                 <option value="">All cities</option>
                 {cityOptions.map((opt) => <option key={opt}>{opt}</option>)}
               </select>
               <select value={contactFilters.area} onChange={(e) => setContactFilters((p) => ({ ...p, area: e.target.value }))} className="h-9 rounded-lg border border-black/15 bg-white px-2 text-xs">
                 <option value="">All areas</option>
-                {areaOptions.map((opt) => <option key={opt}>{opt}</option>)}
+                {contactFilters.city ? getAreasForCity(contactFilters.city).map((opt) => <option key={opt}>{opt}</option>) : areaOptions.map((opt) => <option key={opt}>{opt}</option>)}
               </select>
               <select value={contactFilters.category} onChange={(e) => setContactFilters((p) => ({ ...p, category: e.target.value }))} className="h-9 rounded-lg border border-black/15 bg-white px-2 text-xs">
                 <option value="">All categories</option>
@@ -1363,11 +1486,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#f3f3f3]">
-      <div className="px-4 pt-4 sm:px-6 lg:px-8">
-        <Navbar />
-      </div>
-
-      <div className="grid min-h-[calc(100vh-112px)] lg:grid-cols-[280px_1fr]">
+      <div className="grid min-h-screen lg:grid-cols-[280px_1fr]">
         <aside className="bg-black px-4 py-6 text-white lg:px-5 lg:py-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-sm font-semibold">
@@ -1377,7 +1496,7 @@ const Dashboard = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={async () => await signOut()}
+              onClick={() => setShowLogoutConfirm(true)}
               className="h-8 rounded-full px-2 text-white/70 hover:text-white"
             >
               <LogOut className="h-4 w-4" />
@@ -1425,6 +1544,10 @@ const Dashboard = () => {
         </aside>
 
         <main className="space-y-6 bg-[#f3f3f3] px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+          <div className="px-4 sm:px-0">
+            <Navbar />
+          </div>
+
           <div className="flex flex-col gap-3 border border-black/10 bg-[#efefef] px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs font-semibold text-black/50">Merchants</p>
@@ -1448,7 +1571,33 @@ const Dashboard = () => {
 
           {renderActiveContent()}
         </main>
+
+        <aside className="hidden border-l border-black/10 bg-[#f3f3f3] px-4 py-6 lg:block lg:px-5 lg:py-8">
+        </aside>
       </div>
+
+      <AlertDialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Logout</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to logout? You'll need to sign in again to access your account.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex justify-end gap-3">
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={async () => {
+                await signOut();
+                setShowLogoutConfirm(false);
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Logout
+            </AlertDialogAction>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

@@ -13,8 +13,12 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import { useAuth } from "@/contexts/AuthContext";
+import { useTranslation } from "react-i18next";
 
 const Index = () => {
+  const { user } = useAuth();
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-[#f3f3f3] relative overflow-hidden">
       {/* Animated Background Particles */}
@@ -70,21 +74,19 @@ const Index = () => {
           <div className="grid gap-10 lg:grid-cols-2">
             <div className="max-w-[520px]">
               <h1 className="mb-5 text-[44px] font-semibold leading-[0.95] tracking-[-0.03em] text-black sm:text-[56px] lg:text-[72px]">
-                Connect with
-                <br />
-                your Customers
+                {t('voicelink.hero.title')}
               </h1>
               <p className="max-w-[360px] text-sm leading-relaxed text-black/75 sm:text-base">
-                Send bulk SMS and voice messages instantly. Reach thousands of customers with personalized, automated communication.
+                {t('voicelink.hero.description')}
               </p>
               <div className="mt-7 flex flex-wrap items-center gap-4">
-                <Link to="/auth">
+                <Link to={user ? "/dashboard" : "/auth"}>
                   <Button className="h-11 rounded-xl bg-black px-6 text-xs font-semibold text-white hover:bg-black/90 sm:text-sm">
-                    Get Started Free
+                    {user ? t('voicelink.cta.goToDashboard') : t('voicelink.cta.getStarted')}
                   </Button>
                 </Link>
                 <a href="#" className="inline-flex items-center gap-1 text-xs font-medium text-black/85">
-                  See How It Works
+                  See how it works
                   <ArrowRight className="h-3 w-3" />
                 </a>
               </div>
@@ -92,21 +94,21 @@ const Index = () => {
 
             <div className="relative min-h-[320px] sm:min-h-[360px] lg:min-h-[420px]">
               <div className="absolute left-0 top-2 w-[210px] rotate-[-5deg] rounded-[24px] bg-white p-4 shadow-[0_24px_40px_rgba(0,0,0,0.17)] sm:left-6 sm:w-[250px] lg:left-10 lg:w-[280px]">
-                <p className="mb-3 text-lg font-semibold text-black">Campaign Stats</p>
+                <p className="mb-3 text-lg font-semibold text-black">{t('voicelink.dashboard.campaignStats')}</p>
                 <div className="mb-3 rounded-lg border border-black/10 bg-lime-100 px-3 py-2 text-[10px] text-black font-semibold">
                   98.5% Delivery Rate
                 </div>
                 <div className="mb-3 rounded-xl bg-black p-3 text-[10px] text-white">
-                  <p className="mb-1 font-semibold">Messages Sent</p>
+                  <p className="mb-1 font-semibold">{t('voicelink.dashboard.messagesDelivered')}</p>
                   <p className="text-xl font-bold">12,450</p>
                 </div>
                 <div className="space-y-2 text-[11px]">
                   <div className="flex items-center justify-between">
-                    <span>SMS Delivered</span>
+                    <span>{t('voicelink.dashboard.messagesDelivered')}</span>
                     <span className="text-green-600 font-semibold">9,840</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span>Voice Calls</span>
+                    <span>{t('voicelink.dashboard.voiceCalls')}</span>
                     <span className="text-green-600 font-semibold">2,610</span>
                   </div>
                 </div>
@@ -154,31 +156,29 @@ const Index = () => {
 
         <section id="features" className="mb-20">
           <h2 className="mb-8 text-[40px] font-semibold leading-[0.96] tracking-[-0.02em] text-black sm:text-[48px] lg:text-[60px]">
-            Powerful Features
-            <br />
-            for Your Business
+            {t('voicelink.features.title')}
           </h2>
           <div className="grid gap-4 lg:grid-cols-2">
             <article className="relative overflow-hidden rounded-2xl bg-[#ececec] p-6">
-              <h3 className="text-2xl font-semibold text-black">Bulk SMS Campaigns</h3>
+              <h3 className="text-2xl font-semibold text-black">{t('voicelink.features.bulkSms')}</h3>
               <p className="mt-3 max-w-[330px] text-sm leading-relaxed text-black/65">
-                Send personalized SMS to thousands of customers instantly with guaranteed delivery
+                {t('voicelink.features.bulkSmsDesc')}
               </p>
-              <a href="#" className="mt-6 inline-flex items-center gap-1 text-xs font-semibold text-black">
-                Learn More
+              <Link to="/pricing#bulk-sms" className="mt-6 inline-flex items-center gap-1 text-xs font-semibold text-black">
+                Learn more
                 <ArrowRight className="h-3 w-3" />
-              </a>
+              </Link>
               <div className="absolute -bottom-4 right-0 h-24 w-24 rounded-tl-[30px] bg-lime-300" />
             </article>
             <article className="relative overflow-hidden rounded-2xl bg-[#ececec] p-6">
-              <h3 className="text-2xl font-semibold text-black">Voice Messages & IVR</h3>
+              <h3 className="text-2xl font-semibold text-black">{t('voicelink.features.voiceIvr')}</h3>
               <p className="mt-3 max-w-[350px] text-sm leading-relaxed text-black/65">
-                Automated voice calls with Text-to-Speech or custom audio for alerts and confirmations
+                {t('voicelink.features.voiceIvrDesc')}
               </p>
-              <a href="#" className="mt-6 inline-flex items-center gap-1 text-xs font-semibold text-black">
-                Learn More
+              <Link to="/pricing#voice-ivr" className="mt-6 inline-flex items-center gap-1 text-xs font-semibold text-black">
+                Learn more
                 <ArrowRight className="h-3 w-3" />
-              </a>
+              </Link>
               <div className="absolute bottom-3 right-4 h-20 w-20 rounded-full border-[7px] border-lime-300 border-r-black border-t-[#f77d6f] border-b-transparent" />
             </article>
           </div>
@@ -187,41 +187,41 @@ const Index = () => {
         <section id="why" className="mb-20">
           <div className="grid gap-8 lg:grid-cols-[1fr_2fr]">
             <div>
-              <h2 className="mb-3 text-[44px] font-semibold tracking-[-0.03em] text-black sm:text-[52px] lg:text-[60px]">Why VoiceLink</h2>
+              <h2 className="mb-3 text-[44px] font-semibold tracking-[-0.03em] text-black sm:text-[52px] lg:text-[60px]">{t('voicelink.why.title')}</h2>
               <p className="max-w-[250px] text-sm leading-relaxed text-black/70">
-                The most trusted communication platform for SMEs and organizations worldwide
+                {t('voicelink.why.subtitle')}
               </p>
             </div>
             <div className="grid gap-0 rounded-2xl border border-black/10 bg-[#f5f5f5] md:grid-cols-2">
               <div className="border-b border-r border-black/10 p-5 md:border-b">
                 <div className="mb-3 flex items-center gap-3">
                   <Clock3 className="h-5 w-5 rounded-full bg-lime-300 p-1 text-black" />
-                  <h3 className="text-xl font-semibold">Instant Delivery</h3>
+                  <h3 className="text-xl font-semibold">{t('voicelink.why.instantDelivery')}</h3>
                 </div>
                 <p className="text-sm text-black/65">
-                  Send messages to thousands instantly with 99.9% delivery guarantee
+                  {t('voicelink.why.instantDeliveryDesc')}
                 </p>
               </div>
               <div className="border-b border-black/10 p-5 md:border-b">
                 <div className="mb-3 flex items-center gap-3">
                   <Headphones className="h-5 w-5 rounded-full bg-lime-300 p-1 text-black" />
-                  <h3 className="text-xl font-semibold">Expert Support</h3>
+                  <h3 className="text-xl font-semibold">{t('voicelink.why.expertSupport')}</h3>
                 </div>
-                <p className="text-sm text-black/65">24/7 support team ready to help you maximize your campaigns</p>
+                <p className="text-sm text-black/65">{t('voicelink.why.expertSupportDesc')}</p>
               </div>
               <div className="border-r border-black/10 p-5">
                 <div className="mb-3 flex items-center gap-3">
                   <BadgePercent className="h-5 w-5 rounded-full bg-lime-300 p-1 text-black" />
-                  <h3 className="text-xl font-semibold">Affordable Pricing</h3>
+                  <h3 className="text-xl font-semibold">{t('voicelink.why.affordablePricing')}</h3>
                 </div>
-                <p className="text-sm text-black/65">Pay only for what you send - no hidden fees or subscriptions</p>
+                <p className="text-sm text-black/65">{t('voicelink.why.affordablePricingDesc')}</p>
               </div>
               <div className="p-5">
                 <div className="mb-3 flex items-center gap-3">
                   <BarChart3 className="h-5 w-5 rounded-full bg-lime-300 p-1 text-black" />
-                  <h3 className="text-xl font-semibold">Real Analytics</h3>
+                  <h3 className="text-xl font-semibold">{t('voicelink.why.realAnalytics')}</h3>
                 </div>
-                <p className="text-sm text-black/65">Track delivery, engagement, and ROI with detailed real-time reports</p>
+                <p className="text-sm text-black/65">{t('voicelink.why.realAnalyticsDesc')}</p>
               </div>
             </div>
           </div>
@@ -231,11 +231,11 @@ const Index = () => {
           <div className="grid items-center gap-8 lg:grid-cols-[1.3fr_0.7fr]">
             <div>
               <h2 className="max-w-[520px] text-[42px] font-semibold leading-[0.95] tracking-[-0.03em] sm:text-[52px] lg:text-[60px]">
-                Start Connecting with Your Customers Today
+                {t('voicelink.cta.ready')}
               </h2>
-              <Link to="/auth">
+              <Link to={user ? "/dashboard" : "/auth"}>
                 <Button className="mt-6 h-11 rounded-xl bg-white px-6 text-xs font-semibold text-black hover:bg-white/90 sm:text-sm">
-                  Get Started Free
+                  {user ? t('voicelink.cta.goToDashboard') : t('voicelink.cta.getStarted')}
                 </Button>
               </Link>
             </div>
@@ -288,59 +288,59 @@ const Index = () => {
             </div>
           </div>
           <div>
-            <h2 className="text-[42px] font-semibold leading-[0.95] tracking-[-0.03em] text-black sm:text-[52px] lg:text-[60px]">Send in Real Time</h2>
+            <h2 className="text-[42px] font-semibold leading-[0.95] tracking-[-0.03em] text-black sm:text-[52px] lg:text-[60px]">{t('voicelink.campaigns.realtime')}</h2>
             <p className="mt-4 max-w-[520px] text-base leading-relaxed text-black/70">
-              Messages are delivered instantly to your customers. Track delivery status in real-time and monitor engagement with advanced analytics dashboard.
+              {t('voicelink.campaigns.realtimeDesc')}
             </p>
           </div>
         </section>
 
         <section id="pricing" className="mb-20">
-          <h2 className="text-center text-[44px] font-semibold leading-[0.95] tracking-[-0.03em] text-black sm:text-[52px] lg:text-[60px]">Simple Pricing</h2>
+          <h2 className="text-center text-[44px] font-semibold leading-[0.95] tracking-[-0.03em] text-black sm:text-[52px] lg:text-[60px]">{t('voicelink.pricing.title')}</h2>
           <p className="mx-auto mt-3 max-w-[500px] text-center text-sm text-black/70">
-            Pay only for what you send. No setup fees, no contracts.
+            {t('voicelink.pricing.subtitle')}
           </p>
           <div className="mt-10 grid gap-6 lg:grid-cols-3">
             <div className="rounded-2xl border border-black/10 bg-white p-6">
-              <h3 className="text-xl font-semibold text-black">Starter</h3>
-              <p className="mt-2 text-sm text-black/60">For small businesses</p>
-              <p className="mt-4 text-4xl font-bold text-black">$0<span className="text-lg">/mo</span></p>
+              <h3 className="text-xl font-semibold text-black">{t('voicelink.pricing.starter.name')}</h3>
+              <p className="mt-2 text-sm text-black/60">{t('voicelink.pricing.starter.desc')}</p>
+              <p className="mt-4 text-4xl font-bold text-black">{t('voicelink.pricing.starter.price')}<span className="text-lg">/month</span></p>
               <Link to="/auth">
                 <Button className="mt-6 w-full rounded-xl border border-black/10 text-black hover:bg-black/5">Get Started</Button>
               </Link>
               <ul className="mt-6 space-y-3 text-sm">
-                <li className="flex items-center gap-2 text-black/70">✓ 100 SMS credits</li>
-                <li className="flex items-center gap-2 text-black/70">✓ Basic dashboard</li>
-                <li className="flex items-center gap-2 text-black/70">✓ Email support</li>
+                <li className="flex items-center gap-2 text-black/70">✓ {t('voicelink.pricing.starter.feature1')}</li>
+                <li className="flex items-center gap-2 text-black/70">✓ {t('voicelink.pricing.starter.feature2')}</li>
+                <li className="flex items-center gap-2 text-black/70">✓ {t('voicelink.pricing.starter.feature3')}</li>
               </ul>
             </div>
             <div className="rounded-2xl border-2 border-black bg-white p-6 relative">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-black text-white px-3 py-1 rounded-full text-xs font-semibold">Most Popular</div>
-              <h3 className="text-xl font-semibold text-black">Professional</h3>
-              <p className="mt-2 text-sm text-black/60">For growing businesses</p>
-              <p className="mt-4 text-4xl font-bold text-black">$29<span className="text-lg">/mo</span></p>
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-black text-white px-3 py-1 rounded-full text-xs font-semibold">{t('voicelink.pricing.professional.popular')}</div>
+              <h3 className="text-xl font-semibold text-black">{t('voicelink.pricing.professional.name')}</h3>
+              <p className="mt-2 text-sm text-black/60">{t('voicelink.pricing.professional.desc')}</p>
+              <p className="mt-4 text-4xl font-bold text-black">{t('voicelink.pricing.professional.price')}<span className="text-lg">/month</span></p>
               <Link to="/auth">
                 <Button className="mt-6 w-full rounded-xl bg-black text-white hover:bg-black/90">Get Started</Button>
               </Link>
               <ul className="mt-6 space-y-3 text-sm">
-                <li className="flex items-center gap-2 text-black/70">✓ 10,000 SMS</li>
-                <li className="flex items-center gap-2 text-black/70">✓ Voice campaigns</li>
-                <li className="flex items-center gap-2 text-black/70">✓ Advanced analytics</li>
-                <li className="flex items-center gap-2 text-black/70">✓ Priority support</li>
+                <li className="flex items-center gap-2 text-black/70">✓ {t('voicelink.pricing.professional.feature1')}</li>
+                <li className="flex items-center gap-2 text-black/70">✓ {t('voicelink.pricing.professional.feature2')}</li>
+                <li className="flex items-center gap-2 text-black/70">✓ {t('voicelink.pricing.professional.feature3')}</li>
+                <li className="flex items-center gap-2 text-black/70">✓ {t('voicelink.pricing.professional.feature4')}</li>
               </ul>
             </div>
             <div className="rounded-2xl border border-black/10 bg-white p-6">
-              <h3 className="text-xl font-semibold text-black">Enterprise</h3>
-              <p className="mt-2 text-sm text-black/60">For large organizations</p>
-              <p className="mt-4 text-4xl font-bold text-black">Custom<span className="text-lg">/mo</span></p>
+              <h3 className="text-xl font-semibold text-black">{t('voicelink.pricing.enterprise.name')}</h3>
+              <p className="mt-2 text-sm text-black/60">{t('voicelink.pricing.enterprise.desc')}</p>
+              <p className="mt-4 text-4xl font-bold text-black">{t('voicelink.pricing.enterprise.price')}<span className="text-lg">/month</span></p>
               <a href="#contact">
                 <Button className="mt-6 w-full rounded-xl bg-black text-white hover:bg-black/90">Contact Sales</Button>
               </a>
               <ul className="mt-6 space-y-3 text-sm">
-                <li className="flex items-center gap-2 text-black/70">✓ Unlimited everything</li>
-                <li className="flex items-center gap-2 text-black/70">✓ Dedicated account manager</li>
-                <li className="flex items-center gap-2 text-black/70">✓ API access</li>
-                <li className="flex items-center gap-2 text-black/70">✓ Custom integrations</li>
+                <li className="flex items-center gap-2 text-black/70">✓ {t('voicelink.pricing.enterprise.feature1')}</li>
+                <li className="flex items-center gap-2 text-black/70">✓ {t('voicelink.pricing.enterprise.feature2')}</li>
+                <li className="flex items-center gap-2 text-black/70">✓ {t('voicelink.pricing.enterprise.feature3')}</li>
+                <li className="flex items-center gap-2 text-black/70">✓ {t('voicelink.pricing.enterprise.feature4')}</li>
               </ul>
             </div>
           </div>
@@ -348,9 +348,9 @@ const Index = () => {
 
         <section className="mb-20 grid items-center gap-8 lg:grid-cols-2">
           <div>
-            <h2 className="text-[42px] font-semibold leading-[0.95] tracking-[-0.03em] text-black sm:text-[52px] lg:text-[60px]">Campaign Management</h2>
+            <h2 className="text-[42px] font-semibold leading-[0.95] tracking-[-0.03em] text-black sm:text-[52px] lg:text-[60px]">{t('voicelink.campaigns.title')}</h2>
             <p className="mt-4 max-w-[520px] text-base leading-relaxed text-black/70">
-              Manage all your SMS and voice campaigns from one powerful dashboard. Create, send, and track campaigns with detailed analytics and insights.
+              {t('voicelink.campaigns.description')}
             </p>
           </div>
           <div className="relative flex min-h-[220px] items-center justify-center">
@@ -375,12 +375,12 @@ const Index = () => {
 
         <section className="mb-24 text-center">
           <h2 id="contact" className="mx-auto max-w-[620px] text-[46px] font-semibold leading-[0.95] tracking-[-0.03em] text-black sm:text-[56px] lg:text-[64px]">
-            Ready to connect with customers?
+            {t('voicelink.cta.ready')}
           </h2>
-          <p className="mx-auto mt-3 max-w-[500px] text-black/70">Start sending SMS and voice messages in minutes</p>
-          <Link to="/auth">
+          <p className="mx-auto mt-3 max-w-[500px] text-black/70">{t('voicelink.cta.subtitle')}</p>
+          <Link to={user ? "/dashboard" : "/auth"}>
             <Button className="mt-6 h-11 rounded-xl bg-black px-6 text-xs text-white hover:bg-black/90 sm:text-sm">
-              Get Started Free
+              {user ? t('voicelink.cta.goToDashboard') : t('voicelink.cta.getStarted')}
             </Button>
           </Link>
         </section>

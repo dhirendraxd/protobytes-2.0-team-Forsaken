@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Village Voice Hub",
+    "appName": "VoiceLink",
     "home": "Home",
     "about": "About",
     "contact": "Contact",
@@ -17,111 +17,87 @@
     "error": "Error",
     "success": "Success",
     "warning": "Warning",
-    "noData": "No data available"
+    "noData": "No data available",
+    "merchants": "Merchants",
+    "logout": "Logout"
   },
-  "navigation": {
-    "home": "Home",
-    "dashboard": "Dashboard",
-    "alerts": "Alerts",
-    "contributors": "Contributors",
-      "about": "About",
-    "marketPrices": "Market Prices",
-    "transport": "Transport",
-    "contact": "Contact",
-    "auth": "Login",
-    "logout": "Logout",
-    "applyModerator": "Apply as Moderator"
-  },
-  "auth": {
-    "login": "Login",
-    "signup": "Sign Up",
-    "logout": "Logout",
-    "email": "Email",
-    "password": "Password",
-    "confirmPassword": "Confirm Password",
-    "rememberMe": "Remember me",
-    "forgotPassword": "Forgot password?",
-    "loginSuccess": "Login successful",
-    "loginError": "Login failed",
-    "signupSuccess": "Signup successful",
-    "signupError": "Signup failed",
-    "invalidEmail": "Invalid email address",
-    "passwordMismatch": "Passwords do not match",
-    "passwordTooShort": "Password must be at least 6 characters"
-  },
-  "alerts": {
-    "title": "Community Alerts",
-    "submitAlert": "Submit Alert",
-    "viewAlert": "View Alert",
-    "alertText": "Alert Message",
-    "alertDescription": "Describe the alert details",
-    "phone": "Phone Number",
-    "email": "Email Address",
-    "status": "Status",
-    "pending": "Pending",
-    "approved": "Approved",
-    "rejected": "Rejected",
-    "submitSuccess": "Alert submitted successfully",
-    "submitError": "Failed to submit alert",
-    "acceptAlert": "Accept Alert",
-    "rejectAlert": "Reject Alert",
-    "acceptedEmail": "Alert has been accepted",
-    "rejectedEmail": "Alert has been rejected",
-    "anonymous": "Anonymous Submission"
-  },
-  "contributors": {
-    "title": "Contributors",
-    "name": "Name",
-    "village": "Village",
-    "province": "Province",
-    "phone": "Phone",
-    "email": "Email",
-    "status": "Status",
-    "approved": "Approved",
-    "pending": "Pending",
-    "rejected": "Rejected",
-    "noContributors": "No contributors found",
-    "moderators": "Moderators",
-    "allContributors": "All Contributors"
-  },
-  "dashboard": {
-    "title": "Dashboard",
-    "pendingAlerts": "Pending Alerts",
-    "approvedAlerts": "Approved Alerts",
-    "statistics": "Statistics",
-    "overview": "Overview",
-    "recentActivity": "Recent Activity",
-    "noAlerts": "No pending alerts"
-  },
-  "moderator": {
-    "title": "Moderator Dashboard",
-    "applicationForm": "Apply as Moderator",
-    "approve": "Approve",
-    "reject": "Reject"
-  },
-  "validation": {
-    "required": "This field is required",
-    "email": "Please enter a valid email address",
-    "phone": "Please enter a valid phone number"
-  },
-  "messages": {
-    "welcome": "Welcome to Village Voice Hub",
-    "thankYou": "Thank you for your contribution"
-  },
-  "homepage": {
-    "locating": "Locating...",
-    "latestUpdate": "Latest Update",
-    "loadingUpdates": "Loading latest updates for your area...",
-    "noUpdates": "No recent updates for your area.",
-    "howItWorks": "How It Works",
-    "simple": "Simple. Accessible. Free.",
-    "press1": "Press 1",
-    "press2": "Press 2",
-    "press3": "Press 3",
-    "press4": "Press 4",
-    "marketPricesDesc": "Listen to today's market prices",
-    "transportDesc": "Get bus & jeep schedules",
-    "alertsDesc": "Hear local alerts & news",
-    "voiceMessageDesc": "Leave a voice message"
+  "voicelink": {
+    "hero": {
+      "title": "Connect with your Customers",
+      "description": "Send bulk SMS and voice messages instantly. Reach thousands of customers with personalized, automated communication."
+    },
+    "pricing": {
+      "title": "Simple Pricing",
+      "subtitle": "Pay only for what you send. No setup fees, no contracts.",
+      "starter": {
+        "name": "Starter",
+        "desc": "For small businesses",
+        "price": "₨0",
+        "feature1": "100 SMS credits",
+        "feature2": "Basic dashboard",
+        "feature3": "Email support"
+      },
+      "professional": {
+        "name": "Professional",
+        "desc": "For growing businesses",
+        "price": "₨3,999",
+        "popular": "Most Popular",
+        "feature1": "10,000 SMS",
+        "feature2": "Voice campaigns",
+        "feature3": "Advanced analytics",
+        "feature4": "Priority support"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "desc": "For large organizations",
+        "price": "Custom",
+        "feature1": "Unlimited everything",
+        "feature2": "Dedicated account manager",
+        "feature3": "API access",
+        "feature4": "Custom integrations"
+      }
+    },
+    "features": {
+      "title": "Powerful Features for Your Business",
+      "bulkSms": "Bulk SMS Campaigns",
+      "bulkSmsDesc": "Send personalized SMS to thousands of customers instantly with guaranteed delivery",
+      "voiceIvr": "Voice Messages & IVR",
+      "voiceIvrDesc": "Automated voice calls with Text-to-Speech or custom audio for alerts and confirmations"
+    },
+    "why": {
+      "title": "Why VoiceLink",
+      "subtitle": "The most trusted communication platform for SMEs and organizations in Nepal",
+      "instantDelivery": "Instant Delivery",
+      "instantDeliveryDesc": "Send messages to thousands instantly with 99.9% delivery guarantee",
+      "expertSupport": "Expert Support",
+      "expertSupportDesc": "24/7 support team ready to help you maximize your campaigns",
+      "affordablePricing": "Affordable Pricing",
+      "affordablePricingDesc": "Pay only for what you send - no hidden fees or subscriptions",
+      "realAnalytics": "Real Analytics",
+      "realAnalyticsDesc": "Track delivery, engagement, and ROI with detailed real-time reports"
+    },
+    "campaigns": {
+      "title": "Campaign Management",
+      "description": "Manage all your SMS and voice campaigns from one powerful dashboard. Create, send, and track campaigns with detailed analytics and insights.",
+      "realtime": "Send in Real Time",
+      "realtimeDesc": "Messages are delivered instantly to your customers. Track delivery status in real-time and monitor engagement with advanced analytics dashboard."
+    },
+    "cta": {
+      "ready": "Ready to connect with customers?",
+      "subtitle": "Start sending SMS and voice messages in minutes",
+      "getStarted": "Get Started Free",
+      "goToDashboard": "Go to Dashboard"
+    },
+    "dashboard": {
+      "runningCampaigns": "Running Campaigns",
+      "scheduled": "Scheduled",
+      "drafts": "Drafts",
+      "createCampaign": "Create Campaign",
+      "editCampaign": "Edit Campaign",
+      "campaignQueue": "Campaign Queue",
+      "campaignStats": "Campaign Stats",
+      "messagesDelivered": "Messages Delivered",
+      "voiceCalls": "Voice Calls"
+    }
   }
 }

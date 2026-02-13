@@ -1,20 +1,22 @@
 import { Button } from "@/components/ui/button";
-import { LogOut, Shield, User } from "lucide-react";
+import { User, Globe } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { useTranslation } from "react-i18next";
 
 const Navbar = () => {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const location = useLocation();
+  const { i18n } = useTranslation();
   
   const isActive = (path: string) => location.pathname === path;
   const isDashboard = location.pathname === "/dashboard";
+
+  const toggleLanguage = () => {
+    const newLang = i18n.language === 'en' ? 'ne' : 'en';
+    i18n.changeLanguage(newLang);
+    localStorage.setItem('language', newLang);
+  };
 
   return (
     <nav className="mb-6 flex items-center justify-between bg-[#efefef] px-6 py-5 sm:px-8 rounded-xl">
@@ -104,35 +106,28 @@ const Navbar = () => {
       )}
 
       <div className="flex items-center gap-3">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={toggleLanguage}
+          className="h-10 rounded-full px-3 text-sm text-black hover:bg-black/5"
+          title={i18n.language === 'en' ? 'नेपाली' : 'English'}
+        >
+          <Globe className="h-5 w-5" />
+          <span className="ml-1 text-xs font-semibold">
+            {i18n.language === 'en' ? 'NE' : 'EN'}
+          </span>
+        </Button>
         {user ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-10 rounded-full px-4 text-sm text-gray-900 hover:bg-black/5">
-                {user.photoURL ? (
-                  <img src={user.photoURL} alt="Profile" className="h-6 w-6 rounded-full" />
-                ) : (
-                  <User className="h-5 w-5" />
-                )}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem asChild>
-                <Link to="/dashboard" className="cursor-pointer text-sm">
-                  <Shield className="mr-2 h-4 w-4" />
-                  Dashboard
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <button
-                  onClick={async () => await signOut()}
-                  className="w-full cursor-pointer text-left text-sm text-red-600"
-                >
-                  <LogOut className="mr-2 inline h-4 w-4" />
-                  Logout
-                </button>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Link to="/dashboard">
+            <Button variant="ghost" size="sm" className="h-10 rounded-full px-4 text-sm text-gray-900 hover:bg-black/5">
+              {user.photoURL ? (
+                <img src={user.photoURL} alt="Profile" className="h-6 w-6 rounded-full" />
+              ) : (
+                <User className="h-5 w-5" />
+              )}
+            </Button>
+          </Link>
         ) : (
           <Link to="/auth">
             <Button size="sm" className="h-10 rounded-full bg-black px-5 text-sm text-white hover:bg-lime-600 active:scale-95 transition-all">

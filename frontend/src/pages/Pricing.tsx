@@ -159,6 +159,148 @@ const Pricing = () => {
           </div>
         </section>
 
+        {/* Bulk SMS Feature Section */}
+        <section id="bulk-sms" className="mb-16 scroll-mt-20">
+          <div className="rounded-[26px] bg-gradient-to-br from-lime-300 to-lime-200 px-6 py-12 sm:px-8 lg:px-12">
+            <div className="mx-auto max-w-4xl">
+              <h2 className="mb-4 text-[40px] font-semibold leading-[0.95] tracking-[-0.03em] text-black sm:text-[48px]">
+                Bulk SMS Campaigns
+              </h2>
+              <p className="mb-6 max-w-2xl text-lg text-black/75">
+                Send personalized SMS messages to thousands of your customers instantly with guaranteed delivery rates. Perfect for promotions, alerts, confirmations, and customer engagement.
+              </p>
+              
+              <div className="grid gap-8 md:grid-cols-2">
+                <div>
+                  <h3 className="mb-4 text-2xl font-semibold text-black">Key Features</h3>
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-black" />
+                      <div>
+                        <p className="font-semibold text-black">99.9% Delivery Rate</p>
+                        <p className="text-sm text-black/70">Guaranteed message delivery to all major carriers</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-black" />
+                      <div>
+                        <p className="font-semibold text-black">Instant Send</p>
+                        <p className="text-sm text-black/70">Messages delivered in seconds, not hours</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-black" />
+                      <div>
+                        <p className="font-semibold text-black">Personalization</p>
+                        <p className="text-sm text-black/70">Custom variables to address each customer by name</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-black" />
+                      <div>
+                        <p className="font-semibold text-black">Scheduled Campaigns</p>
+                        <p className="text-sm text-black/70">Send messages at the optimal time for your audience</p>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h3 className="mb-4 text-2xl font-semibold text-black">Pricing Breakdown</h3>
+                  <div className="space-y-3">
+                    <div className="rounded-xl bg-white p-4">
+                      <p className="text-sm text-black/70">Starter Plan</p>
+                      <p className="text-2xl font-bold text-black">रू 2,999<span className="text-base font-normal text-black/60">/month</span></p>
+                      <p className="mt-2 text-xs text-black/60">2,000 SMS credits/month</p>
+                    </div>
+                    <div className="rounded-xl bg-white p-4 border-2 border-black">
+                      <p className="text-sm text-black/70">Professional Plan</p>
+                      <p className="text-2xl font-bold text-black">रू 8,999<span className="text-base font-normal text-black/60">/month</span></p>
+                      <p className="mt-2 text-xs text-black/60">15,000 SMS credits/month + Advanced analytics</p>
+                    </div>
+                    <div className="rounded-xl bg-white p-4">
+                      <p className="text-sm text-black/70">Add-on SMS</p>
+                      <p className="text-2xl font-bold text-black">रू 1,499</p>
+                      <p className="mt-2 text-xs text-black/60">Additional 2,000 SMS credits</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Voice IVR Feature Section */}
+        <section id="voice-ivr" className="mb-16 scroll-mt-20">
+          <div className="rounded-[26px] bg-gradient-to-br from-black to-[#1a1a1a] px-6 py-12 text-white sm:px-8 lg:px-12">
+            <div className="mx-auto max-w-4xl">
+              <h2 className="mb-4 text-[40px] font-semibold leading-[0.95] tracking-[-0.03em] sm:text-[48px]">
+                Voice Messages & IVR
+              </h2>
+              <p className="mb-6 max-w-2xl text-lg text-white/75">
+                Automated voice calls with Text-to-Speech or custom audio for alerts, confirmations, and important notifications. Reach customers even when they can't read SMS.
+              </p>
+              
+              <div className="grid gap-8 md:grid-cols-2">
+                <div>
+                  <h3 className="mb-4 text-2xl font-semibold">Key Features</h3>
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-lime-300" />
+                      <div>
+                        <p className="font-semibold">Text-to-Speech Technology</p>
+                        <p className="text-sm text-white/70">Natural-sounding voices in multiple languages</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-lime-300" />
+                      <div>
+                        <p className="font-semibold">Custom Audio Upload</p>
+                        <p className="text-sm text-white/70">Use your own recordings for branded messages</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-lime-300" />
+                      <div>
+                        <p className="font-semibold">IVR Integration</p>
+                        <p className="text-sm text-white/70">Allow customers to interact via phone keypad</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-lime-300" />
+                      <div>
+                        <p className="font-semibold">Call Recording</p>
+                        <p className="text-sm text-white/70">Record interactions for quality assurance</p>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h3 className="mb-4 text-2xl font-semibold">Pricing Breakdown</h3>
+                  <div className="space-y-3">
+                    <div className="rounded-xl bg-white/10 p-4 border border-white/20">
+                      <p className="text-sm text-white/70">Starter Plan</p>
+                      <p className="text-2xl font-bold">रू 2,999<span className="text-base font-normal text-white/60">/month</span></p>
+                      <p className="mt-2 text-xs text-white/60">1,000 voice minutes/month</p>
+                    </div>
+                    <div className="rounded-xl bg-white/10 p-4 border-2 border-lime-300">
+                      <p className="text-sm text-white/70">Professional Plan</p>
+                      <p className="text-2xl font-bold">रू 8,999<span className="text-base font-normal text-white/60">/month</span></p>
+                      <p className="mt-2 text-xs text-white/60">7,500 voice minutes/month + IVR features</p>
+                    </div>
+                    <div className="rounded-xl bg-white/10 p-4 border border-white/20">
+                      <p className="text-sm text-white/70">Add-on Voice</p>
+                      <p className="text-2xl font-bold">रू 2,499</p>
+                      <p className="mt-2 text-xs text-white/60">Additional 1,000 voice minutes</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* FAQ Section */}
         <section className="mb-16">
           <div className="rounded-[26px] bg-black px-6 py-12 text-white sm:px-8 lg:px-12">
