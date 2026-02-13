@@ -82,6 +82,44 @@ You can add shadcn/ui components manually  by copying from [shadcn/ui](https://u
 
 See `.env.example` for all available environment variables.
 
+## Deployment to Vercel
+
+### Quick Deploy
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone)
+
+### Manual Deployment
+
+1. Install Vercel CLI:
+```bash
+npm i -g vercel
+```
+
+2. Login to Vercel:
+```bash
+vercel login
+```
+
+3. Deploy:
+```bash
+vercel
+```
+
+### Environment Variables Setup
+
+Set the following environment variables in your Vercel project settings:
+
+- `VITE_FIREBASE_API_KEY` - Your Firebase API key
+- `VITE_FIREBASE_AUTH_DOMAIN` - Your Firebase auth domain
+- `VITE_FIREBASE_PROJECT_ID` - Your Firebase project ID
+- `VITE_FIREBASE_STORAGE_BUCKET` - Your Firebase storage bucket
+- `VITE_FIREBASE_MESSAGING_SENDER_ID` - Your Firebase messaging sender ID
+- `VITE_FIREBASE_APP_ID` - Your Firebase app ID
+
+### Automatic Deployments
+
+Once connected to Vercel, every push to the `main` branch will trigger an automatic deployment.
+
 ## Contributing
 
 Follow the commit message guidelines in the root `gitpush-guidlines` file.

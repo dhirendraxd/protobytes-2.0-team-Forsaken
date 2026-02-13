@@ -22,35 +22,43 @@ const Navbar = () => {
         <span className="inline-block h-5 w-5 rounded-full bg-lime-300" />
       </Link>
 
-      <div className="hidden items-center gap-8 text-sm font-medium text-black/70 md:flex">
+      <div className="hidden items-center gap-8 text-sm font-medium md:flex">
         <Link 
           to="/features" 
-          className={`hover:text-black transition-colors ${
-            isActive("/features") ? "text-blue-600 underline decoration-2 underline-offset-4" : ""
+          className={`transition-colors ${
+            isActive("/features") 
+              ? "text-blue-600 underline decoration-2 underline-offset-4" 
+              : "text-black/70 hover:text-blue-600"
           }`}
         >
           Features
         </Link>
         <Link 
           to="/pricing" 
-          className={`hover:text-black transition-colors ${
-            isActive("/pricing") ? "text-blue-600 underline decoration-2 underline-offset-4" : ""
+          className={`transition-colors ${
+            isActive("/pricing") 
+              ? "text-blue-600 underline decoration-2 underline-offset-4" 
+              : "text-black/70 hover:text-blue-600"
           }`}
         >
           Pricing
         </Link>
         <Link 
           to="/why-us" 
-          className={`hover:text-black transition-colors ${
-            isActive("/why-us") ? "text-blue-600 underline decoration-2 underline-offset-4" : ""
+          className={`transition-colors ${
+            isActive("/why-us") 
+              ? "text-blue-600 underline decoration-2 underline-offset-4" 
+              : "text-black/70 hover:text-blue-600"
           }`}
         >
           Why Us
         </Link>
         <Link 
           to="/contact" 
-          className={`hover:text-black transition-colors ${
-            isActive("/contact") ? "text-blue-600 underline decoration-2 underline-offset-4" : ""
+          className={`transition-colors ${
+            isActive("/contact") 
+              ? "text-blue-600 underline decoration-2 underline-offset-4" 
+              : "text-black/70 hover:text-blue-600"
           }`}
         >
           Contact
@@ -89,7 +97,7 @@ const Navbar = () => {
           </DropdownMenu>
         ) : (
           <Link to="/auth">
-            <Button size="sm" className="h-10 rounded-full bg-black px-5 text-sm text-white hover:bg-black/90 active:scale-95 transition-transform">
+            <Button size="sm" className="h-10 rounded-full bg-black px-5 text-sm text-white hover:bg-blue-600 active:scale-95 transition-all">
               Log In
             </Button>
           </Link>

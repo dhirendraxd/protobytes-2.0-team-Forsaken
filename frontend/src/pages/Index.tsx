@@ -16,11 +16,57 @@ import Navbar from "@/components/Navbar";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-[#f3f3f3]">
-      <div className="mx-auto w-full max-w-[1680px] px-4 pt-6 sm:px-6 lg:px-10">
+    <div className="min-h-screen bg-[#f3f3f3] relative overflow-hidden">
+      {/* Animated Background Particles */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <style>
+          {`
+            @keyframes float {
+              0%, 100% { transform: translateY(0) translateX(0); }
+              25% { transform: translateY(-30px) translateX(15px); }
+              50% { transform: translateY(-60px) translateX(-15px); }
+              75% { transform: translateY(-30px) translateX(10px); }
+            }
+            @keyframes float-slow {
+              0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
+              33% { transform: translateY(-40px) translateX(20px) rotate(120deg); }
+              66% { transform: translateY(-20px) translateX(-20px) rotate(240deg); }
+            }
+            @keyframes pulse {
+              0%, 100% { opacity: 0.25; transform: scale(1); }
+              50% { opacity: 0.45; transform: scale(1.15); }
+            }
+            .particle { animation: float 18s infinite ease-in-out; }
+            .particle-slow { animation: float-slow 22s infinite ease-in-out; }
+            .particle-pulse { animation: pulse 10s infinite ease-in-out; }
+          `}
+        </style>
+        
+        {/* Lime particles */}
+        <div className="particle absolute top-[10%] left-[5%] w-24 h-24 rounded-full bg-lime-300/30 blur-2xl" style={{ animationDelay: '0s' }} />
+        <div className="particle-slow absolute top-[20%] right-[15%] w-32 h-32 rounded-full bg-lime-300/25 blur-3xl" style={{ animationDelay: '2s' }} />
+        <div className="particle absolute bottom-[15%] left-[10%] w-28 h-28 rounded-full bg-lime-300/35 blur-2xl" style={{ animationDelay: '4s' }} />
+        <div className="particle-pulse absolute top-[40%] right-[8%] w-40 h-40 rounded-full bg-lime-300/20 blur-3xl" style={{ animationDelay: '1s' }} />
+        <div className="particle-slow absolute bottom-[30%] right-[20%] w-36 h-36 rounded-full bg-lime-300/30 blur-3xl" style={{ animationDelay: '3s' }} />
+        
+        {/* White/Gray particles */}
+        <div className="particle absolute top-[60%] left-[20%] w-20 h-20 rounded-full bg-white/30 blur-xl" style={{ animationDelay: '1.5s' }} />
+        <div className="particle-slow absolute top-[25%] left-[40%] w-24 h-24 rounded-full bg-white/25 blur-2xl" style={{ animationDelay: '3.5s' }} />
+        <div className="particle-pulse absolute bottom-[40%] left-[35%] w-28 h-28 rounded-full bg-white/30 blur-2xl" style={{ animationDelay: '2.5s' }} />
+        
+        {/* Black particles */}
+        <div className="particle absolute top-[70%] right-[30%] w-18 h-18 rounded-full bg-black/12 blur-xl" style={{ animationDelay: '5s' }} />
+        <div className="particle-slow absolute bottom-[20%] right-[40%] w-22 h-22 rounded-full bg-black/15 blur-2xl" style={{ animationDelay: '6s' }} />
+        
+        {/* Additional center particles */}
+        <div className="particle absolute top-[50%] left-[45%] w-16 h-16 rounded-full bg-lime-300/35 blur-xl" style={{ animationDelay: '7s' }} />
+        <div className="particle-slow absolute bottom-[50%] right-[50%] w-20 h-20 rounded-full bg-lime-300/30 blur-xl" style={{ animationDelay: '8s' }} />
+      </div>
+
+      <div className="mx-auto w-full max-w-[1680px] px-4 pt-6 sm:px-6 lg:px-10 relative z-10">
         <Navbar />
 
-        <section className="relative mb-16 overflow-hidden rounded-[26px] bg-lime-300 px-6 pb-10 pt-10 sm:px-8 lg:px-12">
+        <section className="relative mb-24 overflow-hidden rounded-[26px] bg-lime-300 px-6 pb-10 pt-10 sm:px-8 lg:px-12">
           <div className="grid gap-10 lg:grid-cols-2">
             <div className="max-w-[520px]">
               <h1 className="mb-5 text-[44px] font-semibold leading-[0.95] tracking-[-0.03em] text-black sm:text-[56px] lg:text-[72px]">
@@ -31,15 +77,17 @@ const Index = () => {
               <p className="max-w-[360px] text-sm leading-relaxed text-black/75 sm:text-base">
                 Send bulk SMS and voice messages instantly. Reach thousands of customers with personalized, automated communication.
               </p>
-              <Link to="/auth">
-                <Button className="mt-7 h-11 rounded-xl bg-black px-6 text-xs font-semibold text-white hover:bg-black/90 sm:text-sm">
-                  Get Started Free
-                </Button>
-              </Link>
-              <a href="#" className="mt-7 inline-flex items-center gap-1 text-xs font-medium text-black/85">
-                See How It Works
-                <ArrowRight className="h-3 w-3" />
-              </a>
+              <div className="mt-7 flex flex-wrap items-center gap-4">
+                <Link to="/auth">
+                  <Button className="h-11 rounded-xl bg-black px-6 text-xs font-semibold text-white hover:bg-black/90 sm:text-sm">
+                    Get Started Free
+                  </Button>
+                </Link>
+                <a href="#" className="inline-flex items-center gap-1 text-xs font-medium text-black/85">
+                  See How It Works
+                  <ArrowRight className="h-3 w-3" />
+                </a>
+              </div>
             </div>
 
             <div className="relative min-h-[320px] sm:min-h-[360px] lg:min-h-[420px]">
@@ -104,7 +152,7 @@ const Index = () => {
           </svg>
         </section>
 
-        <section id="features" className="mb-16">
+        <section id="features" className="mb-20">
           <h2 className="mb-8 text-[40px] font-semibold leading-[0.96] tracking-[-0.02em] text-black sm:text-[48px] lg:text-[60px]">
             Powerful Features
             <br />
@@ -136,7 +184,7 @@ const Index = () => {
           </div>
         </section>
 
-        <section id="why" className="mb-16">
+        <section id="why" className="mb-20">
           <div className="grid gap-8 lg:grid-cols-[1fr_2fr]">
             <div>
               <h2 className="mb-3 text-[44px] font-semibold tracking-[-0.03em] text-black sm:text-[52px] lg:text-[60px]">Why VoiceLink</h2>
@@ -179,24 +227,7 @@ const Index = () => {
           </div>
         </section>
 
-        <section className="mb-16 text-center">
-          <h2 className="text-[44px] font-semibold tracking-[-0.03em] text-black sm:text-[52px] lg:text-[60px]">Trusted by Businesses</h2>
-          <p className="mx-auto mt-3 max-w-[500px] text-sm text-black/70">
-            Thousands of SMEs and organizations use VoiceLink to reach their customers
-          </p>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-4 md:gap-6">
-            {["Twilio", "AWS", "Firebase", "Stripe", "PayPal", "SendGrid", "Vonage", "Nexmo"].map((partner) => (
-              <div
-                key={partner}
-                className="flex h-12 min-w-24 items-center justify-center rounded-full bg-white px-6 text-xs font-semibold text-black/70 border border-black/10 shadow-[0_1px_0_rgba(0,0,0,0.05)]"
-              >
-                {partner}
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-16 rounded-[22px] bg-gradient-to-r from-black via-[#121212] to-[#212121] px-6 py-8 text-white sm:px-8 lg:px-12">
+        <section className="mb-20 rounded-[22px] bg-gradient-to-r from-black via-[#121212] to-[#212121] px-6 py-8 text-white sm:px-8 lg:px-12">
           <div className="grid items-center gap-8 lg:grid-cols-[1.3fr_0.7fr]">
             <div>
               <h2 className="max-w-[520px] text-[42px] font-semibold leading-[0.95] tracking-[-0.03em] sm:text-[52px] lg:text-[60px]">
@@ -235,7 +266,7 @@ const Index = () => {
           </div>
         </section>
 
-        <section className="mb-14 grid items-center gap-8 md:mb-16 md:grid-cols-2">
+        <section className="mb-20 grid items-center gap-8 md:grid-cols-2">
           <div className="relative mx-auto h-40 w-[280px] sm:w-[320px]">
             <div className="absolute left-0 top-2 h-32 w-40 rotate-[-8deg] rounded-2xl bg-lime-300" />
             <div className="absolute left-5 top-5 h-32 w-56 rounded-2xl bg-black p-3">
@@ -264,7 +295,7 @@ const Index = () => {
           </div>
         </section>
 
-        <section id="pricing" className="mb-16">
+        <section id="pricing" className="mb-20">
           <h2 className="text-center text-[44px] font-semibold leading-[0.95] tracking-[-0.03em] text-black sm:text-[52px] lg:text-[60px]">Simple Pricing</h2>
           <p className="mx-auto mt-3 max-w-[500px] text-center text-sm text-black/70">
             Pay only for what you send. No setup fees, no contracts.
@@ -315,7 +346,7 @@ const Index = () => {
           </div>
         </section>
 
-        <section className="mb-16 grid items-center gap-8 lg:grid-cols-2">
+        <section className="mb-20 grid items-center gap-8 lg:grid-cols-2">
           <div>
             <h2 className="text-[42px] font-semibold leading-[0.95] tracking-[-0.03em] text-black sm:text-[52px] lg:text-[60px]">Campaign Management</h2>
             <p className="mt-4 max-w-[520px] text-base leading-relaxed text-black/70">
@@ -342,7 +373,7 @@ const Index = () => {
           </div>
         </section>
 
-        <section className="mb-16 text-center">
+        <section className="mb-24 text-center">
           <h2 id="contact" className="mx-auto max-w-[620px] text-[46px] font-semibold leading-[0.95] tracking-[-0.03em] text-black sm:text-[56px] lg:text-[64px]">
             Ready to connect with customers?
           </h2>
@@ -354,7 +385,7 @@ const Index = () => {
           </Link>
         </section>
 
-        <footer className="mt-16 rounded-t-[26px] bg-black px-6 py-12 text-white sm:px-8 lg:px-12 -mx-4 sm:-mx-6 lg:-mx-10">
+        <footer className="mt-24 rounded-t-[26px] bg-black px-6 py-12 text-white sm:px-8 lg:px-12 -mx-4 sm:-mx-6 lg:-mx-10">
           <div className="grid gap-12 lg:grid-cols-4 items-start">
             {/* Logo */}
             <div>
