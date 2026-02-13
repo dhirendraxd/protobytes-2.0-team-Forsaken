@@ -4,6 +4,7 @@ import { db } from "@/config/firebase";
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
+import { useLocation } from "react-router-dom";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -192,12 +193,23 @@ const mergeStore = (partial: Partial<DashboardStore> | null | undefined): Dashbo
   activityLog: partial?.activityLog ?? defaultStore.activityLog,
 });
 
+const menuFromPath = (pathname: string) => {
+  if (pathname === "/billing") return "billing";
+  if (pathname === "/campaigns") return "campaigns";
+  if (pathname === "/analytics") return "analytics";
+  if (pathname === "/contacts") return "contacts";
+  if (pathname === "/alerts") return "alerts";
+  if (pathname === "/settings") return "settings";
+  return "dashboard";
+};
+
 const Dashboard = () => {
   const { signOut, user } = useAuth();
+  const location = useLocation();
 
   const initialStore = useMemo(readDashboardStore, []);
 
-  const [activeMenu, setActiveMenu] = useState("dashboard");
+  const [activeMenu, setActiveMenu] = useState(menuFromPath(location.pathname));
   const [quickFind, setQuickFind] = useState("");
   const [analyticsWindow, setAnalyticsWindow] = useState("30d");
 
@@ -221,6 +233,10 @@ const Dashboard = () => {
     schedule: "",
     info: "",
     message: "",
+    emailSubject: "",
+    emailReceiver: "",
+    emailImages: [] as string[],
+    emailAttachments: [] as string[],
   });
   const [campaignError, setCampaignError] = useState("");
   const [editingCampaignId, setEditingCampaignId] = useState<number | null>(null);
@@ -251,8 +267,10 @@ const Dashboard = () => {
     area: "",
   });
 
-  const [topUpAmount, setTopUpAmount] = useState("500");
-  const [billingError, setBillingError] = useState("");
+  const [campaignSearch, setCampaignSearch] = useState("");
+  const [campaignStatusFilter, setCampaignStatusFilter] = useState<"all" | "Draft" | "Scheduled" | "Active">("all");
+  const [contactSearch, setContactSearch] = useState("");
+  const [sidebarMinimized, setSidebarMinimized] = useState(false);
 
   const [alertForm, setAlertForm] = useState({
     title: "",
@@ -274,6 +292,10 @@ const Dashboard = () => {
     ],
     []
   );
+
+  useEffect(() => {
+    setActiveMenu(menuFromPath(location.pathname));
+  }, [location.pathname]);
 
   useEffect(() => {
     let active = true;
@@ -535,6 +557,10 @@ const Dashboard = () => {
       schedule: "",
       info: "",
       message: "",
+      emailSubject: "",
+      emailReceiver: "",
+      emailImages: [],
+      emailAttachments: [],
     });
   };
 
@@ -550,6 +576,10 @@ const Dashboard = () => {
       schedule: campaign.schedule,
       info: campaign.info,
       message: campaign.message,
+      emailSubject: "",
+      emailReceiver: "",
+      emailImages: [],
+      emailAttachments: [],
     });
     setCampaignError("");
   };
@@ -566,6 +596,10 @@ const Dashboard = () => {
       schedule: "",
       info: "",
       message: "",
+      emailSubject: "",
+      emailReceiver: "",
+      emailImages: [],
+      emailAttachments: [],
     });
   };
 
@@ -924,7 +958,7 @@ const Dashboard = () => {
   );
 
   const renderCampaigns = () => (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <SectionCards
         title="Campaign Summary"
         cards={[
@@ -934,128 +968,347 @@ const Dashboard = () => {
         ]}
       />
 
-      <div className="grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
-        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-5">
-          <h3 className="text-lg font-semibold text-black">{editingCampaignId !== null ? "Edit Campaign" : "Create Campaign"}</h3>
-          <p className="mt-1 text-xs text-black/55">{editingCampaignId !== null ? "Update campaign details and save changes." : "Pick category, timing, message, and audience. Keep it simple and launch fast."}</p>
-          <div className="mt-4 space-y-3 text-sm">
+      <div className="grid gap-4 xl:grid-cols-2">
+        {/* Campaign Form */}
+        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
+          <h3 className="text-2xl font-semibold text-black">{editingCampaignId !== null ? "Edit Campaign" : "Create Campaign"}</h3>
+          <p className="mt-2 text-sm text-black/55">{editingCampaignId !== null ? "Update campaign details and save changes." : "Pick category, timing, message, and audience. Keep it simple and launch fast."}</p>
+          <div className="mt-5 space-y-4 text-base">
             <input
               value={campaignForm.name}
               onChange={(e) => setCampaignForm((p) => ({ ...p, name: e.target.value }))}
-              placeholder="Campaign name"
-              className="h-10 w-full rounded-xl border border-black/15 bg-white px-3"
+              placeholder="Campaign name (e.g., Summer Sale, Holiday Promo)"
+              className="h-12 w-full rounded-xl border border-black/15 bg-white px-4 text-base"
             />
             <div className="grid gap-3 md:grid-cols-2">
-              <select
-                value={campaignForm.category}
-                onChange={(e) => {
-                  const category = e.target.value as Campaign["category"];
-                  setCampaignForm((p) => ({
-                    ...p,
-                    category,
-                    message: p.message.trim() ? p.message : CAMPAIGN_TEMPLATES[category],
-                  }));
-                }}
-                className="h-10 rounded-xl border border-black/15 bg-white px-3"
-              >
-                {CAMPAIGN_CATEGORIES.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={campaignForm.objective}
-                onChange={(e) => setCampaignForm((p) => ({ ...p, objective: e.target.value as Campaign["objective"] }))}
-                className="h-10 rounded-xl border border-black/15 bg-white px-3"
-              >
-                {CAMPAIGN_OBJECTIVES.map((option) => (
-                  <option key={option} value={option}>
-                    Objective: {option}
-                  </option>
-                ))}
-              </select>
+              <div>
+                <label className="text-sm text-black/60 block mb-2">Category</label>
+                <select
+                  value={campaignForm.category}
+                  onChange={(e) => {
+                    const category = e.target.value as Campaign["category"];
+                    setCampaignForm((p) => ({
+                      ...p,
+                      category,
+                      message: p.message.trim() ? p.message : CAMPAIGN_TEMPLATES[category],
+                    }));
+                  }}
+                  className="h-12 w-full rounded-xl border border-black/15 bg-white px-4 text-base"
+                >
+                  {CAMPAIGN_CATEGORIES.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-sm text-black/60 block mb-2">Goal</label>
+                <select
+                  value={campaignForm.objective}
+                  onChange={(e) => setCampaignForm((p) => ({ ...p, objective: e.target.value as Campaign["objective"] }))}
+                  className="h-12 w-full rounded-xl border border-black/15 bg-white px-4 text-base"
+                >
+                  {CAMPAIGN_OBJECTIVES.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
             <div className="grid gap-3 md:grid-cols-2">
-              <select
-                value={campaignForm.channel}
-                onChange={(e) => setCampaignForm((p) => ({ ...p, channel: e.target.value as Campaign["channel"] }))}
-                className="h-10 rounded-xl border border-black/15 bg-white px-3"
-              >
-                <option>SMS</option>
-                <option>Voice</option>
-                <option>IVR</option>
-                <option>Email</option>
-              </select>
-              <select
-                value={campaignForm.audience}
-                onChange={(e) => setCampaignForm((p) => ({ ...p, audience: e.target.value }))}
-                className="h-10 rounded-xl border border-black/15 bg-white px-3"
-              >
-                {segmentOptions.map((segment) => (
-                  <option key={segment} value={segment}>
-                    Audience: {segment}
-                  </option>
-                ))}
-              </select>
+              <div>
+                <label className="text-sm text-black/60 block mb-2">Media Type</label>
+                <div className="flex flex-wrap gap-2">
+                  {["SMS", "Voice", "IVR", "Email"].map((type) => (
+                    <button
+                      key={type}
+                      onClick={() => setCampaignForm((p) => ({ ...p, channel: type as Campaign["channel"] }))}
+                      className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                        campaignForm.channel === type
+                          ? "bg-black text-white shadow-md"
+                          : "border border-black/15 bg-white text-black/70 hover:bg-black/5"
+                      }`}
+                    >
+                      {type === "SMS" ? "SMS" : type === "Voice" ? "Voice" : type === "IVR" ? "IVR" : "Email"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="text-sm text-black/60 block mb-2">Audience</label>
+                <select
+                  value={campaignForm.audience}
+                  onChange={(e) => setCampaignForm((p) => ({ ...p, audience: e.target.value }))}
+                  className="h-12 w-full rounded-xl border border-black/15 bg-white px-4 text-base"
+                >
+                  {segmentOptions.map((segment) => (
+                    <option key={segment} value={segment}>
+                      {segment}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
+
+            {/* Conditional Media Type Input Fields */}
+            {campaignForm.channel === "SMS" && (
+              <div className="rounded-xl border border-blue-200 bg-blue-50 p-3">
+                <label className="text-sm font-semibold text-blue-900 block mb-2">SMS Content</label>
+                <p className="text-sm text-blue-700">Text message up to 160 characters</p>
+              </div>
+            )}
+
+            {campaignForm.channel === "Voice" && (
+              <div className="rounded-xl border border-purple-200 bg-purple-50 p-3">
+                <label className="text-sm font-semibold text-purple-900 block mb-2">Voice Message</label>
+                <input
+                  type="file"
+                  accept="audio/*,.mp3,.wav,.ogg"
+                  onChange={(e) => {
+                    const fileName = e.target.files?.[0]?.name || "";
+                    setCampaignForm((p) => ({ ...p, info: fileName }));
+                  }}
+                  className="block w-full text-sm text-black/70 file:mr-3 file:rounded-lg file:border file:border-purple-300 file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium file:cursor-pointer hover:file:bg-purple-50"
+                />
+                {campaignForm.info && (
+                  <p className="mt-2 text-sm text-purple-700">Selected: {campaignForm.info}</p>
+                )}
+              </div>
+            )}
+
+            {campaignForm.channel === "IVR" && (
+              <div className="space-y-2">
+                <div className="rounded-xl border border-orange-200 bg-orange-50 p-3">
+                  <label className="text-sm font-semibold text-orange-900 block mb-2">IVR Audio</label>
+                  <input
+                    type="file"
+                    accept="audio/*,.mp3,.wav,.ogg"
+                    onChange={(e) => {
+                      const fileName = e.target.files?.[0]?.name || "";
+                      setCampaignForm((p) => ({ ...p, message: fileName }));
+                    }}
+                    className="block w-full text-sm text-black/70 file:mr-3 file:rounded-lg file:border file:border-orange-300 file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium file:cursor-pointer hover:file:bg-orange-50"
+                  />
+                  {campaignForm.message && (
+                    <p className="mt-2 text-sm text-orange-700">Selected: {campaignForm.message}</p>
+                  )}
+                </div>
+                <div className="rounded-xl border border-orange-200 bg-orange-50 p-3">
+                  <label className="text-sm font-semibold text-orange-900 block mb-2">IVR Script (Optional)</label>
+                  <input
+                    type="file"
+                    accept=".txt,.pdf,.doc,.docx"
+                    onChange={(e) => {
+                      const fileName = e.target.files?.[0]?.name || "";
+                      setCampaignForm((p) => ({ ...p, info: fileName }));
+                    }}
+                    className="block w-full text-sm text-black/70 file:mr-3 file:rounded-lg file:border file:border-orange-300 file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium file:cursor-pointer hover:file:bg-orange-50"
+                  />
+                  {campaignForm.info && (
+                    <p className="mt-2 text-xs text-orange-700">Selected: {campaignForm.info}</p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {campaignForm.channel === "Email" && (
+              <div className="rounded-xl border border-green-200 bg-white p-0 overflow-hidden shadow-lg">
+                {/* Email Composer Header */}
+                <div className="bg-green-50 border-b border-green-200 px-4 py-3">
+                  <p className="text-sm font-semibold text-green-900">Email Composer</p>
+                </div>
+
+                {/* Email Form */}
+                <div className="space-y-0">
+                  {/* From/To Section */}
+                  <div className="border-b border-green-100 px-4 py-3 space-y-3">
+                    <div>
+                      <label className="text-sm font-semibold text-green-700 block mb-2">To (Recipient Email)</label>
+                      <input
+                        value={campaignForm.emailReceiver}
+                        onChange={(e) => setCampaignForm((p) => ({ ...p, emailReceiver: e.target.value }))}
+                        placeholder="recipient@example.com"
+                        type="email"
+                        className="w-full text-base border border-green-200 rounded-lg bg-white px-4 py-3 focus:outline-none focus:border-green-400"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Subject Section */}
+                  <div className="border-b border-green-100 px-4 py-3">
+                    <label className="text-sm font-semibold text-green-700 block mb-2">Subject</label>
+                    <input
+                      value={campaignForm.emailSubject}
+                      onChange={(e) => setCampaignForm((p) => ({ ...p, emailSubject: e.target.value }))}
+                      placeholder="Email subject line"
+                      className="w-full text-base border border-green-200 rounded-lg bg-white px-4 py-3 focus:outline-none focus:border-green-400"
+                    />
+                  </div>
+
+                  {/* Body Section */}
+                  <div className="border-b border-green-100 px-4 py-3">
+                    <label className="text-sm font-semibold text-green-700 block mb-2">Message Body</label>
+                    <textarea
+                      value={campaignForm.message}
+                      onChange={(e) => setCampaignForm((p) => ({ ...p, message: e.target.value }))}
+                      placeholder="Write your email content here... (You can use {{name}} to personalize)"
+                      className="w-full text-base border border-green-200 rounded-lg bg-white px-4 py-3 h-48 resize-none focus:outline-none focus:border-green-400"
+                    />
+                  </div>
+
+                  {/* Images Section */}
+                  <div className="border-b border-green-100 px-4 py-3">
+                    <label className="text-sm font-semibold text-green-700 block mb-2">Add Images</label>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*,.jpg,.jpeg,.png,.gif,.webp"
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files || []).map((f) => f.name);
+                        setCampaignForm((p) => ({ ...p, emailImages: files }));
+                      }}
+                      className="block w-full text-sm text-black/70 file:mr-3 file:rounded-lg file:border file:border-green-300 file:bg-green-50 file:px-4 file:py-2 file:text-sm file:font-medium file:cursor-pointer hover:file:bg-green-100"
+                    />
+                    {campaignForm.emailImages.length > 0 && (
+                      <div className="mt-3 space-y-2">
+                        {campaignForm.emailImages.map((img, idx) => (
+                          <div key={idx} className="flex items-center justify-between bg-green-50 rounded-lg px-3 py-2">
+                            <span className="text-sm text-green-700">{img}</span>
+                            <button
+                              onClick={() =>
+                                setCampaignForm((p) => ({
+                                  ...p,
+                                  emailImages: p.emailImages.filter((_, i) => i !== idx),
+                                }))
+                              }
+                              className="text-red-600 hover:text-red-700 text-xs"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Attachments Section */}
+                  <div className="border-b border-green-100 px-4 py-3">
+                    <label className="text-sm font-semibold text-green-700 block mb-2">Add Attachments</label>
+                    <input
+                      type="file"
+                      multiple
+                      accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip"
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files || []).map((f) => f.name);
+                        setCampaignForm((p) => ({ ...p, emailAttachments: files }));
+                      }}
+                      className="block w-full text-sm text-black/70 file:mr-3 file:rounded-lg file:border file:border-green-300 file:bg-green-50 file:px-4 file:py-2 file:text-sm file:font-medium file:cursor-pointer hover:file:bg-green-100"
+                    />
+                    {campaignForm.emailAttachments.length > 0 && (
+                      <div className="mt-3 space-y-2">
+                        {campaignForm.emailAttachments.map((att, idx) => (
+                          <div key={idx} className="flex items-center justify-between bg-green-50 rounded-lg px-3 py-2">
+                            <span className="text-sm text-green-700">{att}</span>
+                            <button
+                              onClick={() =>
+                                setCampaignForm((p) => ({
+                                  ...p,
+                                  emailAttachments: p.emailAttachments.filter((_, i) => i !== idx),
+                                }))
+                              }
+                              className="text-red-600 hover:text-red-700 text-xs"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Preview Section */}
+                  <div className="bg-green-50 border-t border-green-200 px-4 py-3">
+                    <p className="text-sm text-green-700 font-semibold">Email Summary</p>
+                    <div className="mt-2 text-sm text-green-800 space-y-1">
+                      <p><span className="font-medium">To:</span> {campaignForm.emailReceiver || "Not set"}</p>
+                      <p><span className="font-medium">Subject:</span> {campaignForm.emailSubject || "Not set"}</p>
+                      <p><span className="font-medium">Images:</span> {campaignForm.emailImages.length} file(s)</p>
+                      <p><span className="font-medium">Attachments:</span> {campaignForm.emailAttachments.length} file(s)</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
             <div className="grid gap-3 md:grid-cols-2">
-              <input
-                type="datetime-local"
-                value={campaignForm.schedule}
-                onChange={(e) => setCampaignForm((p) => ({ ...p, schedule: e.target.value }))}
-                className="h-10 w-full rounded-xl border border-black/15 bg-white px-3"
-              />
-              <select
-                value={campaignForm.frequency}
-                onChange={(e) => setCampaignForm((p) => ({ ...p, frequency: e.target.value as Campaign["frequency"] }))}
-                className="h-10 rounded-xl border border-black/15 bg-white px-3"
-              >
-                {CAMPAIGN_FREQUENCIES.map((option) => (
-                  <option key={option} value={option}>
-                    Repeat: {option}
-                  </option>
-                ))}
-              </select>
+              <div>
+                <label className="text-sm text-black/60 block mb-2">Schedule</label>
+                <input
+                  type="datetime-local"
+                  value={campaignForm.schedule}
+                  onChange={(e) => setCampaignForm((p) => ({ ...p, schedule: e.target.value }))}
+                  className="h-12 w-full rounded-xl border border-black/15 bg-white px-4 text-base"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-black/60 block mb-2">Repeat</label>
+                <select
+                  value={campaignForm.frequency}
+                  onChange={(e) => setCampaignForm((p) => ({ ...p, frequency: e.target.value as Campaign["frequency"] }))}
+                  className="h-12 w-full rounded-xl border border-black/15 bg-white px-4 text-base"
+                >
+                  {CAMPAIGN_FREQUENCIES.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
-            <input
-              value={campaignForm.info}
-              onChange={(e) => setCampaignForm((p) => ({ ...p, info: e.target.value }))}
-              placeholder="What key information should be shared? (offer, link, event address)"
-              className="h-10 w-full rounded-xl border border-black/15 bg-white px-3"
-            />
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => setCampaignForm((p) => ({ ...p, message: CAMPAIGN_TEMPLATES[p.category] }))}
-                className="rounded-lg border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70"
-              >
-                Use Template
-              </button>
-              <button
-                onClick={() => setCampaignForm((p) => ({ ...p, schedule: new Date().toISOString().slice(0, 16) }))}
-                className="rounded-lg border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70"
-              >
-                Set Start Now
-              </button>
-            </div>
-            <textarea
-              value={campaignForm.message}
-              onChange={(e) => setCampaignForm((p) => ({ ...p, message: e.target.value }))}
-              placeholder="Message content (supports placeholders like {{name}})"
-              className="h-24 w-full rounded-xl border border-black/15 bg-white px-3 py-2"
-            />
-            <div className="rounded-xl border border-black/10 bg-white px-3 py-2 text-xs text-black/60">
-              Category: <span className="font-medium text-black">{campaignForm.category}</span> . Objective:{" "}
-              <span className="font-medium text-black">{campaignForm.objective}</span> . Repeat:{" "}
-              <span className="font-medium text-black">{campaignForm.frequency}</span>
+            {(campaignForm.channel === "SMS" || campaignForm.channel === "IVR") && (
+              <>
+                <input
+                  value={campaignForm.info}
+                  onChange={(e) => setCampaignForm((p) => ({ ...p, info: e.target.value }))}
+                  placeholder="Key info (offer, link, event address)"
+                  className="h-12 w-full rounded-xl border border-black/15 bg-white px-4 text-base"
+                />
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setCampaignForm((p) => ({ ...p, message: CAMPAIGN_TEMPLATES[p.category] }))}
+                    className="rounded-lg border border-black/15 bg-white px-4 py-2 text-sm text-black/70 hover:bg-black/5"
+                  >
+                    Use Template
+                  </button>
+                  <button
+                    onClick={() => setCampaignForm((p) => ({ ...p, schedule: new Date().toISOString().slice(0, 16) }))}
+                    className="rounded-lg border border-black/15 bg-white px-4 py-2 text-sm text-black/70 hover:bg-black/5"
+                  >
+                    Send Now
+                  </button>
+                </div>
+                <div>
+                  <label className="text-sm text-black/60 block mb-2">Message</label>
+                  <textarea
+                    value={campaignForm.message}
+                    onChange={(e) => setCampaignForm((p) => ({ ...p, message: e.target.value }))}
+                    placeholder="Use {{name}} to personalize. Under 160 chars for SMS."
+                    className="h-28 w-full rounded-xl border border-black/15 bg-white px-4 py-3 text-base"
+                  />
+                </div>
+              </>
+            )}
+            <div className="rounded-xl border border-black/10 bg-white px-4 py-3 text-sm text-black/60">
+              <span className="font-medium text-black">{campaignForm.category}</span> · <span className="font-medium text-black">{campaignForm.objective}</span> · <span className="font-medium text-black">{campaignForm.frequency}</span>
             </div>
             {campaignError ? <p className="text-xs text-red-600">{campaignError}</p> : null}
             <div className="flex gap-2">
-              <Button onClick={handleCreateCampaign} className="flex-1 rounded-xl bg-black text-white">
+              <Button onClick={handleCreateCampaign} className="flex-1 rounded-xl bg-black text-white hover:bg-black/90">
                 {editingCampaignId !== null ? "Update Campaign" : "Save Campaign"}
               </Button>
               {editingCampaignId !== null && (
-                <Button onClick={cancelEditCampaign} variant="outline" className="rounded-xl border-black/20">
+                <Button onClick={cancelEditCampaign} variant="outline" className="rounded-xl border-black/20 hover:bg-black/5">
                   Cancel
                 </Button>
               )}
@@ -1063,57 +1316,95 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-5">
-          <h3 className="text-lg font-semibold text-black">Campaign Queue</h3>
-          <div className="mt-4 space-y-3">
-            {campaigns.map((c) => (
-              <div key={c.id} className="rounded-xl border border-black/10 bg-white p-3">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-sm font-semibold text-black">{c.name}</p>
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-[10px] ${
-                      c.status === "Active"
-                        ? "bg-black text-white"
-                        : c.status === "Scheduled"
-                          ? "bg-lime-300 text-black"
-                          : "bg-black/10 text-black/70"
-                    }`}
-                  >
-                    {c.status}
-                  </span>
+        {/* Campaign Queue */}
+        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
+          <h3 className="text-2xl font-semibold text-black">Campaign Queue ({campaigns.length})</h3>
+          
+          <div className="mt-5 space-y-4">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-4 top-3 h-5 w-5 text-black/40" />
+              <input
+                value={campaignSearch}
+                onChange={(e) => setCampaignSearch(e.target.value)}
+                placeholder="Search campaigns..."
+                className="h-10 w-full rounded-lg border border-black/15 bg-white pl-12 pr-4 text-sm"
+              />
+            </div>
+
+            {/* Status Filter */}
+            <div className="flex flex-wrap gap-2">
+              {(["all", "Active", "Scheduled", "Draft"] as const).map((status) => (
+                <button
+                  key={status}
+                  onClick={() => setCampaignStatusFilter(status)}
+                  className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                    campaignStatusFilter === status
+                      ? "bg-black text-white"
+                      : "border border-black/15 bg-white text-black/70 hover:bg-black/5"
+                  }`}
+                >
+                  {status === "all" ? "All" : status} ({campaigns.filter((c) => status === "all" || c.status === status).length})
+                </button>
+              ))}
+            </div>
+
+            {/* Campaign List */}
+            <div className="space-y-2">
+              {campaigns
+                .filter((c) => campaignStatusFilter === "all" || c.status === campaignStatusFilter)
+                .filter((c) => campaignSearch === "" || c.name.toLowerCase().includes(campaignSearch.toLowerCase()))
+                .map((c) => (
+                  <div key={c.id} className="rounded-xl border border-black/10 bg-white p-3 hover:shadow-sm transition-all">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-black">{c.name}</p>
+                        <p className="mt-0.5 text-xs text-black/55">
+                          {c.category} · {c.objective} · {c.channel}
+                        </p>
+                        <p className="mt-1 text-xs text-black/45">
+                          📍 {c.audience} · 🔄 {c.frequency}
+                        </p>
+                        {c.info ? <p className="mt-1 text-xs text-black/50">💡 {c.info}</p> : null}
+                      </div>
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[10px] whitespace-nowrap font-medium ${
+                          c.status === "Active"
+                            ? "bg-black text-white"
+                            : c.status === "Scheduled"
+                              ? "bg-lime-300 text-black"
+                              : "bg-black/10 text-black/70"
+                        }`}
+                      >
+                        {c.status}
+                      </span>
+                    </div>
+                    <p className="mt-2 line-clamp-2 text-xs text-black/50">"{c.message}"</p>
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      <button
+                        onClick={() => runCampaignNow(c.id)}
+                        className="rounded-lg bg-black px-2 py-1 text-[10px] text-white hover:bg-black/90"
+                      >
+                        ▶ Run
+                      </button>
+                      <button onClick={() => startEditCampaign(c)} className="rounded-lg border border-black/15 px-2 py-1 text-[10px] text-black/70 hover:bg-black/5">
+                        ✏️ Edit
+                      </button>
+                      <button onClick={() => toggleCampaignStatus(c.id)} className="rounded-lg border border-black/15 px-2 py-1 text-[10px] text-black/70 hover:bg-black/5">
+                        {c.status === "Draft" ? "📅 Schedule" : "📄 Draft"}
+                      </button>
+                      <button onClick={() => removeCampaign(c.id)} className="rounded-lg border border-red-200 px-2 py-1 text-[10px] text-red-600 hover:bg-red-50">
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              {campaigns.filter((c) => campaignStatusFilter === "all" || c.status === campaignStatusFilter).filter((c) => campaignSearch === "" || c.name.toLowerCase().includes(campaignSearch.toLowerCase())).length === 0 ? (
+                <div className="rounded-xl border border-dashed border-black/20 bg-white p-4 text-center text-xs text-black/55">
+                  🎯 No campaigns match. Create one or adjust filters.
                 </div>
-                <p className="mt-1 text-xs text-black/55">
-                  {c.category} . {c.objective} . {c.channel}
-                </p>
-                <p className="mt-1 text-xs text-black/45">
-                  {c.audience} . {c.frequency} . {new Date(c.schedule).toLocaleString()}
-                </p>
-                {c.info ? <p className="mt-1 text-xs text-black/50">Info: {c.info}</p> : null}
-                <p className="mt-1 line-clamp-2 text-xs text-black/50">{c.message}</p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  <button
-                    onClick={() => runCampaignNow(c.id)}
-                    className="rounded-lg border border-black/15 bg-black px-2 py-1 text-[10px] text-white"
-                  >
-                    Run Now
-                  </button>
-                  <button onClick={() => toggleCampaignStatus(c.id)} className="rounded-lg border border-black/15 px-2 py-1 text-[10px] text-black/70">
-                    {c.status === "Draft" ? "Schedule" : "Move To Draft"}
-                  </button>
-                  <button onClick={() => startEditCampaign(c)} className="rounded-lg border border-black/15 px-2 py-1 text-[10px] text-black/70">
-                    Edit
-                  </button>
-                  <button onClick={() => removeCampaign(c.id)} className="rounded-lg border border-red-200 px-2 py-1 text-[10px] text-red-600">
-                    Remove
-                  </button>
-                </div>
-              </div>
-            ))}
-            {campaigns.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-black/20 bg-white p-4 text-center text-xs text-black/55">
-                No campaigns yet. Create one from the form.
-              </div>
-            ) : null}
+              ) : null}
+            </div>
           </div>
         </div>
       </div>
@@ -1121,13 +1412,13 @@ const Dashboard = () => {
   );
 
   const renderAnalytics = () => (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-black">Analytics Snapshot</h2>
+        <h2 className="text-2xl font-semibold text-black">Analytics Snapshot</h2>
         <select
           value={analyticsWindow}
           onChange={(e) => setAnalyticsWindow(e.target.value)}
-          className="h-9 rounded-lg border border-black/20 bg-white px-3 text-xs"
+          className="h-10 rounded-lg border border-black/20 bg-white px-4 text-sm"
         >
           <option value="7d">Last 7 days</option>
           <option value="30d">Last 30 days</option>
@@ -1144,11 +1435,39 @@ const Dashboard = () => {
         ]}
       />
 
-      <div className="rounded-2xl border border-black/10 bg-[#efefef] p-5">
-        <h3 className="text-lg font-semibold text-black">Performance Context</h3>
-        <p className="mt-2 text-sm text-black/60">
-          Delivery improves when contacts are segmented and campaigns are scheduled for the audience timezone. Current timezone: {settingsState.timezone}.
-        </p>
+      <div className="grid gap-4 xl:grid-cols-2">
+        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
+          <h3 className="text-2xl font-semibold text-black">Performance Context</h3>
+          <p className="mt-3 text-base text-black/60">
+            Delivery improves when contacts are segmented and campaigns are scheduled for the audience timezone. Current timezone: {settingsState.timezone}.
+          </p>
+          <div className="mt-4 space-y-2 text-sm">
+            <div className="rounded-xl border border-black/10 bg-white p-3">Campaigns: {campaigns.length}</div>
+            <div className="rounded-xl border border-black/10 bg-white p-3">Contacts: {contacts.length}</div>
+            <div className="rounded-xl border border-black/10 bg-white p-3">Scheduled: {analyticsStats.scheduledCount}</div>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
+          <h3 className="text-2xl font-semibold text-black">Channel Mix</h3>
+          <div className="mt-4 space-y-2">
+            {(["SMS", "Voice", "IVR", "Email"] as Campaign["channel"][]).map((channel) => {
+              const count = campaigns.filter((campaign) => campaign.channel === channel).length;
+              const width = campaigns.length ? Math.max(8, Math.round((count / campaigns.length) * 100)) : 8;
+              return (
+                <div key={channel} className="rounded-xl border border-black/10 bg-white p-3">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-medium text-black">{channel}</span>
+                    <span className="text-black/60">{count}</span>
+                  </div>
+                  <div className="mt-2 h-2 w-full rounded-full bg-black/10">
+                    <div className="h-2 rounded-full bg-black" style={{ width: `${width}%` }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -1202,7 +1521,7 @@ const Dashboard = () => {
     const categoryOptions = ["General", "High Value", "New", "At Risk"];
 
     return (
-      <div className="space-y-6">
+      <div className="space-y-5">
         <SectionCards
           title="Contacts Overview"
           cards={[
@@ -1211,129 +1530,175 @@ const Dashboard = () => {
             { label: "Unique Categories", value: `${new Set(contacts.map((c) => c.category ?? "General")).size}`, note: "Classification groups" },
           ]}
         />
-        <div className="grid gap-4 xl:grid-cols-[0.85fr_1.15fr]">
-          <div className="rounded-2xl border border-black/10 bg-[#efefef] p-5">
-            <h3 className="text-lg font-semibold text-black">Add Contact</h3>
-            <div className="mt-4 grid gap-3 text-sm">
-              <input value={contactForm.name} onChange={(e) => setContactForm((p) => ({ ...p, name: e.target.value }))} placeholder="Full name" className="h-10 w-full rounded-xl border border-black/15 bg-white px-3" />
-              <input value={contactForm.phone} onChange={(e) => setContactForm((p) => ({ ...p, phone: e.target.value }))} placeholder="Phone number" className="h-10 w-full rounded-xl border border-black/15 bg-white px-3" />
-              <div className="grid grid-cols-2 gap-2">
-                <select value={contactForm.segment} onChange={(e) => setContactForm((p) => ({ ...p, segment: e.target.value }))} className="h-10 rounded-xl border border-black/15 bg-white px-3">
-                  {segmentOptions.map((opt) => <option key={opt}>{opt}</option>)}
-                </select>
-                <input value={contactForm.age} onChange={(e) => setContactForm((p) => ({ ...p, age: e.target.value }))} placeholder="Age (optional)" className="h-10 rounded-xl border border-black/15 bg-white px-3" />
+      <div className="grid gap-4 xl:grid-cols-2">
+          {/* Add Contact Form */}
+          <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
+            <h3 className="text-2xl font-semibold text-black">Add Contact</h3>
+            <p className="mt-2 text-sm text-black/55">Add individual contacts or bulk upload CSV files</p>
+            <div className="mt-5 space-y-4 text-base">
+              <input value={contactForm.name} onChange={(e) => setContactForm((p) => ({ ...p, name: e.target.value }))} placeholder="Full name" className="h-12 w-full rounded-xl border border-black/15 bg-white px-4" />
+              <input value={contactForm.phone} onChange={(e) => setContactForm((p) => ({ ...p, phone: e.target.value }))} placeholder="Phone number (9-15 digits)" className="h-12 w-full rounded-xl border border-black/15 bg-white px-4" />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-sm text-black/60 block mb-2">Segment</label>
+                  <select value={contactForm.segment} onChange={(e) => setContactForm((p) => ({ ...p, segment: e.target.value }))} className="h-12 w-full rounded-xl border border-black/15 bg-white px-4">
+                    {segmentOptions.map((opt) => <option key={opt}>{opt}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm text-black/60 block mb-2">Age (optional)</label>
+                  <input value={contactForm.age} onChange={(e) => setContactForm((p) => ({ ...p, age: e.target.value }))} placeholder="Age" className="h-12 w-full rounded-xl border border-black/15 bg-white px-4" />
+                </div>
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                <select value={contactForm.city} onChange={(e) => setContactForm((p) => ({ ...p, city: e.target.value, area: "" }))} className="h-10 rounded-xl border border-black/15 bg-white px-3">
-                  <option value="">Select city</option>
-                  {cityOptions.map((opt) => <option key={opt}>{opt}</option>)}
-                </select>
-                <select value={contactForm.area} onChange={(e) => setContactForm((p) => ({ ...p, area: e.target.value }))} className="h-10 rounded-xl border border-black/15 bg-white px-3">
-                  <option value="">Select area</option>
-                  {areaOptions.map((opt) => <option key={opt}>{opt}</option>)}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-sm text-black/60 block mb-2">City</label>
+                  <select value={contactForm.city} onChange={(e) => setContactForm((p) => ({ ...p, city: e.target.value, area: "" }))} className="h-12 w-full rounded-xl border border-black/15 bg-white px-4">
+                    <option value="">Select city</option>
+                    {cityOptions.map((opt) => <option key={opt}>{opt}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm text-black/60 block mb-2">Area</label>
+                  <select value={contactForm.area} onChange={(e) => setContactForm((p) => ({ ...p, area: e.target.value }))} className="h-12 w-full rounded-xl border border-black/15 bg-white px-4">
+                    <option value="">Select area</option>
+                    {areaOptions.map((opt) => <option key={opt}>{opt}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="text-sm text-black/60 block mb-2">Category</label>
+                <select value={contactForm.category} onChange={(e) => setContactForm((p) => ({ ...p, category: e.target.value }))} className="h-12 w-full rounded-xl border border-black/15 bg-white px-4">
+                  {categoryOptions.map((opt) => <option key={opt}>{opt}</option>)}
                 </select>
               </div>
-              <select value={contactForm.category} onChange={(e) => setContactForm((p) => ({ ...p, category: e.target.value }))} className="h-10 rounded-xl border border-black/15 bg-white px-3">
-                {categoryOptions.map((opt) => <option key={opt}>{opt}</option>)}
-              </select>
               {contactError ? <p className="text-xs text-red-600">{contactError}</p> : null}
-              <Button onClick={handleAddContact} className="w-full rounded-xl bg-black text-white">Save Contact</Button>
+              <Button onClick={handleAddContact} className="w-full rounded-xl bg-black text-white hover:bg-black/90">Save Contact</Button>
             </div>
 
-            <div className="mt-6 border-t border-black/10 pt-4">
-              <h4 className="text-sm font-semibold text-black">Bulk Upload Contacts</h4>
-              <p className="mt-1 text-xs text-black/60">
-                Upload `.csv` or `.txt` with `name,phone,segment,city,area,age,category`
+            {/* Bulk Upload Section */}
+            <div className="mt-6 border-t border-black/10 pt-5">
+              <h4 className="text-base font-semibold text-black">Bulk Upload</h4>
+              <p className="mt-2 text-sm text-black/60">
+                Upload CSV/TXT: name, phone, segment, city, area, age, category
               </p>
               <input
                 type="file"
                 accept=".csv,.txt"
                 onChange={handleBulkContactUpload}
-                className="mt-3 block w-full text-xs text-black/70 file:mr-3 file:rounded-lg file:border file:border-black/20 file:bg-white file:px-3 file:py-1.5 file:text-xs file:font-medium"
+                className="mt-3 block w-full text-xs text-black/70 file:mr-3 file:rounded-lg file:border file:border-black/20 file:bg-white file:px-3 file:py-1.5 file:text-xs file:font-medium file:cursor-pointer hover:file:bg-black/5"
               />
               {bulkImportError ? <p className="mt-2 text-xs text-red-600">{bulkImportError}</p> : null}
               {bulkImportReport ? (
                 <div className="mt-2 rounded-lg bg-white p-2 text-xs text-black/70">
-                  Imported: {bulkImportReport.imported} · Invalid: {bulkImportReport.skippedInvalid} · Duplicate: {bulkImportReport.skippedDuplicate}
+                  Imported: {bulkImportReport.imported} &nbsp; Invalid: {bulkImportReport.skippedInvalid} &nbsp; Duplicate: {bulkImportReport.skippedDuplicate}
                 </div>
               ) : null}
             </div>
           </div>
 
-          <div className="rounded-2xl border border-black/10 bg-[#efefef] p-5">
-            <h3 className="text-lg font-semibold text-black">Contact List</h3>
-            <div className="mt-3 grid gap-2 sm:grid-cols-2">
-              <select
-                value={contactSortBy}
-                onChange={(e) => setContactSortBy(e.target.value as "name" | "city" | "area" | "age")}
-                className="h-9 rounded-lg border border-black/15 bg-white px-2 text-xs"
-              >
-                <option value="name">Sort by Name</option>
-                <option value="city">Sort by City</option>
-                <option value="area">Sort by Area</option>
-                <option value="age">Sort by Age</option>
-              </select>
-              <div className="flex gap-2">
-                <button onClick={selectAllVisibleContacts} className="h-9 flex-1 rounded-lg border border-black/15 bg-white px-2 text-xs text-black/70">Select All</button>
-                <button onClick={clearContactSelection} className="h-9 flex-1 rounded-lg border border-black/15 bg-white px-2 text-xs text-black/70">Clear</button>
+          {/* Contact List */}
+          <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
+            <h3 className="text-2xl font-semibold text-black">Contact List ({visibleContacts.length})</h3>
+            
+            {/* Search and Filters */}
+            <div className="mt-5 space-y-4">
+              <div className="relative">
+                <Search className="absolute left-4 top-3 h-5 w-5 text-black/40" />
+                <input
+                  value={contactSearch}
+                  onChange={(e) => setContactSearch(e.target.value)}
+                  placeholder="Search names or phones..."
+                  className="h-10 w-full rounded-lg border border-black/15 bg-white pl-12 pr-4 text-sm"
+                />
               </div>
-            </div>
 
-            <div className="mt-2 grid gap-2 sm:grid-cols-3">
-              <select value={contactFilters.city} onChange={(e) => setContactFilters((p) => ({ ...p, city: e.target.value, area: "" }))} className="h-9 rounded-lg border border-black/15 bg-white px-2 text-xs">
-                <option value="">All cities</option>
-                {cityOptions.map((opt) => <option key={opt}>{opt}</option>)}
-              </select>
-              <select value={contactFilters.area} onChange={(e) => setContactFilters((p) => ({ ...p, area: e.target.value }))} className="h-9 rounded-lg border border-black/15 bg-white px-2 text-xs">
-                <option value="">All areas</option>
-                {contactFilters.city ? getAreasForCity(contactFilters.city).map((opt) => <option key={opt}>{opt}</option>) : areaOptions.map((opt) => <option key={opt}>{opt}</option>)}
-              </select>
-              <select value={contactFilters.category} onChange={(e) => setContactFilters((p) => ({ ...p, category: e.target.value }))} className="h-9 rounded-lg border border-black/15 bg-white px-2 text-xs">
-                <option value="">All categories</option>
-                {categoryOptions.map((opt) => <option key={opt}>{opt}</option>)}
-              </select>
-            </div>
-
-            <div className="mt-3 rounded-xl border border-black/10 bg-white p-3">
-              <p className="text-xs font-semibold text-black/70">Update Selected ({selectedContactIds.length})</p>
-              <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                <select value={bulkAssign.segment} onChange={(e) => setBulkAssign((p) => ({ ...p, segment: e.target.value }))} className="h-9 rounded-lg border border-black/15 px-2 text-xs">
-                  <option value="">Keep segment</option>
-                  {segmentOptions.map((opt) => <option key={opt}>{opt}</option>)}
+              {/* Sort and Selection */}
+              <div className="grid gap-3 sm:grid-cols-2">
+                <select
+                  value={contactSortBy}
+                  onChange={(e) => setContactSortBy(e.target.value as "name" | "city" | "area" | "age")}
+                  className="h-10 rounded-lg border border-black/15 bg-white px-3 text-sm"
+                >
+                  <option value="name">Sort by Name</option>
+                  <option value="city">Sort by City</option>
+                  <option value="area">Sort by Area</option>
+                  <option value="age">Sort by Age</option>
                 </select>
-                <select value={bulkAssign.category} onChange={(e) => setBulkAssign((p) => ({ ...p, category: e.target.value }))} className="h-9 rounded-lg border border-black/15 px-2 text-xs">
-                  <option value="">Keep category</option>
+                <div className="flex gap-2">
+                  <button onClick={selectAllVisibleContacts} className="h-10 flex-1 rounded-lg border border-black/15 bg-white px-3 text-sm text-black/70 hover:bg-black/5">Select All ({visibleContacts.length})</button>
+                  <button onClick={clearContactSelection} className="h-10 flex-1 rounded-lg border border-black/15 bg-white px-3 text-sm text-black/70 hover:bg-black/5">Clear</button>
+                </div>
+              </div>
+
+              {/* Filters */}
+              <div className="grid gap-3 sm:grid-cols-3">
+                <select value={contactFilters.city} onChange={(e) => setContactFilters((p) => ({ ...p, city: e.target.value, area: "" }))} className="h-10 rounded-lg border border-black/15 bg-white px-3 text-sm">
+                  <option value="">All cities</option>
+                  {cityOptions.map((opt) => <option key={opt}>{opt}</option>)}
+                </select>
+                <select value={contactFilters.area} onChange={(e) => setContactFilters((p) => ({ ...p, area: e.target.value }))} className="h-10 rounded-lg border border-black/15 bg-white px-3 text-sm">
+                  <option value="">All areas</option>
+                  {contactFilters.city ? getAreasForCity(contactFilters.city).map((opt) => <option key={opt}>{opt}</option>) : areaOptions.map((opt) => <option key={opt}>{opt}</option>)}
+                </select>
+                <select value={contactFilters.category} onChange={(e) => setContactFilters((p) => ({ ...p, category: e.target.value }))} className="h-10 rounded-lg border border-black/15 bg-white px-3 text-sm">
+                  <option value="">All categories</option>
                   {categoryOptions.map((opt) => <option key={opt}>{opt}</option>)}
                 </select>
               </div>
-              <Button onClick={applyBulkContactAssignment} className="mt-2 h-9 rounded-lg bg-black px-3 text-xs text-white">Apply</Button>
             </div>
 
-            <div className="mt-4 space-y-3">
-              {visibleContacts.map((contact) => (
-                <div key={contact.id} className="rounded-xl border border-black/10 bg-white p-3">
+            {/* Bulk Update */}
+            {selectedContactIds.length > 0 && (
+              <div className="mt-3 rounded-xl border border-black/10 bg-white p-3">
+                <p className="text-xs font-semibold text-black/70">Update {selectedContactIds.length} Selected</p>
+                <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                  <select value={bulkAssign.segment} onChange={(e) => setBulkAssign((p) => ({ ...p, segment: e.target.value }))} className="h-9 rounded-lg border border-black/15 px-2 text-xs">
+                    <option value="">Keep segment</option>
+                    {segmentOptions.map((opt) => <option key={opt}>{opt}</option>)}
+                  </select>
+                  <select value={bulkAssign.category} onChange={(e) => setBulkAssign((p) => ({ ...p, category: e.target.value }))} className="h-9 rounded-lg border border-black/15 px-2 text-xs">
+                    <option value="">Keep category</option>
+                    {categoryOptions.map((opt) => <option key={opt}>{opt}</option>)}
+                  </select>
+                </div>
+                <Button onClick={applyBulkContactAssignment} className="mt-2 h-9 w-full rounded-lg bg-black px-3 text-xs text-white hover:bg-black/90">✓ Apply Changes</Button>
+              </div>
+            )}
+
+            {/* Contact Cards */}
+            <div className="mt-4 space-y-2">
+              {visibleContacts
+                .filter((c) => contactSearch === "" || c.name.toLowerCase().includes(contactSearch.toLowerCase()) || c.phone.includes(contactSearch))
+                .map((contact) => (
+                <div key={contact.id} className="rounded-xl border border-black/10 bg-white p-3 hover:shadow-sm transition-all">
                   <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-start gap-2">
+                    <div className="flex items-start gap-2 flex-1">
                       <input
                         type="checkbox"
                         checked={selectedContactIds.includes(contact.id)}
                         onChange={() => toggleContactSelection(contact.id)}
-                        className="mt-1 h-3.5 w-3.5"
+                        className="mt-1 h-3.5 w-3.5 cursor-pointer"
                       />
-                      <div>
+                      <div className="flex-1">
                         <p className="text-sm font-semibold text-black">{contact.name}</p>
                         <p className="text-xs text-black/55">{contact.phone}</p>
                         <p className="mt-1 text-[11px] text-black/60">
-                          {contact.segment} · {contact.city ?? "-"} · {contact.area ?? "-"} · Age {contact.age ?? "-"} · {contact.category ?? "General"}
+                          {contact.segment} · 📍 {contact.city || "-"} · {contact.area || "-"} · 🎂 {contact.age || "-"} · {contact.category || "General"}
                         </p>
                       </div>
                     </div>
-                    <button onClick={() => removeContact(contact.id)} className="rounded-lg border border-red-200 px-2 py-1 text-[10px] text-red-600">
+                    <button onClick={() => removeContact(contact.id)} className="rounded-lg border border-red-200 px-2 py-1 text-[10px] text-red-600 hover:bg-red-50 whitespace-nowrap">
                       Remove
                     </button>
                   </div>
                 </div>
               ))}
+              {visibleContacts.filter((c) => contactSearch === "" || c.name.toLowerCase().includes(contactSearch.toLowerCase()) || c.phone.includes(contactSearch)).length === 0 && (
+                <div className="rounded-xl border border-dashed border-black/20 bg-white p-4 text-center text-xs text-black/55">
+                  👤 No contacts. Add one or upload CSV to get started.
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -1342,7 +1707,7 @@ const Dashboard = () => {
   };
 
   const renderBilling = () => (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <SectionCards
         title="Billing Overview"
         cards={[
@@ -1352,19 +1717,21 @@ const Dashboard = () => {
         ]}
       />
       <div className="grid gap-4 xl:grid-cols-2">
-        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-5">
-          <h3 className="text-lg font-semibold text-black">Change Plan</h3>
-          <select value={billingPlan} onChange={(e) => handlePlanChange(e.target.value)} className="mt-4 h-10 w-full rounded-xl border border-black/15 bg-white px-3 text-sm">
+        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
+          <h3 className="text-2xl font-semibold text-black">Change Plan</h3>
+          <p className="mt-2 text-sm text-black/55">Select your preferred subscription tier</p>
+          <select value={billingPlan} onChange={(e) => handlePlanChange(e.target.value)} className="mt-5 h-12 w-full rounded-xl border border-black/15 bg-white px-4 text-base">
             <option>Starter</option>
             <option>Professional</option>
             <option>Enterprise</option>
           </select>
         </div>
-        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-5">
-          <h3 className="text-lg font-semibold text-black">Top Up Credits</h3>
-          <div className="mt-4 flex gap-2">
-            <input value={topUpAmount} onChange={(e) => setTopUpAmount(e.target.value)} placeholder="Amount" className="h-10 flex-1 rounded-xl border border-black/15 bg-white px-3 text-sm" />
-            <Button onClick={handleTopUp} className="rounded-xl bg-black text-white">Top Up</Button>
+        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
+          <h3 className="text-2xl font-semibold text-black">Top Up Credits</h3>
+          <p className="mt-2 text-sm text-black/55">Add more credits to your account</p>
+          <div className="mt-5 flex gap-3">
+            <input value={topUpAmount} onChange={(e) => setTopUpAmount(e.target.value)} placeholder="Amount" className="h-12 flex-1 rounded-xl border border-black/15 bg-white px-4 text-base" />
+            <Button onClick={handleTopUp} className="rounded-xl bg-black px-6 text-white hover:bg-black/90">Top Up</Button>
           </div>
           {billingError ? <p className="mt-2 text-xs text-red-600">{billingError}</p> : null}
         </div>
@@ -1373,7 +1740,7 @@ const Dashboard = () => {
   );
 
   const renderAlerts = () => (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <SectionCards
         title="Alert Center"
         cards={[
@@ -1382,18 +1749,18 @@ const Dashboard = () => {
           { label: "SMS Rules", value: `${alerts.filter((a) => a.channel === "SMS").length}`, note: "Direct notifications" },
         ]}
       />
-      <div className="grid gap-4 xl:grid-cols-[0.85fr_1.15fr]">
-        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-5">
-          <h3 className="text-lg font-semibold text-black">Create Alert Rule</h3>
-          <div className="mt-4 space-y-3 text-sm">
-            <input value={alertForm.title} onChange={(e) => setAlertForm((p) => ({ ...p, title: e.target.value }))} placeholder="Rule title" className="h-10 w-full rounded-xl border border-black/15 bg-white px-3" />
-            <div className="grid grid-cols-2 gap-2">
-              <select value={alertForm.severity} onChange={(e) => setAlertForm((p) => ({ ...p, severity: e.target.value as AlertRule["severity"] }))} className="h-10 rounded-xl border border-black/15 bg-white px-3">
+      <div className="grid gap-4 xl:grid-cols-2">
+        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
+          <h3 className="text-2xl font-semibold text-black">Create Alert Rule</h3>
+          <div className="mt-5 space-y-4 text-base">
+            <input value={alertForm.title} onChange={(e) => setAlertForm((p) => ({ ...p, title: e.target.value }))} placeholder="Rule title" className="h-12 w-full rounded-xl border border-black/15 bg-white px-4" />
+            <div className="grid grid-cols-2 gap-3">
+              <select value={alertForm.severity} onChange={(e) => setAlertForm((p) => ({ ...p, severity: e.target.value as AlertRule["severity"] }))} className="h-12 rounded-xl border border-black/15 bg-white px-4">
                 <option>Low</option>
                 <option>Medium</option>
                 <option>High</option>
               </select>
-              <select value={alertForm.channel} onChange={(e) => setAlertForm((p) => ({ ...p, channel: e.target.value as AlertRule["channel"] }))} className="h-10 rounded-xl border border-black/15 bg-white px-3">
+              <select value={alertForm.channel} onChange={(e) => setAlertForm((p) => ({ ...p, channel: e.target.value as AlertRule["channel"] }))} className="h-12 rounded-xl border border-black/15 bg-white px-4">
                 <option>Email</option>
                 <option>SMS</option>
               </select>
@@ -1403,9 +1770,9 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-5">
-          <h3 className="text-lg font-semibold text-black">Configured Rules</h3>
-          <div className="mt-4 space-y-3">
+        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
+          <h3 className="text-2xl font-semibold text-black">Configured Rules</h3>
+          <div className="mt-5 space-y-4">
             {alerts.map((alert) => (
               <div key={alert.id} className="rounded-xl border border-black/10 bg-white p-3">
                 <div className="flex items-start justify-between gap-3">
@@ -1422,6 +1789,56 @@ const Dashboard = () => {
                 </div>
               </div>
             ))}
+            {alerts.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-black/20 bg-white p-4 text-center text-xs text-black/55">
+                No alert rules yet. Add one from the form.
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-2">
+        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
+          <h3 className="text-2xl font-semibold text-black">Quick Alert Presets</h3>
+          <div className="mt-5 space-y-3">
+            {[
+              { title: "Low credit balance", severity: "High" as AlertRule["severity"], channel: "Email" as AlertRule["channel"] },
+              { title: "Delivery rate below 95%", severity: "Medium" as AlertRule["severity"], channel: "SMS" as AlertRule["channel"] },
+              { title: "Campaign scheduled for today", severity: "Low" as AlertRule["severity"], channel: "Email" as AlertRule["channel"] },
+            ].map((preset) => (
+              <button
+                key={preset.title}
+                onClick={() => setAlertForm(preset)}
+                className="w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-left hover:bg-black/5"
+              >
+                <p className="text-sm font-semibold text-black">{preset.title}</p>
+                <p className="text-xs text-black/60">
+                  {preset.severity} · {preset.channel}
+                </p>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
+          <h3 className="text-2xl font-semibold text-black">Recent Alert Activity</h3>
+          <div className="mt-5 space-y-3">
+            {activityLog
+              .filter((item) => item.title.toLowerCase().includes("alert"))
+              .slice(0, 6)
+              .map((item) => (
+                <div key={item.id} className="rounded-xl border border-black/10 bg-white p-3">
+                  <p className="text-sm font-semibold text-black">{item.title}</p>
+                  <p className="text-xs text-black/55">{item.detail}</p>
+                  <p className="mt-1 text-[11px] text-black/45">{item.time}</p>
+                </div>
+              ))}
+            {activityLog.filter((item) => item.title.toLowerCase().includes("alert")).length === 0 ? (
+              <div className="rounded-xl border border-dashed border-black/20 bg-white p-4 text-center text-xs text-black/55">
+                No alert activity yet.
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
@@ -1429,7 +1846,7 @@ const Dashboard = () => {
   );
 
   const renderSettings = () => (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <SectionCards
         title="Settings"
         cards={[
@@ -1439,35 +1856,50 @@ const Dashboard = () => {
         ]}
       />
 
-      <div className="rounded-2xl border border-black/10 bg-[#efefef] p-5">
-        <h3 className="text-lg font-semibold text-black">Platform Settings</h3>
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
-          <label className="rounded-xl border border-black/10 bg-white p-3 text-sm text-black/80">
-            Timezone
-            <select
-              value={settingsState.timezone}
-              onChange={(e) => updateSetting("timezone", e.target.value)}
-              className="mt-2 h-10 w-full rounded-lg border border-black/15 px-2"
-            >
-              <option>Asia/Kathmandu</option>
-              <option>Asia/Kolkata</option>
-              <option>UTC</option>
-            </select>
-          </label>
+      <div className="grid gap-4 xl:grid-cols-2">
+        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
+          <h3 className="text-2xl font-semibold text-black">Platform Settings</h3>
+          <div className="mt-5 grid gap-4">
+            <label className="rounded-xl border border-black/10 bg-white p-4 text-sm text-black/80">
+              Timezone
+              <select
+                value={settingsState.timezone}
+                onChange={(e) => updateSetting("timezone", e.target.value)}
+                className="mt-3 h-12 w-full rounded-lg border border-black/15 px-4 text-base"
+              >
+                <option>Asia/Kathmandu</option>
+                <option>Asia/Kolkata</option>
+                <option>UTC</option>
+              </select>
+            </label>
 
-          <div className="space-y-2 rounded-xl border border-black/10 bg-white p-3 text-sm text-black/80">
-            <label className="flex items-center justify-between">
-              Two-factor authentication
-              <input type="checkbox" checked={settingsState.twoFactor} onChange={(e) => updateSetting("twoFactor", e.target.checked)} />
-            </label>
-            <label className="flex items-center justify-between">
-              Email reports
-              <input type="checkbox" checked={settingsState.emailReports} onChange={(e) => updateSetting("emailReports", e.target.checked)} />
-            </label>
-            <label className="flex items-center justify-between">
-              Auto retry failed sends
-              <input type="checkbox" checked={settingsState.autoRetry} onChange={(e) => updateSetting("autoRetry", e.target.checked)} />
-            </label>
+            <div className="space-y-3 rounded-xl border border-black/10 bg-white p-4 text-sm text-black/80">
+              <label className="flex items-center justify-between">
+                Two-factor authentication
+                <input type="checkbox" checked={settingsState.twoFactor} onChange={(e) => updateSetting("twoFactor", e.target.checked)} />
+              </label>
+              <label className="flex items-center justify-between">
+                Email reports
+                <input type="checkbox" checked={settingsState.emailReports} onChange={(e) => updateSetting("emailReports", e.target.checked)} />
+              </label>
+              <label className="flex items-center justify-between">
+                Auto retry failed sends
+                <input type="checkbox" checked={settingsState.autoRetry} onChange={(e) => updateSetting("autoRetry", e.target.checked)} />
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
+          <h3 className="text-2xl font-semibold text-black">Recent Configuration Activity</h3>
+          <div className="mt-5 space-y-3">
+            {activityLog.slice(0, 6).map((item) => (
+              <div key={item.id} className="rounded-xl border border-black/10 bg-white p-3">
+                <p className="text-sm font-semibold text-black">{item.title}</p>
+                <p className="text-xs text-black/55">{item.detail}</p>
+                <p className="mt-1 text-[11px] text-black/45">{item.time}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -1486,42 +1918,59 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#f3f3f3]">
-      <div className="grid min-h-screen lg:grid-cols-[280px_1fr]">
-        <aside className="bg-black px-4 py-6 text-white lg:px-5 lg:py-8">
+      <div className={`grid ${sidebarMinimized ? "lg:grid-cols-[80px_1fr]" : "lg:grid-cols-[280px_1fr]"}`}>
+        <aside className={`self-stretch bg-black px-4 py-6 text-white lg:py-8 transition-all duration-300 ${sidebarMinimized ? "lg:px-3" : "lg:px-5"}`}>
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm font-semibold">
-              VoiceLink
-              <span className="inline-block h-3.5 w-3.5 rounded-full bg-lime-300" />
+            {!sidebarMinimized && (
+              <div className="flex items-center gap-2 text-sm font-semibold">
+                VoiceLink
+                <span className="inline-block h-3.5 w-3.5 rounded-full bg-lime-300" />
+              </div>
+            )}
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSidebarMinimized(!sidebarMinimized)}
+                className="h-8 rounded-full px-2 text-white/70 hover:text-white"
+                title={sidebarMinimized ? "Expand sidebar" : "Minimize sidebar"}
+              >
+                {sidebarMinimized ? "»" : "«"}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowLogoutConfirm(true)}
+                className="h-8 rounded-full px-2 text-white/70 hover:text-white"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowLogoutConfirm(true)}
-              className="h-8 rounded-full px-2 text-white/70 hover:text-white"
-            >
-              <LogOut className="h-4 w-4" />
-            </Button>
           </div>
 
-          <div className="mt-6 rounded-xl border border-white/10 bg-[#171717] px-3 py-2">
-            <div className="flex items-center gap-2 text-xs text-white/60">
-              <Search className="h-4 w-4" />
-              <input
-                value={quickFind}
-                onChange={(e) => setQuickFind(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && filteredMenuItems[0]) {
-                    setActiveMenu(filteredMenuItems[0].id);
-                  }
-                }}
-                placeholder="Quick Find"
-                className="w-full bg-transparent text-white outline-none placeholder:text-white/45"
-              />
-            </div>
-            {quickFindHint ? <p className="mt-1 text-[10px] text-white/45">{quickFindHint}</p> : null}
-          </div>
+          {!sidebarMinimized && (
+            <>
+              <div className="mt-6 rounded-xl border border-white/10 bg-[#171717] px-3 py-2">
+                <div className="flex items-center gap-2 text-xs text-white/60">
+                  <Search className="h-4 w-4" />
+                  <input
+                    value={quickFind}
+                    onChange={(e) => setQuickFind(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && filteredMenuItems[0]) {
+                        setActiveMenu(filteredMenuItems[0].id);
+                      }
+                    }}
+                    placeholder="Quick Find"
+                    className="w-full bg-transparent text-white outline-none placeholder:text-white/45"
+                  />
+                </div>
+                {quickFindHint ? <p className="mt-1 text-[10px] text-white/45">{quickFindHint}</p> : null}
+              </div>
+            </>
+          )}
 
-          <div className="mt-6 space-y-2 text-xs">
+          <div className={`mt-6 space-y-3 ${sidebarMinimized ? "text-[11px]" : "text-sm"}`}>
             {filteredMenuItems.map((item) => {
               const Icon = item.icon;
               const isActive = item.id === activeMenu;
@@ -1529,26 +1978,27 @@ const Dashboard = () => {
                 <button
                   key={item.id}
                   onClick={() => setActiveMenu(item.id)}
-                  className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left ${
+                  title={sidebarMinimized ? item.label : ""}
+                  className={`flex w-full items-center gap-3 rounded-xl ${sidebarMinimized ? "justify-center px-3 py-3" : "px-4 py-3 text-left"} ${
                     isActive
                       ? "bg-lime-300 font-semibold text-black"
                       : "text-white/70 hover:bg-[#1f1f1f] hover:text-white"
                   }`}
                 >
-                  <Icon className="h-4 w-4" />
-                  {item.label}
+                  <Icon className="h-5 w-5" />
+                  {!sidebarMinimized && item.label}
                 </button>
               );
             })}
           </div>
         </aside>
 
-        <main className="space-y-6 bg-[#f3f3f3] px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
-          <div className="px-4 sm:px-0">
+        <main className="space-y-5 bg-[#f3f3f3] px-4 py-5 sm:px-5 sm:py-5 lg:px-6 lg:py-6">
+          <div className="px-0">
             <Navbar />
           </div>
 
-          <div className="flex flex-col gap-3 border border-black/10 bg-[#efefef] px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 border border-black/10 bg-[#efefef] px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs font-semibold text-black/50">Merchants</p>
               <h1 className="text-2xl font-semibold text-black">{activeLabel}</h1>
@@ -1572,8 +2022,6 @@ const Dashboard = () => {
           {renderActiveContent()}
         </main>
 
-        <aside className="hidden border-l border-black/10 bg-[#f3f3f3] px-4 py-6 lg:block lg:px-5 lg:py-8">
-        </aside>
       </div>
 
       <AlertDialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
