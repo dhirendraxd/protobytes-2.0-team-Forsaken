@@ -1,39 +1,44 @@
-# VoiceLink
+# VoiceLink Communication Platform
 
-A voice-based community information system for rural villages in Nepal. Provides critical information to communities without requiring internet access.
+A cloud-based SaaS platform that empowers SMEs and organizations to send SMS, voice messages, and automated communications to their customers effortlessly.
 
 ## Project Overview
 
-**VoiceLink** bridges the digital divide by offering both:
-- **Voice-based IVR system** - No internet needed, just call
-- **Web interface** - For those with internet access
+**VoiceLink** is your complete communication solution offering:
+- **SMS Campaigns** - Bulk SMS sending to unlimited contacts
+- **Voice Messages** - Automated voicemail delivery
+- **Contact Management** - Import and organize your customer database
+- **Analytics Dashboard** - Track delivery, engagement, and ROI
 
 ## Features
 
-### User Features
-- 📞 Voice-based information access (IVR system)
-- 📊 Real-time market prices
-- 🚌 Transport schedules with delay alerts
-- 📢 Community alerts and announcements
-- 👥 Community reporter network
-- 🌐 Dual language support (English & Nepali)
+### Core Platform Features
+- 📱 **Bulk SMS Sending** - Send personalized SMS to thousands at once
+- 🎤 **Voice Message Campaigns** - Upload audio or use text-to-speech
+- 📊 **Contact List Management** - Import CSV, organize by groups
+- 📈 **Real-time Analytics** - Track delivery status and engagement
+- 💰 **Pay-as-you-go Pricing** - No subscriptions, only pay for what you send
+- 🔒 **Secure & Reliable** - Enterprise-grade infrastructure
 
-### Moderator Portal Features ✨
-- 📝 **Weekly Briefings Management** - Create/edit IVR content with text, audio, or TTS
-- 📱 **SMS Alert Center** - Send urgent notifications with cost estimation
-- ✅ **Content Approval Workflow** - Review and approve community submissions
-- 📁 **Category Manager** - Organize content categories for IVR navigation
-- 🌍 **Region-Based Targeting** - Tailor content to specific geographic areas
+### Business Tools
+- 📝 **Message Templates** - Save and reuse common messages
+- ⏰ **Schedule Campaigns** - Send at optimal times
+- 👥 **Team Management** - Multiple users with role-based access
+- 🌍 **Multi-language Support** - Communicate in your customers' language
+- 📞 **Two-way SMS** - Receive replies and engage in conversations
+- 🎯 **Targeted Campaigns** - Segment contacts by demographics
 
-> **Access**: Navigate to `/moderator` when logged in to manage community content
+> **Get Started**: Sign up at `/auth` and start sending messages in minutes
 
-For detailed moderator documentation, see [MODERATOR_PORTAL_DOCS.md](MODERATOR_PORTAL_DOCS.md)
+For API documentation and integration guides, see [API_DOCS.md](API_DOCS.md)
 
 ## Technology Stack
 
 - **Frontend**: React + TypeScript + Vite
 - **UI**: shadcn/ui + Tailwind CSS
-- **Backend**: Firebase (Firestore, Authentication, Cloud Functions)
+- **Backend**: Node.js + Express + Firebase
+- **Database**: PostgreSQL + Redis (caching)
+- **SMS/Voice**: Twilio API integration
 - **Routing**: React Router
 - **State**: TanStack Query
 

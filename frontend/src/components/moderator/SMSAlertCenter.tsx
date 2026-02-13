@@ -26,49 +26,48 @@ interface SMSAlert {
 
 const SMSAlertCenter = () => {
   const [message, setMessage] = useState("");
-  const [region, setRegion] = useState("");
-  const [urgency, setUrgency] = useState("normal");
+  const [contactGroup, setContactGroup] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [sentAlerts, setSentAlerts] = useState<
+  const [sentMessages, setSentMessages] = useState<
     Array<{
       id: string;
       message: string;
-      region: string;
+      group: string;
       count: number;
       timestamp: string;
     }>
   >([
     {
       id: "1",
-      message: "Heavy rainfall expected. Stay safe.",
-      region: "Region A",
+      message: "Special offer: 20% off on all products this weekend!",
+      group: "VIP Customers",
       count: 450,
       timestamp: "2 hours ago",
     },
     {
       id: "2",
-      message: "Market closed tomorrow for holiday.",
-      region: "All Regions",
+      message: "New products arriving next week. Stay tuned!",
+      group: "All Contacts",
       count: 1234,
       timestamp: "1 day ago",
     },
   ]);
 
-  const regions = [
-    { value: "all", label: "All Regions", count: 1234 },
-    { value: "region-a", label: "Region A", count: 450 },
-    { value: "region-b", label: "Region B", count: 380 },
-    { value: "region-c", label: "Region C", count: 404 },
+  const contactGroups = [
+    { value: "all", label: "All Contacts", count: 1234 },
+    { value: "vip", label: "VIP Customers", count: 450 },
+    { value: "regular", label: "Regular Customers", count: 380 },
+    { value: "new", label: "New Subscribers", count: 404 },
   ];
 
   const maxChars = 160;
   const charCount = message.length;
   const smsCount = Math.ceil(charCount / 160) || 1;
-  const selectedRegionData = regions.find((r) => r.value === region);
-  const recipientCount = selectedRegionData?.count || 0;
+  const selectedGroupData = contactGroups.find((g) => g.value === contactGroup);
+  const recipientCount = selectedGroupData?.count || 0;
 
   const handleSend = () => {
-    if (!message || !region) {
+    if (!message || !contactGroup) {
       alert("Please fill in all required fields");
       return;
     }
@@ -76,17 +75,16 @@ const SMSAlertCenter = () => {
   };
 
   const handleConfirmSend = () => {
-    const newAlert = {
+    const newMessage = {
       id: Date.now().toString(),
       message: message,
-      region: selectedRegionData?.label || region,
+      group: selectedGroupData?.label || contactGroup,
       count: recipientCount,
       timestamp: "Just now",
     };
-    setSentAlerts([newAlert, ...sentAlerts]);
+    setSentMessages([newMessage, ...sentMessages]);
     setMessage("");
-    setRegion("");
-    setUrgency("normal");
+    setContactGroup("");
     setShowConfirmation(false);
   };
 
@@ -96,10 +94,10 @@ const SMSAlertCenter = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold text-foreground">
-            SMS Alert Center
+            Send SMS Messages
           </h2>
           <p className="text-muted-foreground">
-            Send urgent notifications to users by region
+            Send messages to your customers and contacts
           </p>
         </div>
       </div>
@@ -109,14 +107,14 @@ const SMSAlertCenter = () => {
         <div className="space-y-6">
           <Card className="p-6 border border-border/50 backdrop-blur-sm bg-card/50">
             <h3 className="text-lg font-bold text-foreground mb-4">
-              Compose Alert
+              Compose Message
             </h3>
 
             <div className="space-y-4">
               {/* Message Input */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="message">Alert Message</Label>
+                  <Label htmlFor="message">Message</Label>
                   <span
                     className={`text-sm ${
                       charCount > maxChars
@@ -131,46 +129,28 @@ const SMSAlertCenter = () => {
                   id="message"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Type your urgent alert message here..."
+                  placeholder="Enter your message (promotions, updates, notifications, etc.)..."
                   rows={4}
                   className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Keep messages clear and concise. Avoid special characters.
+                  Keep messages clear and engaging. Longer messages cost more credits.
                 </p>
               </div>
 
-              {/* Region Selection */}
+              {/* Contact Group Selection */}
               <div className="space-y-2">
-                <Label htmlFor="region">Target Region</Label>
-                <Select value={region} onValueChange={setRegion}>
+                <Label htmlFor="contact-group">Recipients</Label>
+                <Select value={contactGroup} onValueChange={setContactGroup}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select target region" />
+                    <SelectValue placeholder="Select contact group" />
                   </SelectTrigger>
                   <SelectContent>
-                    {regions.map((reg) => (
-                      <SelectItem key={reg.value} value={reg.value}>
-                        {reg.label} ({reg.count} users)
+                    {contactGroups.map((group) => (
+                      <SelectItem key={group.value} value={group.value}>
+                        {group.label} ({group.count} contacts)
                       </SelectItem>
                     ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Urgency Level */}
-              <div className="space-y-2">
-                <Label htmlFor="urgency">Urgency Level</Label>
-                <Select value={urgency} onValueChange={setUrgency}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Low - General Notice</SelectItem>
-                    <SelectItem value="normal">Normal - Important</SelectItem>
-                    <SelectItem value="high">High - Urgent</SelectItem>
-                    <SelectItem value="critical">
-                      Critical - Emergency
-                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -180,11 +160,11 @@ const SMSAlertCenter = () => {
           {/* Send Button */}
           <Button
             onClick={handleSend}
-            disabled={!message || !region}
+            disabled={!message || !contactGroup}
             className="w-full gap-2 h-12 text-lg"
           >
             <Send className="w-5 h-5" />
-            Review & Send Alert
+            Review & Send
           </Button>
         </div>
 
@@ -192,16 +172,15 @@ const SMSAlertCenter = () => {
         <div className="space-y-6">
           {/* Confirmation Dialog */}
           {showConfirmation && (
-            <Card className="p-6 border-2 border-orange-500/50 backdrop-blur-sm bg-orange-500/10">
+            <Card className="p-6 border-2 border-primary/50 backdrop-blur-sm bg-primary/10">
               <div className="flex items-start gap-4 mb-4">
-                <AlertTriangle className="w-6 h-6 text-orange-600 flex-shrink-0" />
+                <Send className="w-6 h-6 text-primary flex-shrink-0" />
                 <div>
                   <h3 className="text-lg font-bold text-foreground mb-2">
-                    Confirm SMS Alert
+                    Confirm Send
                   </h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Please review the details before sending. This action cannot
-                    be undone.
+                    Please review the details before sending. Messages will be delivered immediately.
                   </p>
                 </div>
               </div>
@@ -218,10 +197,10 @@ const SMSAlertCenter = () => {
                 <div className="flex gap-6">
                   <div>
                     <span className="text-xs text-muted-foreground">
-                      Region:
+                      Group:
                     </span>
                     <p className="text-sm text-foreground font-medium">
-                      {selectedRegionData?.label}
+                      {selectedGroupData?.label}
                     </p>
                   </div>
                   <div>
@@ -238,7 +217,7 @@ const SMSAlertCenter = () => {
               <div className="flex gap-3">
                 <Button
                   onClick={handleConfirmSend}
-                  className="flex-1 gap-2 bg-orange-600 hover:bg-orange-700"
+                  className="flex-1 gap-2"
                 >
                   <CheckCircle className="w-4 h-4" />
                   Confirm & Send
@@ -254,32 +233,32 @@ const SMSAlertCenter = () => {
             </Card>
           )}
 
-          {/* Recent Alerts */}
+          {/* Recent Messages */}
           <Card className="p-6 border border-border/50 backdrop-blur-sm bg-card/50">
             <h3 className="text-lg font-bold text-foreground mb-4">
-              Recent Alerts Sent
+              Recent Messages
             </h3>
             <div className="space-y-3">
-              {sentAlerts.map((alert) => (
+              {sentMessages.map((msg) => (
                 <div
-                  key={alert.id}
+                  key={msg.id}
                   className="p-4 rounded-lg bg-background/50 border border-border/50 hover:border-primary/30 transition-colors"
                 >
                   <p className="text-sm text-foreground font-medium mb-2">
-                    "{alert.message}"
+                    "{msg.message}"
                   </p>
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <MapPin className="w-3 h-3" />
-                      {alert.region}
+                      {msg.group}
                     </span>
                     <span className="flex items-center gap-1">
                       <Users className="w-3 h-3" />
-                      {alert.count} users
+                      {msg.count} contacts
                     </span>
                     <span className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
-                      {alert.timestamp}
+                      {msg.timestamp}
                     </span>
                   </div>
                 </div>
@@ -287,20 +266,20 @@ const SMSAlertCenter = () => {
             </div>
           </Card>
 
-          {/* Warning Card */}
-          <Card className="p-6 border border-red-500/30 backdrop-blur-sm bg-red-500/10">
+          {/* Info Card */}
+          <Card className="p-6 border border-blue-500/30 backdrop-blur-sm bg-blue-500/10">
             <div className="flex items-start gap-4">
-              <AlertTriangle className="w-6 h-6 text-red-600 flex-shrink-0" />
+              <AlertTriangle className="w-6 h-6 text-blue-600 flex-shrink-0" />
               <div>
                 <h3 className="font-bold text-foreground mb-2">
-                  Important Guidelines
+                  Best Practices
                 </h3>
                 <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• SMS alerts are sent immediately and cannot be recalled</li>
-                  <li>• Always verify the message and target region</li>
-                  <li>• Use urgency levels appropriately to avoid alert fatigue</li>
-                  <li>• All alerts are logged and can be audited</li>
-                  <li>• Free SMS service - no sending costs</li>
+                  <li>• Messages are sent immediately and cannot be recalled</li>
+                  <li>• Always verify message content and recipient group</li>
+                  <li>• Keep messages concise and include clear call-to-action</li>
+                  <li>• All messages are logged for your records</li>
+                  <li>• SMS: $0.05/message • Voice: $0.15/minute</li>
                 </ul>
               </div>
             </div>
