@@ -266,7 +266,6 @@ const Dashboard = () => {
   const [campaignError, setCampaignError] = useState("");
   const [editingCampaignId, setEditingCampaignId] = useState<number | null>(null);
   const [lastLaunchResult, setLastLaunchResult] = useState<CampaignLaunchResult | null>(null);
-  const [showQuickTools, setShowQuickTools] = useState(false);
   const [showCampaignManager, setShowCampaignManager] = useState(false);
 
   const [contactForm, setContactForm] = useState({
@@ -1190,37 +1189,39 @@ const Dashboard = () => {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-2xl font-semibold text-black">Quick Voice & Campaign Tools</h2>
-            <p className="text-sm text-black/60">Open this section to send instant messages or launch bulk voice campaigns.</p>
+            <p className="text-sm text-black/60">Send instant messages or launch bulk voice campaigns.</p>
           </div>
-          <Button
-            onClick={() => setShowQuickTools((prev) => !prev)}
-            className="rounded-xl bg-black text-white hover:bg-black/90"
-          >
-            {showQuickTools ? "Hide Quick Tools" : "Open Quick Tools"}
-          </Button>
         </div>
       </div>
 
-      {showQuickTools ? (
-        <div className="grid gap-5 xl:grid-cols-2">
-          <div className="rounded-2xl border border-black/10 bg-[#efefef] p-6">
-            <h3 className="text-lg font-semibold text-black mb-4">Send Individual Messages</h3>
-            <p className="text-sm text-black/60 mb-4">Send SMS or voice calls to a single recipient with instant delivery</p>
-            <div className="bg-white rounded-xl p-4">
-              <MessageSender />
-            </div>
-          </div>
-          <div className="rounded-2xl border border-black/10 bg-[#efefef] p-6">
-            <h3 className="text-lg font-semibold text-black mb-4">Bulk Voice & SMS Campaigns</h3>
-            <p className="text-sm text-black/60 mb-4">Send message campaigns to multiple recipients with TTS, file upload, or text options</p>
-            <div className="bg-white rounded-xl p-4">
-              <VoiceCampaign />
-            </div>
+      <div className="grid gap-5 xl:grid-cols-2">
+        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-6">
+          <h3 className="text-lg font-semibold text-black mb-4">Send Individual Messages</h3>
+          <p className="text-sm text-black/60 mb-4">Send SMS or voice calls to a single recipient with instant delivery</p>
+          <div className="bg-white rounded-xl p-4">
+            <MessageSender />
           </div>
         </div>
-      ) : null}
+        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-6">
+          <h3 className="text-lg font-semibold text-black mb-4">Bulk Voice & SMS Campaigns</h3>
+          <p className="text-sm text-black/60 mb-4">Send message campaigns to multiple recipients with TTS, file upload, or text options</p>
+          <div className="bg-white rounded-xl p-4">
+            <VoiceCampaign
+              onCampaignStarted={() => {
+                setShowCampaignManager(true);
+                requestAnimationFrame(() => {
+                  document.getElementById('campaign-queue')?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                  });
+                });
+              }}
+            />
+          </div>
+        </div>
+      </div>
 
-      <div className="rounded-2xl border border-black/10 bg-[#efefef] p-5">
+      <div id="campaign-manager" className="rounded-2xl border border-black/10 bg-[#efefef] p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-2xl font-semibold text-black">Campaign Manager</h2>
@@ -1543,7 +1544,7 @@ const Dashboard = () => {
         </div>
 
         {/* Campaign Queue */}
-        <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
+        <div id="campaign-queue" className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
           <div className="flex items-center justify-between gap-3">
             <h3 className="text-2xl font-semibold text-black">Campaign Queue ({filteredCampaigns.length})</h3>
             <span className="rounded-lg border border-black/10 bg-white px-3 py-1 text-xs text-black/60">Sorted: active first</span>

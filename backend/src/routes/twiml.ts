@@ -4,6 +4,47 @@ import { Router, Request, Response } from 'express';
 
 const router = Router();
 
+const escapeXml = (value: string) =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+
+const toAbsoluteUrl = (req: Request, url: string) => {
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  if (url.startsWith('/')) {
+    return `${req.protocol}://${req.get('host')}${url}`;
+  }
+  return `${req.protocol}://${req.get('host')}/${url}`;
+};
+
+/**
+ * GET /api/twiml/play
+ * Play a hosted audio file via Twilio
+ */
+router.get('/play', (req: Request, res: Response) => {
+  const audioUrl = typeof req.query.audioUrl === 'string' ? req.query.audioUrl : '';
+
+  if (!audioUrl) {
+    return res.status(400).json({
+      success: false,
+      message: 'audioUrl is required',
+    });
+  }
+
+  const absoluteUrl = toAbsoluteUrl(req, audioUrl);
+  const twiml = `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Play>${escapeXml(absoluteUrl)}</Play>
+</Response>`;
+
+  res.type('text/xml').send(twiml);
+});
+
 /**
  * GET /api/twiml/main-menu
  * Main IVR menu with options
