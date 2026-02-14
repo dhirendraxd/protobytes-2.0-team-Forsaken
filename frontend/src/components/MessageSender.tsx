@@ -467,16 +467,19 @@ const MessageSender: React.FC = () => {
                       : '🎤 Generate Audio from Text'}
                   </Button>
 
-                  {/* TTS Progress */}
-                  {ttsProgress > 0 && ttsProgress < 100 && (
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-xs">
-                        <span>Generation Progress</span>
-                        <span>{ttsProgress}%</span>
+                  {/* TTS Progress - Prominent Visual Feedback */}
+                  {ttsProgress > 0 && (
+                    <div className="space-y-2 p-3 rounded-lg bg-yellow-50 border border-yellow-200">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <span className="text-sm font-medium text-yellow-900">⚙️ Generating Audio...</span>
+                          <p className="text-xs text-yellow-700 mt-1">Processing your text into speech (this may take a moment)</p>
+                        </div>
+                        <span className="text-lg font-bold text-yellow-900">{ttsProgress}%</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="w-full bg-yellow-200 rounded-full h-3">
                         <div
-                          className="bg-blue-600 h-2 rounded-full transition-all"
+                          className="bg-yellow-600 h-3 rounded-full transition-all duration-300"
                           style={{ width: `${ttsProgress}%` }}
                         />
                       </div>
@@ -484,7 +487,7 @@ const MessageSender: React.FC = () => {
                   )}
 
                   {/* Generated Audio Preview */}
-                  {generatedAudioUrl && (
+                  {generatedAudioUrl && ttsProgress === 100 && (
                     <div className="bg-green-50 border border-green-200 rounded p-3">
                       <p className="text-sm font-medium text-green-900 mb-2">✓ Audio Generated</p>
                       <audio
@@ -553,6 +556,13 @@ const MessageSender: React.FC = () => {
             </>
           )}
 
+          {/* Status Message for Audio Generation */}
+          {messageType === 'call' && voiceInputMethod === 'tts' && ttsProgress > 0 && ttsProgress < 100 && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-900">
+              📢 Audio is being generated... You can initiate the call now. We'll use the audio as soon as it's ready!
+            </div>
+          )}
+
           {/* Response Data */}
           {responseData && (
             <div className="bg-green-50 border border-green-200 rounded-lg p-4 space-y-2">
@@ -586,7 +596,7 @@ const MessageSender: React.FC = () => {
                 disabled={
                   loading ||
                   !phoneNumber ||
-                  (voiceInputMethod === 'tts' && !generatedAudioUrl) ||
+                  (voiceInputMethod === 'tts' && !generatedAudioUrl && ttsProgress === 0) ||
                   (voiceInputMethod === 'upload' && !voiceFile) ||
                   (voiceInputMethod === 'twiml' && !voiceUrl)
                 }
