@@ -26,8 +26,6 @@
 
 **Backend**: Node.js, Express, Firebase
 
-**Database**: PostgreSQL, Redis (caching)
-
 **Other Technologies**: Twilio API, React Router, TanStack Query, Firebase Authentication, Firestore
 
 ## Installation & Setup
@@ -63,15 +61,10 @@ Required variables:
 - `VITE_FIREBASE_MESSAGING_SENDER_ID`
 - `VITE_FIREBASE_APP_ID`
 
-## Demo Credentials (if applicable)
 
-**Username**: demo@example.com
+## Demo
 
-**Password**: demo123
-
-## Screenshots/Demo
-
-[Add screenshots or demo video link]
+[https://protobytes-2-0-team-forsaken.vercel.app/]
 
 ---
 
