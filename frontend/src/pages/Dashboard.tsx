@@ -3,8 +3,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { db } from "@/config/firebase";
 import { doc, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import { useLocation } from "react-router-dom";
+import MessageSender from "@/components/MessageSender";
+import VoiceCampaign from "@/components/VoiceCampaign";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -223,6 +226,7 @@ const menuFromPath = (pathname: string) => {
 
 const Dashboard = () => {
   const { signOut, user } = useAuth();
+  const { toast } = useToast();
   const location = useLocation();
 
   const initialStore = useMemo(readDashboardStore, []);
@@ -262,6 +266,8 @@ const Dashboard = () => {
   const [campaignError, setCampaignError] = useState("");
   const [editingCampaignId, setEditingCampaignId] = useState<number | null>(null);
   const [lastLaunchResult, setLastLaunchResult] = useState<CampaignLaunchResult | null>(null);
+  const [showQuickTools, setShowQuickTools] = useState(false);
+  const [showCampaignManager, setShowCampaignManager] = useState(false);
 
   const [contactForm, setContactForm] = useState({
     name: "",
@@ -530,7 +536,8 @@ const Dashboard = () => {
       ...prev,
       audience,
       name: prev.name || `${audience} Campaign`,
-      message: prev.message || CAMPAIGN_TEMPLATES[prev.category],
+      message:
+        prev.channel === "SMS" ? prev.message || CAMPAIGN_TEMPLATES[prev.category] : prev.message,
       schedule: prev.schedule || new Date().toISOString().slice(0, 16),
     }));
     setActiveMenu("campaigns");
@@ -649,8 +656,52 @@ const Dashboard = () => {
 
   const handleCreateCampaign = () => {
     setCampaignError("");
-    if (!campaignForm.name.trim() || !campaignForm.message.trim()) {
-      setCampaignError("Campaign name and message are required.");
+    if (!campaignForm.name.trim()) {
+      setCampaignError("Campaign name is required.");
+      return;
+    }
+
+    if (campaignForm.channel === "SMS" && !campaignForm.message.trim()) {
+      setCampaignError("SMS message is required.");
+      return;
+    }
+
+    if (campaignForm.channel === "Voice" && !campaignForm.info.trim() && !campaignForm.message.trim()) {
+      setCampaignError("Add a voice file or a voice script.");
+      return;
+    }
+
+    if (campaignForm.channel === "Email") {
+      if (!campaignForm.emailReceiver.trim()) {
+        setCampaignError("Recipient email is required for email campaigns.");
+        return;
+      }
+      if (!campaignForm.emailSubject.trim()) {
+        setCampaignError("Email subject is required.");
+        return;
+      }
+      if (!campaignForm.message.trim()) {
+        setCampaignError("Email body is required.");
+        return;
+      }
+    }
+
+    const normalizedInfo =
+      campaignForm.channel === "Email"
+        ? `To: ${campaignForm.emailReceiver.trim()} | Subject: ${campaignForm.emailSubject.trim()} | Images: ${campaignForm.emailImages.length} | Attachments: ${campaignForm.emailAttachments.length}`
+        : campaignForm.channel === "Voice"
+          ? campaignForm.info.trim()
+            ? `Voice file: ${campaignForm.info.trim()}`
+            : "Voice script only"
+          : campaignForm.info.trim();
+
+    const normalizedMessage =
+      campaignForm.channel === "Voice" && !campaignForm.message.trim()
+        ? "Voice message will be played to recipients."
+        : campaignForm.message.trim();
+
+    if (campaignForm.channel === "Email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(campaignForm.emailReceiver.trim())) {
+      setCampaignError("Recipient email format looks invalid.");
       return;
     }
 
@@ -668,8 +719,8 @@ const Dashboard = () => {
                 objective: campaignForm.objective,
                 frequency: campaignForm.frequency,
                 schedule: campaignForm.schedule || new Date().toISOString().slice(0, 16),
-                info: campaignForm.info.trim(),
-                message: campaignForm.message.trim(),
+                info: normalizedInfo,
+                message: normalizedMessage,
               }
             : c
         )
@@ -677,6 +728,10 @@ const Dashboard = () => {
       const campaign = campaigns.find((c) => c.id === editingCampaignId);
       if (campaign) {
         logActivity("Campaign updated", `${campaignForm.name.trim()} modified`);
+        toast({
+          title: "Campaign updated",
+          description: `${campaignForm.name.trim()} was updated successfully.`,
+        });
       }
       setEditingCampaignId(null);
     } else {
@@ -690,13 +745,17 @@ const Dashboard = () => {
         objective: campaignForm.objective,
         frequency: campaignForm.frequency,
         schedule: campaignForm.schedule || new Date().toISOString().slice(0, 16),
-        info: campaignForm.info.trim(),
-        message: campaignForm.message.trim(),
+        info: normalizedInfo,
+        message: normalizedMessage,
         status: campaignForm.schedule ? "Scheduled" : "Draft",
       };
 
       setCampaigns((prev) => [createdCampaign, ...prev]);
       logActivity("Campaign created", `${createdCampaign.name} (${createdCampaign.channel}, ${createdCampaign.category})`);
+      toast({
+        title: "Campaign saved",
+        description: `${createdCampaign.name} is ready (${createdCampaign.channel}).`,
+      });
     }
 
     setCampaignForm({
@@ -717,6 +776,10 @@ const Dashboard = () => {
   };
 
   const startEditCampaign = (campaign: Campaign) => {
+    const emailReceiverMatch = campaign.info.match(/To:\s*([^|]+)/i);
+    const emailSubjectMatch = campaign.info.match(/Subject:\s*([^|]+)/i);
+    const voiceFileName = campaign.info.replace(/^Voice file:\s*/i, "").trim();
+
     setEditingCampaignId(campaign.id);
     setCampaignForm({
       name: campaign.name,
@@ -726,10 +789,10 @@ const Dashboard = () => {
       objective: campaign.objective,
       frequency: campaign.frequency,
       schedule: campaign.schedule,
-      info: campaign.info,
+      info: campaign.channel === "Voice" ? voiceFileName : campaign.info,
       message: campaign.message,
-      emailSubject: "",
-      emailReceiver: "",
+      emailSubject: campaign.channel === "Email" ? (emailSubjectMatch?.[1] ?? "").trim() : "",
+      emailReceiver: campaign.channel === "Email" ? (emailReceiverMatch?.[1] ?? "").trim() : "",
       emailImages: [],
       emailAttachments: [],
     });
@@ -763,6 +826,10 @@ const Dashboard = () => {
       target.status === "Draft" ? "Scheduled" : target.status === "Scheduled" ? "Draft" : "Scheduled";
     setCampaigns((prev) => prev.map((c) => (c.id === id ? { ...c, status: nextStatus } : c)));
     logActivity("Campaign updated", `${target.name} moved to ${nextStatus}`);
+    toast({
+      title: "Campaign status updated",
+      description: `${target.name} moved to ${nextStatus}.`,
+    });
   };
 
   const runCampaignNow = (id: number) => {
@@ -773,6 +840,10 @@ const Dashboard = () => {
     const mockResult = buildMockLaunchResult(target);
     setLastLaunchResult(mockResult);
     logActivity("Campaign launched", `${target.name}: ${mockResult.delivered}/${mockResult.targeted} delivered`);
+    toast({
+      title: "Campaign completed",
+      description: `${target.name} done. Delivered ${mockResult.delivered}/${mockResult.targeted}, failed ${mockResult.failed}.`,
+    });
   };
 
   const removeCampaign = (id: number) => {
@@ -780,6 +851,10 @@ const Dashboard = () => {
     setCampaigns((prev) => prev.filter((c) => c.id !== id));
     if (target) {
       logActivity("Campaign removed", target.name);
+      toast({
+        title: "Campaign removed",
+        description: `${target.name} was removed.`,
+      });
     }
   };
 
@@ -1111,53 +1186,105 @@ const Dashboard = () => {
 
   const renderCampaigns = () => (
     <div className="space-y-5">
-      <SectionCards
-        title="Campaign Summary"
-        cards={[
-          { label: "Running Campaigns", value: `${analyticsStats.activeCount}`, note: "Live right now" },
-          { label: "Scheduled", value: `${campaigns.filter((c) => c.status === "Scheduled").length}`, note: "Queued by date/time" },
-          { label: "Drafts", value: `${campaigns.filter((c) => c.status === "Draft").length}`, note: "Needs scheduling" },
-        ]}
-      />
-
-      {lastLaunchResult ? (
-        <div className="rounded-2xl border border-lime-300 bg-lime-50 p-5">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm font-semibold text-black">Campaign Sent Successfully</p>
-              <p className="text-xs text-black/60">
-                {lastLaunchResult.campaignName} · {lastLaunchResult.channel} · {lastLaunchResult.launchedAt}
-              </p>
-            </div>
-            <button
-              onClick={() => setLastLaunchResult(null)}
-              className="rounded-lg border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:bg-black/5"
-            >
-              Dismiss
-            </button>
+      <div className="rounded-2xl border border-black/10 bg-[#efefef] p-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-2xl font-semibold text-black">Quick Voice & Campaign Tools</h2>
+            <p className="text-sm text-black/60">Open this section to send instant messages or launch bulk voice campaigns.</p>
           </div>
-          <div className="mt-3 grid gap-2 sm:grid-cols-4">
-            <div className="rounded-xl border border-black/10 bg-white p-3 text-xs text-black/70">
-              Targeted
-              <p className="mt-1 text-lg font-semibold text-black">{lastLaunchResult.targeted}</p>
+          <Button
+            onClick={() => setShowQuickTools((prev) => !prev)}
+            className="rounded-xl bg-black text-white hover:bg-black/90"
+          >
+            {showQuickTools ? "Hide Quick Tools" : "Open Quick Tools"}
+          </Button>
+        </div>
+      </div>
+
+      {showQuickTools ? (
+        <div className="grid gap-5 xl:grid-cols-2">
+          <div className="rounded-2xl border border-black/10 bg-[#efefef] p-6">
+            <h3 className="text-lg font-semibold text-black mb-4">Send Individual Messages</h3>
+            <p className="text-sm text-black/60 mb-4">Send SMS or voice calls to a single recipient with instant delivery</p>
+            <div className="bg-white rounded-xl p-4">
+              <MessageSender />
             </div>
-            <div className="rounded-xl border border-black/10 bg-white p-3 text-xs text-black/70">
-              Delivered
-              <p className="mt-1 text-lg font-semibold text-black">{lastLaunchResult.delivered}</p>
-            </div>
-            <div className="rounded-xl border border-black/10 bg-white p-3 text-xs text-black/70">
-              Failed
-              <p className="mt-1 text-lg font-semibold text-black">{lastLaunchResult.failed}</p>
-            </div>
-            <div className="rounded-xl border border-black/10 bg-white p-3 text-xs text-black/70">
-              Response Rate
-              <p className="mt-1 text-lg font-semibold text-black">{lastLaunchResult.responseRate}%</p>
+          </div>
+          <div className="rounded-2xl border border-black/10 bg-[#efefef] p-6">
+            <h3 className="text-lg font-semibold text-black mb-4">Bulk Voice & SMS Campaigns</h3>
+            <p className="text-sm text-black/60 mb-4">Send message campaigns to multiple recipients with TTS, file upload, or text options</p>
+            <div className="bg-white rounded-xl p-4">
+              <VoiceCampaign />
             </div>
           </div>
         </div>
       ) : null}
 
-      <div className="grid gap-4 xl:grid-cols-2">
+      <div className="rounded-2xl border border-black/10 bg-[#efefef] p-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-2xl font-semibold text-black">Campaign Manager</h2>
+            <p className="text-sm text-black/60">Create, schedule, and run campaigns only when you need this section.</p>
+          </div>
+          <Button
+            onClick={() => setShowCampaignManager((prev) => !prev)}
+            variant="outline"
+            className="rounded-xl border-black/20 bg-white text-black hover:bg-black/5"
+          >
+            {showCampaignManager ? "Hide Campaign Manager" : "Open Campaign Manager"}
+          </Button>
+        </div>
+      </div>
+
+      {showCampaignManager ? (
+        <>
+          <SectionCards
+            title="Campaign Summary"
+            cards={[
+              { label: "Running Campaigns", value: `${analyticsStats.activeCount}`, note: "Live right now" },
+              { label: "Scheduled", value: `${campaigns.filter((c) => c.status === "Scheduled").length}`, note: "Queued by date/time" },
+              { label: "Drafts", value: `${campaigns.filter((c) => c.status === "Draft").length}`, note: "Needs scheduling" },
+            ]}
+          />
+
+          {lastLaunchResult ? (
+            <div className="rounded-2xl border border-lime-300 bg-lime-50 p-5">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-black">Campaign Sent Successfully</p>
+                  <p className="text-xs text-black/60">
+                    {lastLaunchResult.campaignName} · {lastLaunchResult.channel} · {lastLaunchResult.launchedAt}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setLastLaunchResult(null)}
+                  className="rounded-lg border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:bg-black/5"
+                >
+                  Dismiss
+                </button>
+              </div>
+              <div className="mt-3 grid gap-2 sm:grid-cols-4">
+                <div className="rounded-xl border border-black/10 bg-white p-3 text-xs text-black/70">
+                  Targeted
+                  <p className="mt-1 text-lg font-semibold text-black">{lastLaunchResult.targeted}</p>
+                </div>
+                <div className="rounded-xl border border-black/10 bg-white p-3 text-xs text-black/70">
+                  Delivered
+                  <p className="mt-1 text-lg font-semibold text-black">{lastLaunchResult.delivered}</p>
+                </div>
+                <div className="rounded-xl border border-black/10 bg-white p-3 text-xs text-black/70">
+                  Failed
+                  <p className="mt-1 text-lg font-semibold text-black">{lastLaunchResult.failed}</p>
+                </div>
+                <div className="rounded-xl border border-black/10 bg-white p-3 text-xs text-black/70">
+                  Response Rate
+                  <p className="mt-1 text-lg font-semibold text-black">{lastLaunchResult.responseRate}%</p>
+                </div>
+              </div>
+            </div>
+          ) : null}
+
+          <div className="grid gap-4 xl:grid-cols-2">
         {/* Campaign Form */}
         <div className="rounded-2xl border border-black/10 bg-[#efefef] p-7">
           <h3 className="text-2xl font-semibold text-black">{editingCampaignId !== null ? "Edit Campaign" : "Create Campaign"}</h3>
@@ -1179,7 +1306,10 @@ const Dashboard = () => {
                     setCampaignForm((p) => ({
                       ...p,
                       category,
-                      message: p.message.trim() ? p.message : CAMPAIGN_TEMPLATES[category],
+                      message:
+                        p.channel === "SMS" && !p.message.trim()
+                          ? CAMPAIGN_TEMPLATES[category]
+                          : p.message,
                     }));
                   }}
                   className="h-12 w-full rounded-xl border border-black/15 bg-white px-4 text-base"
@@ -1213,7 +1343,18 @@ const Dashboard = () => {
                   {["SMS", "Voice", "Email"].map((type) => (
                     <button
                       key={type}
-                      onClick={() => setCampaignForm((p) => ({ ...p, channel: type as Campaign["channel"] }))}
+                      onClick={() => {
+                        const nextChannel = type as Campaign["channel"];
+                        setCampaignForm((p) => ({
+                          ...p,
+                          channel: nextChannel,
+                          message:
+                            nextChannel === "SMS" && !p.message.trim()
+                              ? CAMPAIGN_TEMPLATES[p.category]
+                              : p.message,
+                        }));
+                        setCampaignError("");
+                      }}
                       className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${
                         campaignForm.channel === type
                           ? "bg-black text-white shadow-md"
@@ -1241,17 +1382,37 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Conditional Media Type Input Fields */}
+            {/* Channel-specific input fields */}
             {campaignForm.channel === "SMS" && (
-              <div className="rounded-xl border border-blue-200 bg-blue-50 p-3">
-                <label className="text-sm font-semibold text-blue-900 block mb-2">SMS Content</label>
-                <p className="text-sm text-blue-700">Text message up to 160 characters</p>
+              <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 space-y-3">
+                <label className="text-sm font-semibold text-blue-900 block">SMS Message</label>
+                <input
+                  value={campaignForm.info}
+                  onChange={(e) => setCampaignForm((p) => ({ ...p, info: e.target.value }))}
+                  placeholder="Key info (offer code, short link, event location)"
+                  className="h-11 w-full rounded-lg border border-blue-200 bg-white px-4 text-base"
+                />
+                <textarea
+                  value={campaignForm.message}
+                  onChange={(e) => setCampaignForm((p) => ({ ...p, message: e.target.value }))}
+                  placeholder="Write SMS text (use {{name}} to personalize)"
+                  className="h-28 w-full rounded-lg border border-blue-200 bg-white px-4 py-3 text-base"
+                />
+                <div className="flex items-center justify-between gap-3 text-xs text-blue-700">
+                  <p>{campaignForm.message.length} / 160 characters</p>
+                  <button
+                    onClick={() => setCampaignForm((p) => ({ ...p, message: CAMPAIGN_TEMPLATES[p.category] }))}
+                    className="rounded-lg border border-blue-300 bg-white px-3 py-1.5 text-xs text-blue-700 hover:bg-blue-100"
+                  >
+                    Use Template
+                  </button>
+                </div>
               </div>
             )}
 
             {campaignForm.channel === "Voice" && (
-              <div className="rounded-xl border border-purple-200 bg-purple-50 p-3">
-                <label className="text-sm font-semibold text-purple-900 block mb-2">Voice Message</label>
+              <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 space-y-3">
+                <label className="text-sm font-semibold text-amber-900 block">Voice Message</label>
                 <input
                   type="file"
                   accept="audio/*,.mp3,.wav,.ogg"
@@ -1259,63 +1420,43 @@ const Dashboard = () => {
                     const fileName = e.target.files?.[0]?.name || "";
                     setCampaignForm((p) => ({ ...p, info: fileName }));
                   }}
-                  className="block w-full text-sm text-black/70 file:mr-3 file:rounded-lg file:border file:border-purple-300 file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium file:cursor-pointer hover:file:bg-purple-50"
+                  className="block w-full text-sm text-black/70 file:mr-3 file:rounded-lg file:border file:border-amber-300 file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium file:cursor-pointer hover:file:bg-amber-100"
                 />
-                {campaignForm.info && (
-                  <p className="mt-2 text-sm text-purple-700">Selected: {campaignForm.info}</p>
-                )}
+                <p className="text-xs text-amber-800">{campaignForm.info || "No file chosen"}</p>
+                <textarea
+                  value={campaignForm.message}
+                  onChange={(e) => setCampaignForm((p) => ({ ...p, message: e.target.value }))}
+                  placeholder="Optional voice script or call notes"
+                  className="h-24 w-full rounded-lg border border-amber-200 bg-white px-4 py-3 text-base"
+                />
               </div>
             )}
 
-
             {campaignForm.channel === "Email" && (
-              <div className="rounded-xl border border-green-200 bg-white p-0 overflow-hidden shadow-lg">
-                {/* Email Composer Header */}
-                <div className="bg-green-50 border-b border-green-200 px-4 py-3">
-                  <p className="text-sm font-semibold text-green-900">Email Composer</p>
-                </div>
-
-                {/* Email Form */}
-                <div className="space-y-0">
-                  {/* From/To Section */}
-                  <div className="border-b border-green-100 px-4 py-3 space-y-3">
-                    <div>
-                      <label className="text-sm font-semibold text-green-700 block mb-2">To (Recipient Email)</label>
-                      <input
-                        value={campaignForm.emailReceiver}
-                        onChange={(e) => setCampaignForm((p) => ({ ...p, emailReceiver: e.target.value }))}
-                        placeholder="recipient@example.com"
-                        type="email"
-                        className="w-full text-base border border-green-200 rounded-lg bg-white px-4 py-3 focus:outline-none focus:border-green-400"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Subject Section */}
-                  <div className="border-b border-green-100 px-4 py-3">
-                    <label className="text-sm font-semibold text-green-700 block mb-2">Subject</label>
-                    <input
-                      value={campaignForm.emailSubject}
-                      onChange={(e) => setCampaignForm((p) => ({ ...p, emailSubject: e.target.value }))}
-                      placeholder="Email subject line"
-                      className="w-full text-base border border-green-200 rounded-lg bg-white px-4 py-3 focus:outline-none focus:border-green-400"
-                    />
-                  </div>
-
-                  {/* Body Section */}
-                  <div className="border-b border-green-100 px-4 py-3">
-                    <label className="text-sm font-semibold text-green-700 block mb-2">Message Body</label>
-                    <textarea
-                      value={campaignForm.message}
-                      onChange={(e) => setCampaignForm((p) => ({ ...p, message: e.target.value }))}
-                      placeholder="Write your email content here... (You can use {{name}} to personalize)"
-                      className="w-full text-base border border-green-200 rounded-lg bg-white px-4 py-3 h-48 resize-none focus:outline-none focus:border-green-400"
-                    />
-                  </div>
-
-                  {/* Images Section */}
-                  <div className="border-b border-green-100 px-4 py-3">
-                    <label className="text-sm font-semibold text-green-700 block mb-2">Add Images</label>
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 space-y-3">
+                <label className="text-sm font-semibold text-emerald-900 block">Email Details</label>
+                <input
+                  type="email"
+                  value={campaignForm.emailReceiver}
+                  onChange={(e) => setCampaignForm((p) => ({ ...p, emailReceiver: e.target.value }))}
+                  placeholder="Recipient email (e.g., customer@example.com)"
+                  className="h-11 w-full rounded-lg border border-emerald-200 bg-white px-4 text-base"
+                />
+                <input
+                  value={campaignForm.emailSubject}
+                  onChange={(e) => setCampaignForm((p) => ({ ...p, emailSubject: e.target.value }))}
+                  placeholder="Email subject"
+                  className="h-11 w-full rounded-lg border border-emerald-200 bg-white px-4 text-base"
+                />
+                <textarea
+                  value={campaignForm.message}
+                  onChange={(e) => setCampaignForm((p) => ({ ...p, message: e.target.value }))}
+                  placeholder="Write email body (you can use {{name}})"
+                  className="h-28 w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-base"
+                />
+                <div className="grid gap-3 md:grid-cols-2">
+                  <div>
+                    <label className="text-xs text-emerald-700 block mb-1">Images</label>
                     <input
                       type="file"
                       multiple
@@ -1324,33 +1465,12 @@ const Dashboard = () => {
                         const files = Array.from(e.target.files || []).map((f) => f.name);
                         setCampaignForm((p) => ({ ...p, emailImages: files }));
                       }}
-                      className="block w-full text-sm text-black/70 file:mr-3 file:rounded-lg file:border file:border-green-300 file:bg-green-50 file:px-4 file:py-2 file:text-sm file:font-medium file:cursor-pointer hover:file:bg-green-100"
+                      className="block w-full text-sm text-black/70 file:mr-3 file:rounded-lg file:border file:border-emerald-300 file:bg-white file:px-3 file:py-2 file:text-sm file:font-medium file:cursor-pointer hover:file:bg-emerald-100"
                     />
-                    {campaignForm.emailImages.length > 0 && (
-                      <div className="mt-3 space-y-2">
-                        {campaignForm.emailImages.map((img, idx) => (
-                          <div key={idx} className="flex items-center justify-between bg-green-50 rounded-lg px-3 py-2">
-                            <span className="text-sm text-green-700">{img}</span>
-                            <button
-                              onClick={() =>
-                                setCampaignForm((p) => ({
-                                  ...p,
-                                  emailImages: p.emailImages.filter((_, i) => i !== idx),
-                                }))
-                              }
-                              className="text-red-600 hover:text-red-700 text-xs"
-                            >
-                              Remove
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    <p className="mt-1 text-xs text-emerald-700">{campaignForm.emailImages.length} file(s)</p>
                   </div>
-
-                  {/* Attachments Section */}
-                  <div className="border-b border-green-100 px-4 py-3">
-                    <label className="text-sm font-semibold text-green-700 block mb-2">Add Attachments</label>
+                  <div>
+                    <label className="text-xs text-emerald-700 block mb-1">Attachments</label>
                     <input
                       type="file"
                       multiple
@@ -1359,39 +1479,9 @@ const Dashboard = () => {
                         const files = Array.from(e.target.files || []).map((f) => f.name);
                         setCampaignForm((p) => ({ ...p, emailAttachments: files }));
                       }}
-                      className="block w-full text-sm text-black/70 file:mr-3 file:rounded-lg file:border file:border-green-300 file:bg-green-50 file:px-4 file:py-2 file:text-sm file:font-medium file:cursor-pointer hover:file:bg-green-100"
+                      className="block w-full text-sm text-black/70 file:mr-3 file:rounded-lg file:border file:border-emerald-300 file:bg-white file:px-3 file:py-2 file:text-sm file:font-medium file:cursor-pointer hover:file:bg-emerald-100"
                     />
-                    {campaignForm.emailAttachments.length > 0 && (
-                      <div className="mt-3 space-y-2">
-                        {campaignForm.emailAttachments.map((att, idx) => (
-                          <div key={idx} className="flex items-center justify-between bg-green-50 rounded-lg px-3 py-2">
-                            <span className="text-sm text-green-700">{att}</span>
-                            <button
-                              onClick={() =>
-                                setCampaignForm((p) => ({
-                                  ...p,
-                                  emailAttachments: p.emailAttachments.filter((_, i) => i !== idx),
-                                }))
-                              }
-                              className="text-red-600 hover:text-red-700 text-xs"
-                            >
-                              Remove
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Preview Section */}
-                  <div className="bg-green-50 border-t border-green-200 px-4 py-3">
-                    <p className="text-sm text-green-700 font-semibold">Email Summary</p>
-                    <div className="mt-2 text-sm text-green-800 space-y-1">
-                      <p><span className="font-medium">To:</span> {campaignForm.emailReceiver || "Not set"}</p>
-                      <p><span className="font-medium">Subject:</span> {campaignForm.emailSubject || "Not set"}</p>
-                      <p><span className="font-medium">Images:</span> {campaignForm.emailImages.length} file(s)</p>
-                      <p><span className="font-medium">Attachments:</span> {campaignForm.emailAttachments.length} file(s)</p>
-                    </div>
+                    <p className="mt-1 text-xs text-emerald-700">{campaignForm.emailAttachments.length} file(s)</p>
                   </div>
                 </div>
               </div>
@@ -1421,41 +1511,22 @@ const Dashboard = () => {
                 </select>
               </div>
             </div>
-            {campaignForm.channel === "SMS" && (
-              <>
-                <input
-                  value={campaignForm.info}
-                  onChange={(e) => setCampaignForm((p) => ({ ...p, info: e.target.value }))}
-                  placeholder="Key info (offer, link, event address)"
-                  className="h-12 w-full rounded-xl border border-black/15 bg-white px-4 text-base"
-                />
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => setCampaignForm((p) => ({ ...p, message: CAMPAIGN_TEMPLATES[p.category] }))}
-                    className="rounded-lg border border-black/15 bg-white px-4 py-2 text-sm text-black/70 hover:bg-black/5"
-                  >
-                    Use Template
-                  </button>
-                  <button
-                    onClick={() => setCampaignForm((p) => ({ ...p, schedule: new Date().toISOString().slice(0, 16) }))}
-                    className="rounded-lg border border-black/15 bg-white px-4 py-2 text-sm text-black/70 hover:bg-black/5"
-                  >
-                    Send Now
-                  </button>
-                </div>
-                <div>
-                  <label className="text-sm text-black/60 block mb-2">Message</label>
-                  <textarea
-                    value={campaignForm.message}
-                    onChange={(e) => setCampaignForm((p) => ({ ...p, message: e.target.value }))}
-                    placeholder="Use {{name}} to personalize. Under 160 chars for SMS."
-                    className="h-28 w-full rounded-xl border border-black/15 bg-white px-4 py-3 text-base"
-                  />
-                </div>
-              </>
-            )}
+            <button
+              onClick={() => setCampaignForm((p) => ({ ...p, schedule: new Date().toISOString().slice(0, 16) }))}
+              className="w-fit rounded-lg border border-black/15 bg-white px-4 py-2 text-sm text-black/70 hover:bg-black/5"
+            >
+              Send Now
+            </button>
             <div className="rounded-xl border border-black/10 bg-white px-4 py-3 text-sm text-black/60">
-              <span className="font-medium text-black">{campaignForm.category}</span> · <span className="font-medium text-black">{campaignForm.objective}</span> · <span className="font-medium text-black">{campaignForm.frequency}</span>
+              <p>
+                <span className="font-medium text-black">{campaignForm.category}</span> · <span className="font-medium text-black">{campaignForm.objective}</span> · <span className="font-medium text-black">{campaignForm.frequency}</span>
+              </p>
+              <p className="mt-1">
+                {campaignForm.channel === "SMS" && "SMS campaign"}
+                {campaignForm.channel === "Voice" && `Voice campaign · ${campaignForm.info || "No file chosen"}`}
+                {campaignForm.channel === "Email" &&
+                  `Email campaign · ${campaignForm.emailSubject || "No subject"}`}
+              </p>
             </div>
             {campaignError ? <p className="text-xs text-red-600">{campaignError}</p> : null}
             <div className="flex gap-2">
@@ -1563,7 +1634,9 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-      </div>
+          </div>
+        </>
+      ) : null}
     </div>
   );
 

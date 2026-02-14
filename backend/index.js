@@ -16,6 +16,7 @@ const transportRouter = require('./routes/transport');
 const authRouter = require('./routes/auth');
 const moderatorPortalRouter = require('./routes/moderator');
 const disastersRouter = require('./routes/disasters');
+const voiceRouter = require('./routes/voice');
 
 // Import middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -51,6 +52,7 @@ app.use('/api/market-prices', marketPricesRouter);
 app.use('/api/transport', transportRouter);
 app.use('/api/moderator-portal', moderatorPortalRouter);
 app.use('/api/disasters', disastersRouter);
+app.use('/api/voice', voiceRouter);
 
 // 404 handler
 app.use((req, res) => {

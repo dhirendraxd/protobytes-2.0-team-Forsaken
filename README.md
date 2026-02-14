@@ -1,62 +1,45 @@
 # VoiceLink Communication Platform
 
-A cloud-based SaaS platform that empowers SMEs and organizations to send SMS, voice messages, and automated communications to their customers effortlessly.
+## Team Information
 
-## Project Overview
+**Team Name**: Team Forsaken
 
-**VoiceLink** is your complete communication solution offering:
-- **SMS Campaigns** - Bulk SMS sending to unlimited contacts
-- **Voice Messages** - Automated voicemail delivery
-- **Contact Management** - Import and organize your customer database
-- **Analytics Dashboard** - Track delivery, engagement, and ROI
+**Team Members**:
+- Dhiren - dhiren@example.com - dhirendraxd
+- Ritendra - ritentam404@gmail.com - RitenTam
+- Shishir - shishirjoshi65@gmail.com - Shishirjoshi
+- Hitesh - hitesh18nayak@gmail.com - hitesh-nayak-58b6b7344
 
-## Features
+## Project Details
 
-### Core Platform Features
-- 📱 **Bulk SMS Sending** - Send personalized SMS to thousands at once
-- 🎤 **Voice Message Campaigns** - Upload audio or use text-to-speech
-- 📊 **Contact List Management** - Import CSV, organize by groups
-- 📈 **Real-time Analytics** - Track delivery status and engagement
-- 💰 **Pay-as-you-go Pricing** - No subscriptions, only pay for what you send
-- 🔒 **Secure & Reliable** - Enterprise-grade infrastructure
+**Project Title**: VoiceLink Communication Platform
 
-### Business Tools
-- 📝 **Message Templates** - Save and reuse common messages
-- ⏰ **Schedule Campaigns** - Send at optimal times
-- 👥 **Team Management** - Multiple users with role-based access
-- 🌍 **Multi-language Support** - Communicate in your customers' language
-- 📞 **Two-way SMS** - Receive replies and engage in conversations
-- 🎯 **Targeted Campaigns** - Segment contacts by demographics
+**Category**: [x] Open Innovation
 
-> **Get Started**: Sign up at `/auth` and start sending messages in minutes
+**Problem Statement**: SMEs and organizations lack affordable, easy-to-use communication platforms to reach their customers through multiple channels (SMS, voice calls). Current solutions are expensive, complex, and require technical expertise. VoiceLink solves this by providing a simple, pay-as-you-go platform for bulk communications with built-in analytics.
 
-For API documentation and integration guides, see [API_DOCS.md](API_DOCS.md)
+**Solution Overview**: VoiceLink is a cloud-based SaaS platform that empowers SMEs and organizations to send SMS, voice messages, and automated communications to their customers effortlessly. It offers bulk SMS sending, voice message campaigns, contact management, real-time analytics, team management, and multi-language support. Users can schedule campaigns, create message templates, receive two-way SMS, and segment contacts by demographics. With an intuitive dashboard and pay-as-you-go pricing model, VoiceLink makes professional communication accessible to businesses of all sizes.
 
-## Technology Stack
+## Technical Stack
 
-- **Frontend**: React + TypeScript + Vite
-- **UI**: shadcn/ui + Tailwind CSS
-- **Backend**: Node.js + Express + Firebase
-- **Database**: PostgreSQL + Redis (caching)
-- **SMS/Voice**: Twilio API integration
-- **Routing**: React Router
-- **State**: TanStack Query
+**Frontend**: React, TypeScript, Vite, shadcn/ui, Tailwind CSS
 
-## Getting Started
+**Backend**: Node.js, Express, Firebase
 
-### Prerequisites
+**Database**: PostgreSQL, Redis (caching)
 
-- Node.js & npm installed ([nvm recommended](https://github.com/nvm-sh/nvm))
-- Firebase account
+**Other Technologies**: Twilio API, React Router, TanStack Query, Firebase Authentication, Firestore
 
-### Installation
+## Installation & Setup
 
-```sh
+Step-by-step instructions to run your project:
+
+```bash
 # Clone the repository
-git clone <YOUR_GIT_URL>
+git clone https://github.com/dhirendraxd/protobytes-2.0-team-Forsaken.git
 
 # Navigate to project
-cd village-voice-hub
+cd protobytes-2.0-team-Forsaken
 
 # Install dependencies
 npm install
@@ -66,8 +49,6 @@ npm run dev
 ```
 
 ### Firebase Setup
-
-Use environment variables for Firebase in local and production:
 
 1. Go to [Firebase Console](https://console.firebase.google.com)
 2. Enable **Authentication** (Email/Password + Google if used)
@@ -82,51 +63,16 @@ Required variables:
 - `VITE_FIREBASE_MESSAGING_SENDER_ID`
 - `VITE_FIREBASE_APP_ID`
 
-### Vercel Deployment (Production)
+## Demo Credentials (if applicable)
 
-1. Import this repo in Vercel.
-2. Set **Root Directory** to project root (keep `vercel.json` in root).
-3. Add all `VITE_FIREBASE_*` variables in Vercel Project Settings -> Environment Variables.
-4. In Firebase Authentication -> Settings -> Authorized domains, add:
-- your Vercel domain (e.g. `your-app.vercel.app`)
-- any custom domain you attach
-5. Deploy.
+**Username**: demo@example.com
 
-## Available Scripts
+**Password**: demo123
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
+## Screenshots/Demo
 
-## Project Structure
-
-```
-src/
-├── components/      # Reusable UI components
-├── contexts/        # React contexts (Auth, etc.)
-├── hooks/          # Custom hooks
-├── lib/            # Utilities
-├── pages/          # Route components
-└── config/         # Configuration files
-```
-
-## IVR System
-
-When users call the hotline:
-- **Press 1**: Market prices
-- **Press 2**: Transport schedules  
-- **Press 3**: Local alerts
-- **Press 4**: Leave voice message
-
-## Contributing
-
-This is a community-driven project aimed at empowering rural communities. Contributions are welcome!
-
-## License
-
-MIT
+[Add screenshots or demo video link]
 
 ---
 
-Built with ❤️ for rural communities in Nepal
+Built with ❤️ by Team Forsakenin Nepal
