@@ -8,7 +8,7 @@
 - Dhiren - dhiren@example.com - dhirendraxd
 - Ritendra - ritentam404@gmail.com - RitenTam
 - Shishir - shishirjoshi65@gmail.com - Shishirjoshi
-- Hitesh - hitesh18nayak@gmail.com - hitesh-nayak-58b6b7344
+- Hitesh - hitesh18nayak@gmail.com - hitesh
 
 ## Project Details
 
@@ -68,4 +68,4 @@ Required variables:
 
 ---
 
-Built with ❤️ by Team Forsakenin Nepal
+Built with ❤️ by Team Forsaken in Nepal
