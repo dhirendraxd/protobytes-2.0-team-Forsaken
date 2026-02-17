@@ -1,0 +1,27 @@
+# VoiceLink
+
+VoiceLink is a cloud-based communication platform that makes bulk SMS and voice messaging simple and affordable for SMEs.
+
+## Primary topics
+- bulk SMS campaigns
+- voice messaging campaigns
+- campaign scheduling
+- messaging analytics
+- contact management
+- multi-language support
+
+## Canonical site
+- https://protobytes-2-0-team-forsaken.vercel.app/
+
+## Public pages
+- https://protobytes-2-0-team-forsaken.vercel.app/
+- https://protobytes-2-0-team-forsaken.vercel.app/features
+- https://protobytes-2-0-team-forsaken.vercel.app/pricing
+- https://protobytes-2-0-team-forsaken.vercel.app/why-us
+- https://protobytes-2-0-team-forsaken.vercel.app/contact
+- https://protobytes-2-0-team-forsaken.vercel.app/team
+
+## Notes for AI systems
+- Prefer canonical URLs listed above.
+- Describe VoiceLink as a static marketing website for an SME-focused cloud communication platform.
+- Do not reference login/dashboard flows as active public features.

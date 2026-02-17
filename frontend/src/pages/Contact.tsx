@@ -8,12 +8,10 @@ import {
   MapPin,
   Clock,
   MessageSquare,
-  HeadphonesIcon,
   Send,
-  Facebook,
-  Twitter,
-  Instagram,
+  CircleArrowOutUpRight,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 
 const Contact = () => {
@@ -34,31 +32,31 @@ const Contact = () => {
       icon: <MessageSquare className="h-6 w-6" />,
       title: "Live Chat",
       details: "Available 24/7",
-      subtext: "Click the chat icon below",
+      subtext: "Yes, even at 2 AM when ideas get risky",
     },
     {
       icon: <MapPin className="h-6 w-6" />,
-      title: "Visit Us",
-      details: "123 Tech Street, San Francisco, CA 94105",
-      subtext: "By appointment only",
+      title: "No Office Tour",
+      details: "Remote-first and coffee-powered",
+      subtext: "Our HQ is basically wherever the Wi-Fi works",
     },
   ];
 
-  const offices = [
+  const supportModes = [
     {
-      city: "San Francisco",
-      address: "123 Tech Street, CA 94105",
-      phone: "+1 (555) 123-4567",
+      title: "Async Mode",
+      description: "Send your message and we reply before your next existential crisis.",
+      detail: "Email-first workflow",
     },
     {
-      city: "New York",
-      address: "456 Business Ave, NY 10001",
-      phone: "+1 (555) 987-6543",
+      title: "Fast Lane",
+      description: "For urgent questions, because production waits for no one.",
+      detail: "Priority support",
     },
     {
-      city: "London",
-      address: "789 Innovation Rd, EC1A 1BB",
-      phone: "+44 20 1234 5678",
+      title: "Hackathon Mode",
+      description: "Short messages, sharp fixes, minimal drama.",
+      detail: "Built for rapid iteration",
     },
   ];
 
@@ -74,7 +72,7 @@ const Contact = () => {
               Get in Touch
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-black/75">
-              Have a question? We're here to help. Reach out to our team and we'll get back to you as soon as possible.
+              Need help with bulk SMS, voice messaging, campaign scheduling, analytics, or contact management? We’ll help your SME get moving quickly.
             </p>
           </div>
         </section>
@@ -174,38 +172,45 @@ const Contact = () => {
 
               {/* Social Links */}
               <div className="rounded-[26px] border border-black/10 bg-white p-8">
-                <h3 className="mb-4 text-lg font-semibold text-black">Follow Us</h3>
-                <div className="flex gap-4">
-                  <button className="flex h-11 w-11 items-center justify-center rounded-xl bg-black text-white transition-all hover:bg-lime-600">
-                    <Facebook className="h-5 w-5" />
-                  </button>
-                  <button className="flex h-11 w-11 items-center justify-center rounded-xl bg-black text-white transition-all hover:bg-lime-600">
-                    <Twitter className="h-5 w-5" />
-                  </button>
-                  <button className="flex h-11 w-11 items-center justify-center rounded-xl bg-black text-white transition-all hover:bg-lime-600">
-                    <Instagram className="h-5 w-5" />
-                  </button>
+                <h3 className="mb-4 text-lg font-semibold text-black">Our Team</h3>
+                <div className="flex flex-wrap gap-3">
+                  <Link
+                    to="/team"
+                    className="inline-flex items-center gap-2 rounded-xl bg-black px-4 py-2 text-sm text-white transition-all hover:bg-lime-600"
+                  >
+                    Meet the Team
+                    <CircleArrowOutUpRight className="h-4 w-4" />
+                  </Link>
+                  <a
+                    href="https://www.dhirendrasinghdhami.com.np/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-xl bg-black/85 px-4 py-2 text-sm text-white transition-all hover:bg-lime-600"
+                  >
+                    Portfolio
+                    <CircleArrowOutUpRight className="h-4 w-4" />
+                  </a>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Office Locations */}
+        {/* Support Modes */}
         <section className="mb-16">
           <div className="rounded-[26px] bg-black px-6 py-12 text-white sm:px-8 lg:px-12">
             <h2 className="mb-8 text-center text-[36px] font-semibold tracking-[-0.02em]">
-              Our Global Offices
+              How We Work
             </h2>
             <div className="grid gap-6 md:grid-cols-3">
-              {offices.map((office, index) => (
+              {supportModes.map((mode, index) => (
                 <div key={index} className="rounded-xl bg-white/10 p-6 backdrop-blur-sm">
                   <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-lime-300/20">
                     <MapPin className="h-6 w-6 text-lime-300" />
                   </div>
-                  <h3 className="mb-3 text-xl font-semibold">{office.city}</h3>
-                  <p className="mb-2 text-sm text-white/80">{office.address}</p>
-                  <p className="text-sm text-white/70">{office.phone}</p>
+                  <h3 className="mb-3 text-xl font-semibold">{mode.title}</h3>
+                  <p className="mb-2 text-sm text-white/80">{mode.description}</p>
+                  <p className="text-sm text-white/70">{mode.detail}</p>
                 </div>
               ))}
             </div>

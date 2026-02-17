@@ -24,7 +24,7 @@
   "voicelink": {
     "hero": {
       "title": "Connect with your Customers",
-      "description": "Send bulk SMS and voice messages instantly. Reach thousands of customers with personalized, automated communication."
+      "description": "VoiceLink is a cloud-based communication platform for SMEs. Send bulk SMS and voice messages with scheduling, analytics, contact management, and multi-language support."
     },
     "pricing": {
       "title": "Simple Pricing",
@@ -66,7 +66,7 @@
     },
     "why": {
       "title": "Why VoiceLink",
-      "subtitle": "The most trusted communication platform for SMEs and organizations in Nepal",
+      "subtitle": "A communication platform built for SMEs that want scale without the technical headache",
       "instantDelivery": "Instant Delivery",
       "instantDeliveryDesc": "Send messages to thousands instantly with 99.9% delivery guarantee",
       "expertSupport": "Expert Support",

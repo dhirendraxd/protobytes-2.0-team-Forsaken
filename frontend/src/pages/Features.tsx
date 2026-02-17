@@ -52,14 +52,14 @@ const Features = () => {
     {
       icon: <Shield className="w-8 h-8" />,
       title: "Enterprise Security",
-      description: "Bank-level encryption, secure API endpoints, and compliance with global messaging regulations.",
+      description: "Strong encryption, secure APIs, and compliance checks that don’t ruin your sprint velocity.",
       highlights: ["256-bit Encryption", "GDPR Compliant", "2FA Support"],
     },
   ];
 
   const additionalFeatures = [
-    { icon: <Zap className="w-5 h-5" />, title: "Lightning Fast Delivery", description: "99.9% delivery rate globally" },
-    { icon: <Globe className="w-5 h-5" />, title: "Global Coverage", description: "200+ countries supported" },
+    { icon: <Zap className="w-5 h-5" />, title: "Lightning Fast Delivery", description: "Fast enough to beat most coffee breaks" },
+    { icon: <Globe className="w-5 h-5" />, title: "Built to Scale", description: "Handles growth without dramatic plot twists" },
     { icon: <Smartphone className="w-5 h-5" />, title: "Mobile Apps", description: "iOS & Android available" },
     { icon: <HeadphonesIcon className="w-5 h-5" />, title: "24/7 Support", description: "Round-the-clock assistance" },
   ];
@@ -76,7 +76,7 @@ const Features = () => {
               Powerful Features
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-black/75">
-              Everything you need to communicate effectively with your customers through SMS and voice messaging
+              VoiceLink gives SMEs everything needed for bulk SMS and voice messaging: campaign scheduling, analytics, contact management, and multi-language communication.
             </p>
           </div>
         </section>
@@ -138,7 +138,7 @@ const Features = () => {
           <p className="mx-auto mt-3 max-w-[500px] text-black/70">
             Join thousands of businesses already using VoiceLink
           </p>
-          <Link to="/auth">
+          <Link to="/contact">
             <Button className="mt-6 h-11 rounded-xl bg-black px-8 text-sm text-white hover:bg-lime-600 transition-all">
               Start Free Trial
               <ArrowRight className="ml-2 h-4 w-4" />

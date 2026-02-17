@@ -15,7 +15,7 @@ const Footer = () => {
               <span className="text-xl font-bold">VoiceLink</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              Connecting rural communities with essential information through voice and web.
+              Simple cloud communication for SMEs with bulk SMS and voice messaging.
             </p>
           </div>
 

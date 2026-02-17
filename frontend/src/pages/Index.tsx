@@ -7,17 +7,12 @@ import {
   CircleArrowOutUpRight,
   Clock3,
   Headphones,
-  Facebook,
-  Twitter,
-  Instagram,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
-import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "react-i18next";
 
 const Index = () => {
-  const { user } = useAuth();
   const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-[#f3f3f3] relative overflow-hidden">
@@ -34,9 +29,9 @@ const Index = () => {
                 {t('voicelink.hero.description')}
               </p>
               <div className="mt-7 flex flex-wrap items-center gap-4">
-                <Link to={user ? "/dashboard" : "/auth"}>
+                <Link to="/contact">
                   <Button className="h-11 rounded-xl bg-black px-6 text-xs font-semibold text-white hover:bg-black/90 sm:text-sm">
-                    {user ? t('voicelink.cta.goToDashboard') : t('voicelink.cta.getStarted')}
+                    {t('voicelink.cta.getStarted')}
                   </Button>
                 </Link>
                 <a href="#" className="inline-flex items-center gap-1 text-xs font-medium text-black/85">
@@ -187,9 +182,9 @@ const Index = () => {
               <h2 className="max-w-[520px] text-[42px] font-semibold leading-[0.95] tracking-[-0.03em] sm:text-[52px] lg:text-[60px]">
                 {t('voicelink.cta.ready')}
               </h2>
-              <Link to={user ? "/dashboard" : "/auth"}>
+              <Link to="/contact">
                 <Button className="mt-6 h-11 rounded-xl bg-white px-6 text-xs font-semibold text-black hover:bg-white/90 sm:text-sm">
-                  {user ? t('voicelink.cta.goToDashboard') : t('voicelink.cta.getStarted')}
+                  {t('voicelink.cta.getStarted')}
                 </Button>
               </Link>
             </div>
@@ -259,8 +254,8 @@ const Index = () => {
               <h3 className="text-xl font-semibold text-black">{t('voicelink.pricing.starter.name')}</h3>
               <p className="mt-2 text-sm text-black/60">{t('voicelink.pricing.starter.desc')}</p>
               <p className="mt-4 text-4xl font-bold text-black">{t('voicelink.pricing.starter.price')}<span className="text-lg">/month</span></p>
-              <Link to="/auth">
-                <Button className="mt-6 w-full rounded-xl border border-black/10 text-black hover:bg-black/5">Get Started</Button>
+              <Link to="/contact">
+                <Button className="mt-6 w-full rounded-xl border border-black/10 text-black">Get Started</Button>
               </Link>
               <ul className="mt-6 space-y-3 text-sm">
                 <li className="flex items-center gap-2 text-black/70">✓ {t('voicelink.pricing.starter.feature1')}</li>
@@ -273,7 +268,7 @@ const Index = () => {
               <h3 className="text-xl font-semibold text-black">{t('voicelink.pricing.professional.name')}</h3>
               <p className="mt-2 text-sm text-black/60">{t('voicelink.pricing.professional.desc')}</p>
               <p className="mt-4 text-4xl font-bold text-black">{t('voicelink.pricing.professional.price')}<span className="text-lg">/month</span></p>
-              <Link to="/auth">
+              <Link to="/contact">
                 <Button className="mt-6 w-full rounded-xl bg-black text-white hover:bg-black/90">Get Started</Button>
               </Link>
               <ul className="mt-6 space-y-3 text-sm">
@@ -332,9 +327,9 @@ const Index = () => {
             {t('voicelink.cta.ready')}
           </h2>
           <p className="mx-auto mt-3 max-w-[500px] text-black/70">{t('voicelink.cta.subtitle')}</p>
-          <Link to={user ? "/dashboard" : "/auth"}>
+          <Link to="/contact">
             <Button className="mt-6 h-11 rounded-xl bg-black px-6 text-xs text-white hover:bg-black/90 sm:text-sm">
-              {user ? t('voicelink.cta.goToDashboard') : t('voicelink.cta.getStarted')}
+              {t('voicelink.cta.getStarted')}
             </Button>
           </Link>
         </section>
@@ -364,7 +359,11 @@ const Index = () => {
             <div>
               <h3 className="mb-4 text-sm font-semibold text-white">Company</h3>
               <ul className="space-y-2.5 text-sm text-white/60">
-                <li><a href="#" className="hover:text-white transition-colors">About</a></li>
+                <li>
+                  <Link to="/team" className="hover:text-white transition-colors">
+                    Our Team
+                  </Link>
+                </li>
                 <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Privacy</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Terms</a></li>
@@ -384,17 +383,15 @@ const Index = () => {
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
-              <div className="flex gap-4">
-                <a href="#" className="text-white/60 hover:text-white transition-colors">
-                  <Facebook className="h-5 w-5" />
-                </a>
-                <a href="#" className="text-white/60 hover:text-white transition-colors">
-                  <Twitter className="h-5 w-5" />
-                </a>
-                <a href="#" className="text-white/60 hover:text-white transition-colors">
-                  <Instagram className="h-5 w-5" />
-                </a>
-              </div>
+              <a
+                href="https://www.dhirendrasinghdhami.com.np/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2 text-sm text-white/90 transition-colors hover:bg-white/20"
+              >
+                Lead Portfolio
+                <CircleArrowOutUpRight className="h-4 w-4" />
+              </a>
             </div>
           </div>
         </footer>

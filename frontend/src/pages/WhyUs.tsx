@@ -21,7 +21,7 @@ const WhyUs = () => {
     {
       icon: <Zap className="w-8 h-8" />,
       title: "Lightning Fast Delivery",
-      description: "99.9% delivery rate with average message delivery in under 3 seconds globally. Our redundant infrastructure ensures your messages always reach their destination.",
+      description: "99.9% delivery rate with average delivery in under 3 seconds. Our infrastructure is redundantly over-prepared, just how hackathon teams like it.",
     },
     {
       icon: <Shield className="w-8 h-8" />,
@@ -30,8 +30,8 @@ const WhyUs = () => {
     },
     {
       icon: <Globe className="w-8 h-8" />,
-      title: "Global Coverage",
-      description: "Reach customers in 200+ countries with local number support and multi-language capabilities. Seamless international messaging at competitive rates.",
+      title: "Scalable Coverage",
+      description: "Built for multilingual communication and high-volume delivery without turning your dashboard into abstract art.",
     },
     {
       icon: <HeadphonesIcon className="w-8 h-8" />,
@@ -54,7 +54,7 @@ const WhyUs = () => {
     { number: "10M+", label: "Messages Delivered Daily" },
     { number: "15K+", label: "Active Businesses" },
     { number: "99.9%", label: "Uptime Guarantee" },
-    { number: "200+", label: "Countries Covered" },
+    { number: "24/7", label: "Support Hours" },
   ];
 
   const testimonials = [
@@ -90,7 +90,7 @@ const WhyUs = () => {
               Why Choose VoiceLink?
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-black/75">
-              Join thousands of businesses that trust VoiceLink for their mission-critical communications
+              VoiceLink helps SMEs run reliable bulk SMS and voice messaging campaigns with less setup, clear analytics, and scalable communication workflows.
             </p>
           </div>
         </section>
@@ -203,7 +203,7 @@ const WhyUs = () => {
           <p className="mx-auto mt-3 max-w-[500px] text-black/70">
             Join thousands of satisfied customers today
           </p>
-          <Link to="/auth">
+          <Link to="/contact">
             <Button className="mt-6 h-11 rounded-xl bg-black px-8 text-sm text-white hover:bg-lime-600 transition-all">
               Start Free Trial
               <ArrowRight className="ml-2 h-4 w-4" />

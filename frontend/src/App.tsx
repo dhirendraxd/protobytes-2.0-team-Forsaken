@@ -3,46 +3,21 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense } from "react";
 import RouteLoader from "@/components/RouteLoader";
-import { auth } from "@/config/firebase";
 import FloatingParticles from "@/components/FloatingParticles";
+import SeoMeta from "@/components/SeoMeta";
 
 // Lazy load pages
 const Index = lazy(() => import("./pages/Index"));
-const Auth = lazy(() => import("./pages/Auth"));
-const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Features = lazy(() => import("./pages/Features"));
 const Pricing = lazy(() => import("./pages/Pricing"));
 const WhyUs = lazy(() => import("./pages/WhyUs"));
 const Contact = lazy(() => import("./pages/Contact"));
+const Team = lazy(() => import("./pages/Team"));
 
 const queryClient = new QueryClient();
-
-// Protected Route wrapper
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    if (!auth) {
-      setIsAuthenticated(false);
-      return;
-    }
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setIsAuthenticated(!!user);
-    });
-
-    return unsubscribe;
-  }, []);
-
-  if (isAuthenticated === null) {
-    return <RouteLoader />;
-  }
-
-  return isAuthenticated ? <>{children}</> : <Navigate to="/auth" replace />;
-};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -52,83 +27,28 @@ const App = () => (
       <ErrorBoundary>
         <BrowserRouter>
           <FloatingParticles />
-          <AuthProvider>
-            <Suspense fallback={<RouteLoader />}>
-              <div className="relative z-10">
-                <Routes>
+          <SeoMeta />
+          <Suspense fallback={<RouteLoader />}>
+            <div className="relative z-10">
+              <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<Index />} />
-                <Route path="/auth" element={<Auth />} />
                 <Route path="/features" element={<Features />} />
                 <Route path="/pricing" element={<Pricing />} />
                 <Route path="/why-us" element={<WhyUs />} />
                 <Route path="/contact" element={<Contact />} />
-                
-                {/* Protected Routes */}
-                <Route
-                  path="/dashboard"
-                  element={
-                    <ProtectedRoute>
-                      <Dashboard />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/campaigns"
-                  element={
-                    <ProtectedRoute>
-                      <Dashboard />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/analytics"
-                  element={
-                    <ProtectedRoute>
-                      <Dashboard />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/contacts"
-                  element={
-                    <ProtectedRoute>
-                      <Dashboard />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/billing"
-                  element={
-                    <ProtectedRoute>
-                      <Dashboard />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/alerts"
-                  element={
-                    <ProtectedRoute>
-                      <Dashboard />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/settings"
-                  element={
-                    <ProtectedRoute>
-                      <Dashboard />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/moderation"
-                  element={
-                    <ProtectedRoute>
-                      <Dashboard />
-                    </ProtectedRoute>
-                  }
-                />
+                <Route path="/team" element={<Team />} />
+
+                {/* Legacy auth/dashboard paths redirected for static-mode */}
+                <Route path="/auth" element={<Navigate to="/" replace />} />
+                <Route path="/dashboard" element={<Navigate to="/" replace />} />
+                <Route path="/campaigns" element={<Navigate to="/" replace />} />
+                <Route path="/analytics" element={<Navigate to="/" replace />} />
+                <Route path="/contacts" element={<Navigate to="/" replace />} />
+                <Route path="/billing" element={<Navigate to="/" replace />} />
+                <Route path="/alerts" element={<Navigate to="/" replace />} />
+                <Route path="/settings" element={<Navigate to="/" replace />} />
+                <Route path="/moderation" element={<Navigate to="/" replace />} />
                 
                 {/* Fallback */}
                 <Route
@@ -145,10 +65,9 @@ const App = () => (
                     </div>
                   }
                 />
-                </Routes>
-              </div>
-            </Suspense>
-          </AuthProvider>
+              </Routes>
+            </div>
+          </Suspense>
         </BrowserRouter>
       </ErrorBoundary>
     </TooltipProvider>

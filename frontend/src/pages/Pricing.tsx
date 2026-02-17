@@ -83,7 +83,7 @@ const Pricing = () => {
               Simple Pricing
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-black/75">
-              Choose the perfect plan for your business. All plans include a 14-day free trial with no credit card required.
+              Affordable plans for SMEs using bulk SMS and voice messaging, with scheduling, analytics, and contact management built in.
             </p>
           </div>
         </section>
@@ -114,12 +114,14 @@ const Pricing = () => {
                   <span className="text-lg text-black/60">{plan.period}</span>
                 </div>
                 <p className="mb-6 text-sm text-black/70">{plan.description}</p>
-                <Link to="/auth">
+                <Link to="/contact">
                   <Button
                     className={`mb-6 h-11 w-full rounded-xl text-sm font-semibold transition-all ${
                       plan.highlighted
                         ? "bg-black text-white hover:bg-lime-600"
-                        : "bg-lime-300 text-black hover:bg-lime-400"
+                        : plan.name === "Starter"
+                          ? "bg-lime-300 text-black"
+                          : "bg-lime-300 text-black hover:bg-lime-400"
                     }`}
                   >
                     {plan.cta}
@@ -344,7 +346,7 @@ const Pricing = () => {
           <p className="mx-auto mt-3 max-w-[500px] text-black/70">
             No credit card required. Cancel anytime.
           </p>
-          <Link to="/auth">
+          <Link to="/contact">
             <Button className="mt-6 h-11 rounded-xl bg-black px-8 text-sm text-white hover:bg-lime-600 transition-all">
               Get Started Free
               <ArrowRight className="ml-2 h-4 w-4" />
