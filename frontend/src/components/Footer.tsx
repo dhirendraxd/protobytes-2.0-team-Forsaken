@@ -36,14 +36,14 @@ const Footer = () => {
             <h3 className="font-semibold text-foreground">Get Involved</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Become a Reporter
-                </a>
+                <Link to="/team" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  Meet the Team
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Submit Alert
-                </a>
+                <Link to="/contact" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  Contact Support
+                </Link>
               </li>
             </ul>
           </div>
@@ -55,12 +55,12 @@ const Footer = () => {
               © 2026 VoiceLink. All rights reserved.
             </p>
             <div className="flex gap-4">
-              <a href="#" className="text-xs text-muted-foreground hover:text-primary transition-colors">
+              <Link to="/contact" className="text-xs text-muted-foreground hover:text-primary transition-colors">
                 Privacy Policy
-              </a>
-              <a href="#" className="text-xs text-muted-foreground hover:text-primary transition-colors">
+              </Link>
+              <Link to="/contact" className="text-xs text-muted-foreground hover:text-primary transition-colors">
                 Terms of Service
-              </a>
+              </Link>
             </div>
           </div>
         </div>

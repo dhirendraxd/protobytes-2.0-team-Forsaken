@@ -34,10 +34,10 @@ const Index = () => {
                     {t('voicelink.cta.getStarted')}
                   </Button>
                 </Link>
-                <a href="#" className="inline-flex items-center gap-1 text-xs font-medium text-black/85">
+                <Link to="/features" className="inline-flex items-center gap-1 text-xs font-medium text-black/85">
                   See how it works
                   <ArrowRight className="h-3 w-3" />
-                </a>
+                </Link>
               </div>
             </div>
 
@@ -348,10 +348,10 @@ const Index = () => {
             <div>
               <h3 className="mb-4 text-sm font-semibold text-white">Resources</h3>
               <ul className="space-y-2.5 text-sm text-white/60">
-                <li><a href="#" className="hover:text-white transition-colors">Stocks & Founds</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Learn</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Help & Support</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
+                <li><Link to="/features" className="hover:text-white transition-colors">Features</Link></li>
+                <li><Link to="/why-us" className="hover:text-white transition-colors">Why Us</Link></li>
+                <li><Link to="/contact" className="hover:text-white transition-colors">Help & Support</Link></li>
+                <li><Link to="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
               </ul>
             </div>
 
@@ -364,9 +364,9 @@ const Index = () => {
                     Our Team
                   </Link>
                 </li>
-                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms</a></li>
+                <li><Link to="/contact" className="hover:text-white transition-colors">Careers</Link></li>
+                <li><Link to="/contact" className="hover:text-white transition-colors">Privacy</Link></li>
+                <li><Link to="/contact" className="hover:text-white transition-colors">Terms</Link></li>
               </ul>
             </div>
 
